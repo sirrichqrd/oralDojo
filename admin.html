@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ORAL DOJO — Admin Console</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{ --bg:#FAF8F5; --card:#FFFFFF; --ink:#1A1A1A; --muted:#8A8A86; --teal:#14B8A6; --teal-dark:#0F766E; --yellow:#FFD93D; --orange:#FF8C42; }
+*{font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif}
+h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
+.glass{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,0.78);border:1px solid rgba(255,255,255,0.6)}
+.belt-shadow{box-shadow:0 12px 24px -6px rgba(0,0,0,0.12),0 4px 12px -2px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.8)}
+.press:active{transform:scale(0.97)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+#toast{animation:toastIn .28s ease}
+</style>
+</head>
+<body class="min-h-screen w-full bg-[#FAF8F5] text-[#1A1A1A] selection:bg-[#FFD93D]/30">
+<div id="app" class="relative z-10"></div>
+
+<script src="dojo-data.js"></script>
+<script type="module">
+// ORAL DOJO — ADMIN CONSOLE (standalone)
+// Feeds the dojo: questions, research, dictionary, library, settings.
+// Publishes changes via catalog.json into the dojo root folder.
+// The dojo app NEVER links here — open this file directly.
+await DojoData.init();
+
+let belts=[], questions={}, research=[], dictionary=[], library=[], settings={};
+function refreshData(){
+  const c=DojoData.getCatalog();
+  belts=c.belts||[]; questions={};
+  (c.questions||[]).forEach(q=>{ (questions[q.belt]=questions[q.belt]||[]).push(q); });
+  research=c.research||[]; dictionary=c.dictionary||[]; library=c.library||[]; settings=c.settings||{};
+}
+refreshData();
+
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+let toastTimer=null;
+function showToast(msg){
+  const oldT=document.getElementById('toast'); if(oldT) oldT.remove();
+  const el=document.createElement('div');
+  el.id='toast';
+  el.className='fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] bg-black text-white text-[13px] font-bold px-5 py-3 rounded-full shadow-2xl border border-[#FFD93D]/30 flex items-center gap-2';
+  el.innerHTML='<span>⚙️</span><span>'+msg+'</span>';
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.remove(),2800);
+}
+
+const arm=(btn,fn)=>{
+  if(btn.dataset.armed==='1'){ fn(); return; }
+  btn.dataset.armed='1'; const old=btn.innerHTML; btn.innerHTML='Sure?';
+  setTimeout(()=>{ if(btn.isConnected){btn.innerHTML=old; btn.dataset.armed='';} },2600);
+};
+
+const app=document.getElementById('app');
+let state={
+  authed: sessionStorage.getItem('oralDojo_admin_auth')==='1',
+  tab:'questions',
+  form:null,
+  qBelt:'all',
+};
+
+function render(){
+  try{ renderApp(); }
+  catch(e){
+    console.error('Admin render failed:', e);
+    DojoData.discardDraft().then(()=>{ refreshData(); try{ renderApp(); }catch(e2){ document.getElementById('app').innerHTML='<div style="padding:48px 24px;text-align:center;font-family:sans-serif;font-weight:700">Data error — please reload the page.</div>'; } });
+  }
+}
+
+function renderApp(){
+  const srcLabel=DojoData.getSource();
+  const cat=DojoData.getCatalog();
+  let body='';
+  if(!state.authed){
+    body=`
+    <div class="max-w-[460px] mx-auto px-4 py-10 lg:py-16">
+      <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-7 text-center">
+        <div class="w-16 h-16 mx-auto rounded-full bg-[#F5F0FF] border border-[#8E44AD]/20 flex items-center justify-center text-[30px]">⚙️</div>
+        <h2 class="fredoka text-[24px] font-bold mt-4">Admin Console</h2>
+        <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">The management console for the whole dojo — feed questions, research, dictionary and library, tune settings, and publish catalog.json for every device.</p>
+        <form id="pinForm" class="mt-5 space-y-2">
+          <input id="pinInput" type="password" inputmode="numeric" autocomplete="off" placeholder="Admin PIN" class="w-full h-12 rounded-2xl border-2 border-black/10 px-4 font-semibold text-[16px] tracking-widest text-center focus:border-black outline-none">
+          <button type="submit" class="w-full h-[50px] rounded-full bg-black text-white font-bold fredoka text-[15px] press">Unlock Console →</button>
+        </form>
+        <p class="text-[11px] font-bold tracking-widest text-black/30 mt-4">DEFAULT PIN: 1234 — CHANGE IT IN SETTINGS</p>
+      </div>
+    </div>`;
+  } else {
+    const tabDefs=[['questions','❓ Questions'],['research','📚 Research'],['dictionary','🔤 Dictionary'],['library','🗂️ Library'],['settings','⚙️ Settings']];
+    const tabBar=`<div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">${tabDefs.map(t=>`<button data-atab="${t[0]}" class="aTab shrink-0 h-10 px-4 rounded-full text-[12px] font-bold border ${state.tab===t[0]?'bg-black text-white border-black':'bg-white border-black/10'}">${t[1]}</button>`).join('')}</div>`;
+    body=tabBar+`<div class="mt-4">${(panels[state.tab]||qPanel)()}</div>`;
+  }
+  app.innerHTML=`<div class="min-h-screen">
+    <header class="sticky top-0 z-30 glass border-b border-black/[0.06]">
+      <div class="max-w-[1100px] mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-black fredoka text-[17px]">道</div>
+          <div><div class="fredoka font-bold leading-none text-[14px]">ORAL DOJO — ADMIN CONSOLE</div><div class="text-[11px] font-semibold text-black/50 tracking-wide">FEED THE DOJO • MANAGE • PUBLISH</div></div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[11px] font-bold tracking-widest bg-[#FAF8F5] border px-3 py-1.5 rounded-full max-w-[260px] truncate" title="${esc(srcLabel)}">DATA: ${esc(srcLabel)}</span>
+          <span class="text-[11px] font-bold tracking-widest bg-[#FFF8D6] border border-[#FFD93D]/40 px-3 py-1.5 rounded-full">CATALOG v${esc(cat.version)}</span>
+          ${state.authed?'<button id="adExport" class="h-9 px-4 rounded-full bg-black text-[#FFD93D] text-[12px] font-black flex items-center gap-1.5 press">⬇ Export catalog.json</button>':''}
+          <a href="oralDojo.html" target="_blank" rel="noopener" class="h-9 px-4 rounded-full bg-white border text-[12px] font-bold flex items-center gap-1.5 press">Open Dojo ↗</a>
+          ${state.authed?'<button id="adLock" class="h-9 px-3 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/30 text-[#9A1A1A] text-[12px] font-bold press">🔒 Lock</button>':''}
+        </div>
+      </div>
+    </header>
+    <div class="max-w-[1100px] mx-auto px-4 py-6">${body}</div>
+  </div>`;
+
+  document.getElementById('adExport')?.addEventListener('click',doExport);
+  document.getElementById('adLock')?.addEventListener('click',()=>{
+    sessionStorage.removeItem('oralDojo_admin_auth');
+    state.authed=false; state.tab='questions'; state.form=null;
+    render(); showToast('Console locked — OSS!');
+  });
+  if(!state.authed){
+    document.getElementById('pinForm').onsubmit=e=>{
+      e.preventDefault();
+      const val=document.getElementById('pinInput').value.trim();
+      if(val===String(settings.adminPin||'1234')){
+        state.authed=true; sessionStorage.setItem('oralDojo_admin_auth','1');
+        render(); showToast('Welcome, Sensei — console unlocked');
+      } else showToast('Wrong PIN — try again');
+    };
+  } else {
+    document.querySelectorAll('.aTab').forEach(b=>b.onclick=()=>{state.tab=b.dataset.atab; state.form=null; render();});
+    if(state.tab==='questions') bindQ();
+    else if(state.tab==='research') bindR();
+    else if(state.tab==='dictionary') bindD();
+    else if(state.tab==='library') bindL();
+    else bindS();
+  }
+}
+
+function doExport(){
+  const data=DojoData.exportCatalog();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='catalog.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),3000);
+  showToast('catalog.json exported (v'+data.version+') — place it in the dojo root folder');
+}
+
+// ---------- QUESTIONS ----------
+const adminQForm=(item)=>{
+  const v=item||{belt:(state.qBelt!=='all'?parseInt(state.qBelt,10):0),type:'mcq'};
+  return `
+  <div class="mt-4 bg-white rounded-[24px] border-2 border-[#14B8A6]/40 p-5">
+    <h3 class="fredoka font-bold text-[16px]">${item?'Edit Question':'New Question'}</h3>
+    <input type="hidden" id="aQFId" value="${esc(v.id||'')}">
+    <div class="mt-3 grid sm:grid-cols-3 gap-3">
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">BELT</label>
+        <select id="aQFBelt" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[13px] focus:border-black outline-none">${belts.map(b=>`<option value="${b.id}" ${String(v.belt)===String(b.id)?'selected':''}>${b.short} • ${b.from} → ${b.to}</option>`).join('')}</select></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TYPE</label>
+        <select id="aQFType" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[13px] focus:border-black outline-none">${['mcq','tf','fill','scenario'].map(t=>`<option value="${t}" ${v.type===t?'selected':''}>${t.toUpperCase()}</option>`).join('')}</select></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TOPIC</label>
+        <input id="aQFTopic" value="${esc(v.topic||'')}" placeholder="e.g. Tradition • Osu" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+    </div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">QUESTION</label>
+      <textarea id="aQFQ" rows="2" class="mt-1 w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none">${esc(v.q||'')}</textarea></div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">OPTIONS</label>
+      <div id="aQFOpts" class="mt-1 space-y-2"></div></div>
+    <div class="mt-3 grid sm:grid-cols-[160px_1fr] gap-3">
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">CORRECT</label>
+        <select id="aQFAns" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[13px] focus:border-black outline-none"></select></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">WHY IS IT CORRECT? (EXPLANATION)</label>
+        <textarea id="aQFEx" rows="2" class="mt-1 w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none">${esc(v.explanation||'')}</textarea></div>
+    </div>
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <button id="aQSave" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Question</button>
+      <button id="aQCancel" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button>
+    </div>
+  </div>`;
+};
+const qPanel=()=>{
+  const allQ=DojoData.getQuestions();
+  const form=state.form&&state.form.kind==='q'?adminQForm(state.form.item):'';
+  const filtered=(state.qBelt==='all'?allQ:allQ.filter(q=>q.belt===parseInt(state.qBelt,10))).slice().sort((a,b)=>a.belt-b.belt||String(a.id).localeCompare(String(b.id)));
+  return `
+  <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+    <select id="aQBeltFilter" class="h-11 rounded-2xl border-2 border-black/10 bg-white px-3 font-semibold text-[13px] focus:border-black outline-none flex-1">
+      <option value="all" ${state.qBelt==='all'?'selected':''}>All belts (${allQ.length})</option>
+      ${belts.map(b=>`<option value="${b.id}" ${String(state.qBelt)===String(b.id)?'selected':''}>${b.short} • ${b.from} → ${b.to} (${(questions[b.id]||[]).length})</option>`).join('')}
+    </select>
+    <button id="aQAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press shrink-0">+ Add Question</button>
+  </div>
+  ${form}
+  <div class="mt-4 space-y-2">
+    ${filtered.map(q=>`
+    <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
+      <span class="text-[10px] font-black tracking-widest px-2 py-1 rounded-full bg-[#FAF8F5] border shrink-0">${esc((belts.find(b=>b.id===q.belt)||{}).short||('Belt '+q.belt))}</span>
+      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(q.q)}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(q.topic)} • ${String(q.type).toUpperCase()} • ${q.options.length} options</div></div>
+      <button data-qedit="${esc(q.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press" title="Edit">✎</button>
+      <button data-qdel="${esc(q.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press" title="Delete">🗑</button>
+    </div>`).join('')||'<div class="bg-white rounded-2xl border-2 border-dashed border-black/10 p-6 text-center text-[13px] font-bold text-black/40">No questions for this belt yet.</div>'}
+  </div>`;
+};
+// ---------- RESEARCH ----------
+const adminRForm=(item)=>{
+  const v=item||{};
+  return `
+  <div class="mt-4 bg-white rounded-[24px] border-2 border-[#14B8A6]/40 p-5">
+    <h3 class="fredoka font-bold text-[16px]">${item?'Edit Research':'New Research'}</h3>
+    <input type="hidden" id="aRId" value="${esc(v.id||'')}">
+    <div class="mt-3 grid sm:grid-cols-2 gap-3">
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TITLE</label><input id="aRTitle" value="${esc(v.title||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">AUTHOR</label><input id="aRAuthor" value="${esc(v.author||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">RANK</label><input id="aRRank" value="${esc(v.rank||'')}" placeholder="e.g. Nidan" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TAG</label><input id="aRTag" value="${esc(v.tag||'')}" placeholder="e.g. Research" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+    </div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">EXCERPT</label><textarea id="aRExcerpt" rows="3" class="mt-1 w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none">${esc(v.excerpt||'')}</textarea></div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">LIKES</label><input id="aRLikes" type="number" min="0" value="${esc(v.likes!=null?v.likes:0)}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <button id="aRSave" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Research</button>
+      <button id="aRCancel" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button>
+    </div>
+  </div>`;
+};
+const rPanel=()=>{
+  const form=state.form&&state.form.kind==='res'?adminRForm(state.form.item):'';
+  return `
+  <div class="flex justify-end"><button id="aRAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press">+ Add Research</button></div>
+  ${form}
+  <div class="mt-4 space-y-2">
+    ${research.map(r=>`
+    <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
+      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(r.title)}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(r.author)} • ${esc(r.rank)} • ${esc(r.tag)} • ❤️ ${r.likes}</div></div>
+      <button data-redit="${esc(r.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press">✎</button>
+      <button data-rdel="${esc(r.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press">🗑</button>
+    </div>`).join('')}
+  </div>`;
+};
+// ---------- DICTIONARY ----------
+const adminDForm=(item)=>{
+  const v=item||{};
+  return `
+  <div class="mt-4 bg-white rounded-[24px] border-2 border-[#14B8A6]/40 p-5">
+    <h3 class="fredoka font-bold text-[16px]">${item?'Edit Term':'New Term'}</h3>
+    <input type="hidden" id="aDId" value="${esc(v.id||'')}">
+    <div class="mt-3 grid sm:grid-cols-3 gap-3">
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TERM *</label><input id="aDTerm" value="${esc(v.term||'')}" placeholder="e.g. Zanshin" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">READING (OPTIONAL)</label><input id="aDReading" value="${esc(v.reading||'')}" placeholder="zahn-sheen" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">CATEGORY</label><input id="aDCat" list="dCats" value="${esc(v.category||'')}" placeholder="e.g. Concepts" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none">
+      <datalist id="dCats">${Array.from(new Set(DojoData.getDictionary().map(d=>d.category))).map(c=>`<option value="${esc(c)}">`).join('')}</datalist></div>
+    </div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">DEFINITION *</label><textarea id="aDDef" rows="2" class="mt-1 w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none">${esc(v.definition||'')}</textarea></div>
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <button id="aDSave" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Term</button>
+      <button id="aDCancel" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button>
+    </div>
+  </div>`;
+};
+const dPanel=()=>{
+  const all=DojoData.getDictionary();
+  const form=state.form&&state.form.kind==='dict'?adminDForm(state.form.item):'';
+  return `
+  <div class="flex justify-end"><button id="aDAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press">+ Add Term</button></div>
+  ${form}
+  <div class="mt-4 space-y-2">
+    ${all.map(d=>`
+    <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
+      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(d.term)}${d.reading?` <span class="text-black/40 font-semibold">(${esc(d.reading)})</span>`:''}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(d.category)}</div><div class="text-[12px] text-black/60 mt-1 leading-snug">${esc(d.definition)}</div></div>
+      <button data-dedit="${esc(d.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press">✎</button>
+      <button data-ddel="${esc(d.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press">🗑</button>
+    </div>`).join('')}
+  </div>`;
+};
+// ---------- LIBRARY ----------
+const adminLForm=(item)=>{
+  const v=item||{};
+  return `
+  <div class="mt-4 bg-white rounded-[24px] border-2 border-[#14B8A6]/40 p-5">
+    <h3 class="fredoka font-bold text-[16px]">${item?'Edit Resource':'New Resource'}</h3>
+    <input type="hidden" id="aLId" value="${esc(v.id||'')}">
+    <div class="mt-3 grid sm:grid-cols-2 gap-3">
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TITLE *</label><input id="aLTitle" value="${esc(v.title||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">AUTHOR</label><input id="aLAuthor" value="${esc(v.author||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TYPE</label><select id="aLType" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[13px] focus:border-black outline-none">${['Book','Reference','Article','Video','Link'].map(t=>`<option value="${t}" ${v.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">CATEGORY</label><input id="aLCat" value="${esc(v.category||'')}" placeholder="e.g. Philosophy" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+    </div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">DESCRIPTION *</label><textarea id="aLDesc" rows="2" class="mt-1 w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none">${esc(v.description||'')}</textarea></div>
+    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">URL (OPTIONAL)</label><input id="aLUrl" value="${esc(v.url||'')}" placeholder="https://..." class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <button id="aLSave" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Resource</button>
+      <button id="aLCancel" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button>
+    </div>
+  </div>`;
+};
+const lPanel=()=>{
+  const all=DojoData.getLibrary();
+  const form=state.form&&state.form.kind==='lib'?adminLForm(state.form.item):'';
+  return `
+  <div class="flex justify-end"><button id="aLAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press">+ Add Resource</button></div>
+  ${form}
+  <div class="mt-4 space-y-2">
+    ${all.map(l=>`
+    <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
+      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(l.title)}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(l.author||'')} • ${esc(l.type)} • ${esc(l.category)}</div><div class="text-[12px] text-black/60 mt-1 leading-snug">${esc(l.description)}</div></div>
+      <button data-ledit="${esc(l.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press">✎</button>
+      <button data-ldel="${esc(l.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press">🗑</button>
+    </div>`).join('')}
+  </div>`;
+};
+// ---------- SETTINGS ----------
+const sPanel=()=>{
+  const srcLabel=DojoData.getSource();
+  const cat=DojoData.getCatalog();
+  const counts=`${DojoData.getQuestions().length} questions • ${research.length} research • ${DojoData.getDictionary().length} dictionary terms • ${DojoData.getLibrary().length} library items • ${belts.length} belts`;
+  return `
+  <div class="grid lg:grid-cols-2 gap-4">
+    <div class="bg-white rounded-[24px] border border-black/5 p-5">
+      <h3 class="fredoka font-bold text-[16px]">📡 Data Source</h3>
+      <p class="text-[13px] font-medium mt-2 leading-relaxed ${srcLabel.indexOf('global')>=0?'text-[#0A7A42]':'text-[#8A6D00]'}">${esc(srcLabel)}</p>
+      <p class="text-[12px] text-black/50 font-medium mt-1">Catalog v${esc(cat.version)} • updated ${esc(cat.updatedAt||'—')}</p>
+      <div class="mt-3 bg-[#FAF8F5] rounded-2xl p-3 border border-black/5 text-[12px] font-medium text-black/60 leading-relaxed">${esc(counts)}</div>
+    </div>
+    <div class="bg-white rounded-[24px] border border-black/5 p-5">
+      <h3 class="fredoka font-bold text-[16px]">🤙 Dojo Contact &amp; Access</h3>
+      <div class="mt-3 space-y-3">
+        <div><label class="text-[11px] font-black tracking-widest text-black/50">SENSEI WHATSAPP (INTERNATIONAL, DIGITS ONLY)</label><input id="aWa" value="${esc(settings.senseiWhatsApp||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+        <div><label class="text-[11px] font-black tracking-widest text-black/50">SENSEI EMAIL (CONTRIBUTIONS)</label><input id="aEmail" value="${esc(settings.senseiEmail||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+        <div><label class="text-[11px] font-black tracking-widest text-black/50">ADMIN PIN</label><input id="aPin" value="${esc(settings.adminPin||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+        <button id="aSaveSettings" class="w-full h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Settings</button>
+      </div>
+    </div>
+    <div class="bg-white rounded-[24px] border-2 border-[#FFD93D]/50 p-5 lg:col-span-2">
+      <h3 class="fredoka font-bold text-[16px]">🚀 Publish Changes (catalog.json)</h3>
+      <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">Export the full catalog and place <b>catalog.json</b> in the dojo root folder — right next to <b>oralDojo.html</b>. Every device then loads your changes on the next visit (works when the dojo is served over web/HTTP). The data layer is database-ready: point <b>dojo-data.js</b> at a REST/DB adapter later and everything keeps working unchanged.</p>
+      <div class="mt-4 grid sm:grid-cols-3 gap-2">
+        <button id="aExport2" class="h-12 rounded-full bg-black text-[#FFD93D] font-bold fredoka text-[13px] press flex items-center justify-center gap-1.5">⬇ Export catalog.json</button>
+        <label class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[13px] press flex items-center justify-center gap-1.5 cursor-pointer">⬆ Import catalog.json<input type="file" id="aImportFile" accept=".json,application/json" class="hidden"></label>
+        ${srcLabel.indexOf('draft')>=0?'<button id="aDiscard" class="h-12 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/30 text-[#9A1A1A] font-bold fredoka text-[13px] press">↺ Discard device draft</button>':''}
+      </div>
+      <p class="text-[11px] font-bold tracking-widest text-black/30 mt-3">EXPORT BUMPS THE VERSION — THE HIGHEST-VERSION CATALOG ALWAYS WINS ON LOAD</p>
+    </div>
+  </div>`;
+};
+
+const panels={questions:qPanel,research:rPanel,dictionary:dPanel,library:lPanel,settings:sPanel};
+
+// ---------- BINDINGS ----------
+function bindQ(){
+  const wrap=document.getElementById('aQFOpts');
+  document.getElementById('aQAdd').onclick=()=>{state.form={kind:'q', item:null}; render();};
+  document.getElementById('aQBeltFilter').onchange=e=>{state.qBelt=e.target.value; state.form=null; render();};
+  document.querySelectorAll('[data-qedit]').forEach(b=>b.onclick=()=>{
+    const q=DojoData.getQuestions().find(x=>String(x.id)===String(b.dataset.qedit));
+    state.form={kind:'q', item:JSON.parse(JSON.stringify(q))}; render();
+  });
+  document.querySelectorAll('[data-qdel]').forEach(b=>b.onclick=()=>arm(b,async()=>{
+    await DojoData.deleteQuestion(b.dataset.qdel); state.form=null; refreshData(); render(); showToast('Question deleted');
+  }));
+  if(!wrap) return;
+  const typeSel=document.getElementById('aQFType');
+  const ansSel=document.getElementById('aQFAns');
+  const build=(preserve)=>{
+    const n=typeSel.value==='tf'?2:4;
+    const prev=preserve?[...wrap.querySelectorAll('input')].map(i=>i.value):[];
+    const base=(state.form&&state.form.item&&state.form.item.options)||[];
+    wrap.innerHTML=[...Array(n)].map((_,i)=>{
+      const val=prev[i]!==undefined?prev[i]:(base[i]||'');
+      return `<input data-oi="${i}" placeholder="Option ${String.fromCharCode(65+i)}" value="${esc(val)}" class="w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">`;
+    }).join('');
+    ansSel.innerHTML=[...Array(n)].map((_,i)=>`<option value="${i}">${String.fromCharCode(65+i)}</option>`).join('');
+    const a=(state.form&&state.form.item)?state.form.item.answer:0;
+    ansSel.value=String(Math.min(a,n-1));
+  };
+  build(false);
+  typeSel.onchange=()=>build(true);
+  document.getElementById('aQCancel').onclick=()=>{state.form=null; render();};
+  document.getElementById('aQSave').onclick=async()=>{
+    const opts=[...wrap.querySelectorAll('input')].map(i=>i.value.trim());
+    const item={
+      id:document.getElementById('aQFId').value||('q'+document.getElementById('aQFBelt').value+'-'+Date.now()),
+      belt:parseInt(document.getElementById('aQFBelt').value,10),
+      type:typeSel.value,
+      topic:document.getElementById('aQFTopic').value.trim(),
+      q:document.getElementById('aQFQ').value.trim(),
+      options:opts,
+      answer:parseInt(ansSel.value,10),
+      explanation:document.getElementById('aQFEx').value.trim()
+    };
+    const prev=(state.form&&state.form.item)||{};
+    if(prev.emojiOptions&&prev.emojiOptions.length===opts.length) item.emojiOptions=prev.emojiOptions;
+    if(!item.topic||!item.q||!item.explanation||opts.some(o=>!o)){ showToast('Please fill every field, sensei'); return; }
+    await DojoData.upsertQuestion(item);
+    state.form=null; refreshData(); render(); showToast('Question saved — OSS!');
+  };
+}
+function bindR(){
+  document.getElementById('aRAdd').onclick=()=>{state.form={kind:'res', item:null}; render();};
+  document.querySelectorAll('[data-redit]').forEach(b=>b.onclick=()=>{
+    const r=DojoData.getResearch().find(x=>String(x.id)===String(b.dataset.redit));
+    state.form={kind:'res', item:JSON.parse(JSON.stringify(r))}; render();
+  });
+  document.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>arm(b,async()=>{
+    await DojoData.deleteResearch(b.dataset.rdel); state.form=null; refreshData(); render(); showToast('Research deleted');
+  }));
+  if(!document.getElementById('aRSave')) return;
+  document.getElementById('aRCancel').onclick=()=>{state.form=null; render();};
+  document.getElementById('aRSave').onclick=async()=>{
+    const all=DojoData.getResearch();
+    const idStr=document.getElementById('aRId').value;
+    const item={
+      id: idStr?parseInt(idStr,10):Math.max(0,...all.map(r=>+r.id||0))+1,
+      title:document.getElementById('aRTitle').value.trim(),
+      author:document.getElementById('aRAuthor').value.trim(),
+      rank:document.getElementById('aRRank').value.trim(),
+      tag:document.getElementById('aRTag').value.trim(),
+      excerpt:document.getElementById('aRExcerpt').value.trim(),
+      likes:parseInt(document.getElementById('aRLikes').value,10)||0
+    };
+    if(!item.title||!item.excerpt){ showToast('Title and excerpt are required'); return; }
+    await DojoData.upsertResearch(item);
+    state.form=null; refreshData(); render(); showToast('Research saved — OSS!');
+  };
+}
+function bindD(){
+  document.getElementById('aDAdd').onclick=()=>{state.form={kind:'dict', item:null}; render();};
+  document.querySelectorAll('[data-dedit]').forEach(b=>b.onclick=()=>{
+    const d=DojoData.getDictionary().find(x=>String(x.id)===String(b.dataset.dedit));
+    state.form={kind:'dict', item:JSON.parse(JSON.stringify(d))}; render();
+  });
+  document.querySelectorAll('[data-ddel]').forEach(b=>b.onclick=()=>arm(b,async()=>{
+    await DojoData.deleteDictionary(b.dataset.ddel); state.form=null; refreshData(); render(); showToast('Term deleted');
+  }));
+  if(!document.getElementById('aDSave')) return;
+  document.getElementById('aDCancel').onclick=()=>{state.form=null; render();};
+  document.getElementById('aDSave').onclick=async()=>{
+    const item={
+      id:document.getElementById('aDId').value||('d'+Date.now()),
+      term:document.getElementById('aDTerm').value.trim(),
+      reading:document.getElementById('aDReading').value.trim(),
+      category:document.getElementById('aDCat').value.trim()||'Concepts',
+      definition:document.getElementById('aDDef').value.trim()
+    };
+    if(!item.term||!item.definition){ showToast('Term and definition are required'); return; }
+    await DojoData.upsertDictionary(item);
+    state.form=null; refreshData(); render(); showToast('Term saved — OSS!');
+  };
+}
+function bindL(){
+  document.getElementById('aLAdd').onclick=()=>{state.form={kind:'lib', item:null}; render();};
+  document.querySelectorAll('[data-ledit]').forEach(b=>b.onclick=()=>{
+    const l=DojoData.getLibrary().find(x=>String(x.id)===String(b.dataset.ledit));
+    state.form={kind:'lib', item:JSON.parse(JSON.stringify(l))}; render();
+  });
+  document.querySelectorAll('[data-ldel]').forEach(b=>b.onclick=()=>arm(b,async()=>{
+    await DojoData.deleteLibrary(b.dataset.ldel); state.form=null; refreshData(); render(); showToast('Resource deleted');
+  }));
+  if(!document.getElementById('aLSave')) return;
+  document.getElementById('aLCancel').onclick=()=>{state.form=null; render();};
+  document.getElementById('aLSave').onclick=async()=>{
+    const item={
+      id:document.getElementById('aLId').value||('l'+Date.now()),
+      title:document.getElementById('aLTitle').value.trim(),
+      author:document.getElementById('aLAuthor').value.trim(),
+      type:document.getElementById('aLType').value,
+      category:document.getElementById('aLCat').value.trim()||'General',
+      description:document.getElementById('aLDesc').value.trim(),
+      url:document.getElementById('aLUrl').value.trim()
+    };
+    if(!item.title||!item.description){ showToast('Title and description are required'); return; }
+    await DojoData.upsertLibrary(item);
+    state.form=null; refreshData(); render(); showToast('Resource saved — OSS!');
+  };
+}
+function bindS(){
+  document.getElementById('aExport2').onclick=doExport;
+  document.getElementById('aImportFile').onchange=async e=>{
+    const f=e.target.files[0]; if(!f) return;
+    try{
+      const obj=JSON.parse(await f.text());
+      await DojoData.importCatalog(obj);
+      refreshData(); render();
+      showToast('Catalog imported — OSS!');
+    }catch(err){ showToast('Invalid catalog file'); }
+  };
+  document.getElementById('aDiscard')?.addEventListener('click',async()=>{
+    await DojoData.discardDraft(); refreshData(); render(); showToast('Global catalog reloaded');
+  });
+  document.getElementById('aSaveSettings').onclick=async()=>{
+    const wa=document.getElementById('aWa').value.trim().replace(/[^\d]/g,'');
+    const em=document.getElementById('aEmail').value.trim();
+    const pin=document.getElementById('aPin').value.trim();
+    if(!wa||!em||!pin){ showToast('All settings fields are required'); return; }
+    await DojoData.updateSettings({senseiWhatsApp:wa,senseiEmail:em,adminPin:pin});
+    refreshData(); render(); showToast('Settings saved — OSS!');
+  };
+}
+
+render();
+console.log('ORAL DOJO ADMIN loaded. Data source:', DojoData.getSource(), '| catalog v'+DojoData.getCatalog().version);
+</script>
+</body>
+</html>
