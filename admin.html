@@ -15,6 +15,7 @@ h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
 .press:active{transform:scale(0.97)}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 #toast{animation:toastIn .28s ease}
+.check{width:20px;height:20px}
 </style>
 </head>
 <body class="min-h-screen w-full bg-[#FAF8F5] text-[#1A1A1A] selection:bg-[#FFD93D]/30">
@@ -22,10 +23,6 @@ h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
 
 <script src="dojo-data.js"></script>
 <script type="module">
-// ORAL DOJO — ADMIN CONSOLE (standalone)
-// Feeds the dojo: questions, research, dictionary, library, settings.
-// Publishes changes via catalog.json into the dojo root folder.
-// The dojo app NEVER links here — open this file directly.
 await DojoData.init();
 
 let belts=[], questions={}, research=[], dictionary=[], library=[], settings={};
@@ -48,7 +45,7 @@ function showToast(msg){
   el.innerHTML='<span>⚙️</span><span>'+msg+'</span>';
   document.body.appendChild(el);
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.remove(),2800);
+  toastTimer=setTimeout(()=>el.remove(),3200);
 }
 
 const arm=(btn,fn)=>{
@@ -63,6 +60,28 @@ let state={
   tab:'questions',
   form:null,
   qBelt:'all',
+  selected:new Set(),
+  bulkOpen:false,
+  bulkText:`Belt: 1
+Topic: Concepts
+Type: mcq
+Q: What does Dojo mean?
+A) Place of the way
+B) Fighting arena
+C) Meditation hall
+D) Weapon store
+Answer: A
+Explanation: Dojo translates to place of the way.
+
+---
+Belt: 2 | Topic: Tradition | Type: tf
+Q: Kata is improvised?
+A) True
+B) False
+Answer: B
+Explanation: Kata is pre-arranged forms.`,
+  bulkParsed:[],
+  bulkDefaultBelt:''
 };
 
 function render(){
@@ -98,10 +117,10 @@ function renderApp(){
   }
   app.innerHTML=`<div class="min-h-screen">
     <header class="sticky top-0 z-30 glass border-b border-black/[0.06]">
-      <div class="max-w-[1100px] mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="max-w-[1120px] mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center font-black fredoka text-[17px]">道</div>
-          <div><div class="fredoka font-bold leading-none text-[14px]">ORAL DOJO — ADMIN CONSOLE</div><div class="text-[11px] font-semibold text-black/50 tracking-wide">FEED THE DOJO • MANAGE • PUBLISH</div></div>
+          <div><div class="fredoka font-bold leading-none text-[14px]">ORAL DOJO — ADMIN CONSOLE v2</div><div class="text-[11px] font-semibold text-black/50 tracking-wide">MOVE • COPY • BULK ADD</div></div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[11px] font-bold tracking-widest bg-[#FAF8F5] border px-3 py-1.5 rounded-full max-w-[260px] truncate" title="${esc(srcLabel)}">DATA: ${esc(srcLabel)}</span>
@@ -112,7 +131,7 @@ function renderApp(){
         </div>
       </div>
     </header>
-    <div class="max-w-[1100px] mx-auto px-4 py-6">${body}</div>
+    <div class="max-w-[1120px] mx-auto px-4 py-6">${body}</div>
   </div>`;
 
   document.getElementById('adExport')?.addEventListener('click',doExport);
@@ -150,9 +169,97 @@ function doExport(){
   showToast('catalog.json exported (v'+data.version+') — place it in the dojo root folder');
 }
 
+// ---------- BULK PARSER ----------
+function parseBulk(raw){
+  const chunks = raw.split(/\n\s*---\s*\n|\n---\n|---\n|\n---/).map(s=>s.trim()).filter(Boolean);
+  const results=[];
+  chunks.forEach((chunk, idx)=>{
+    if(!chunk) return;
+    const lines = chunk.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+    let belt = null, topic='', type='mcq', q='', options=[], answer=null, explanation='';
+    let optMap={}; // A->text
+    lines.forEach(line=>{
+      // handle inline pipe format first line: Belt:1 | Topic: x | Type: mcq
+      if(line.includes('|') && /belt:/i.test(line)){
+        line.split('|').forEach(p=>parseLine(p.trim()));
+        return;
+      }
+      parseLine(line);
+    });
+    function parseLine(l){
+      const mBelt = l.match(/^belt\s*[:=]\s*(\d+)/i);
+      if(mBelt){ belt=parseInt(mBelt[1],10); return; }
+      const mTopic = l.match(/^topic\s*[:=]\s*(.+)$/i);
+      if(mTopic){ topic=mTopic[1].trim(); return; }
+      const mType = l.match(/^type\s*[:=]\s*(mcq|tf|fill|scenario)/i);
+      if(mType){ type=mType[1].toLowerCase(); return; }
+      const mQ = l.match(/^(q|question)\s*[:=]\s*(.+)$/i);
+      if(mQ){ q=mQ[2].trim(); return; }
+      const mAnsLetter = l.match(/^(answer|ans|correct)\s*[:=]\s*(.+)$/i);
+      if(mAnsLetter){
+        const rawAns = mAnsLetter[2].trim();
+        // will resolve later
+        answer=rawAns;
+        return;
+      }
+      const mExp = l.match(/^(explanation|exp|why)\s*[:=]\s*(.+)$/i);
+      if(mExp){ explanation=mExp[2].trim(); return; }
+      const mOpt = l.match(/^([A-D]|\d)\s*[\)\.\:\-]\s*(.+)$/i);
+      if(mOpt){
+        const key=mOpt[1].toUpperCase();
+        const txt=mOpt[2].trim();
+        if(/^[A-D]$/.test(key)) optMap[key]=txt;
+        else {
+          // numeric -> convert to letter order
+          const idxNum=parseInt(key,10)-1;
+          const letter=String.fromCharCode(65+idxNum);
+          optMap[letter]=txt;
+        }
+        return;
+      }
+      // fallback: if no prefix but we are in options zone? ignore
+    }
+    // build options array sorted by A,B,C,D
+    const sortedKeys = Object.keys(optMap).sort();
+    options = sortedKeys.map(k=>optMap[k]);
+    // resolve answer index
+    let ansIdx=-1;
+    if(answer!==null){
+      const aStr = String(answer).trim();
+      if(/^[A-Da-d]$/.test(aStr)){
+        ansIdx = aStr.toUpperCase().charCodeAt(0)-65;
+      } else if(/^\d+$/.test(aStr)){
+        const n=parseInt(aStr,10);
+        ansIdx = n>=0 && n<=3 ? n : n-1; // support 0-based or 1-based
+      } else {
+        // match by text
+        const found = options.findIndex(o=>o.toLowerCase()===aStr.toLowerCase() || o.toLowerCase().includes(aStr.toLowerCase()));
+        if(found>=0) ansIdx=found;
+      }
+    }
+    const err=[];
+    if(!q) err.push('Missing Q:');
+    if(options.length<2) err.push(`Need >=2 options (found ${options.length})`);
+    if(ansIdx<0 || ansIdx>=options.length) err.push(`Invalid Answer "${answer}"`);
+    if(!topic) err.push('Missing Topic');
+    if(!explanation) err.push('Missing Explanation');
+    if(!belt && state.bulkDefaultBelt) belt=parseInt(state.bulkDefaultBelt,10);
+    if(!belt && state.qBelt!=='all') belt=parseInt(state.qBelt,10);
+    if(!belt) belt = belts[0]?.id ?? 0;
+
+    results.push({
+      rawIndex: idx,
+      belt, topic, type, q, options, answer:ansIdx, answerRaw:answer, explanation,
+      errors:err,
+      valid: err.length===0
+    });
+  });
+  return results;
+}
+
 // ---------- QUESTIONS ----------
 const adminQForm=(item)=>{
-  const v=item||{belt:(state.qBelt!=='all'?parseInt(state.qBelt,10):0),type:'mcq'};
+  const v=item||{belt:(state.qBelt!=='all'?parseInt(state.qBelt,10):(belts[0]?.id||0)),type:'mcq'};
   return `
   <div class="mt-4 bg-white rounded-[24px] border-2 border-[#14B8A6]/40 p-5">
     <h3 class="fredoka font-bold text-[16px]">${item?'Edit Question':'New Question'}</h3>
@@ -181,30 +288,116 @@ const adminQForm=(item)=>{
     </div>
   </div>`;
 };
+
+const bulkPanel=()=>{
+  if(!state.bulkOpen) return '';
+  return `
+  <div class="mt-4 bg-[#0F0F0F] rounded-[24px] border border-[#FFD93D]/20 p-5 text-white">
+    <div class="flex items-center justify-between gap-2">
+      <h3 class="fredoka font-bold text-[16px]">📦 Bulk Add Questions</h3>
+      <button id="aBulkClose" class="h-8 px-3 rounded-full bg-white/10 border border-white/10 text-[12px] font-bold">Close</button>
+    </div>
+    <p class="text-[12px] text-white/60 mt-2 leading-relaxed">Paste many questions at once. Separate each with <b>---</b>. Options as <b>A) ... B) ...</b> or <b>1) ...</b>. Answer as <b>A</b> or <b>0</b> or full text. Belt can be set per question or use the default below.</p>
+    <div class="mt-3 grid sm:grid-cols-2 gap-3">
+      <div><label class="text-[10px] font-black tracking-widest text-white/50">DEFAULT BELT IF NOT SPECIFIED</label>
+        <select id="aBulkBelt" class="mt-1 w-full h-11 rounded-2xl border border-white/10 bg-white/10 px-3 font-semibold text-[13px] outline-none text-white">${belts.map(b=>`<option value="${b.id}" ${String(state.bulkDefaultBelt)===String(b.id)?'selected':''} style="color:black">${b.short} • ${b.from} → ${b.to}</option>`).join('')}</select></div>
+      <div class="flex items-end gap-2">
+        <button id="aBulkParse" class="h-11 flex-1 rounded-full bg-[#FFD93D] text-black font-black text-[13px] press">Preview / Validate</button>
+        <button id="aBulkImport" class="h-11 flex-1 rounded-full bg-[#14B8A6] text-black font-black text-[13px] press">Import ${state.bulkParsed.filter(x=>x.valid).length||''} Valid</button>
+      </div>
+    </div>
+    <textarea id="aBulkText" rows="16" class="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-3 font-mono text-[12px] leading-relaxed outline-none focus:border-[#FFD93D]/40">${esc(state.bulkText)}</textarea>
+    <div id="aBulkPreview" class="mt-3 space-y-2 max-h-[320px] overflow-auto pr-1">
+      ${state.bulkParsed.map((p,i)=>`
+        <div class="rounded-2xl border p-3 ${p.valid?'bg-white/5 border-white/10':'bg-[#FF4B4B]/10 border-[#FF4B4B]/30'}">
+          <div class="flex items-center gap-2 text-[11px] font-black tracking-widest">
+            <span class="${p.valid?'bg-[#14B8A6] text-black':'bg-[#FF4B4B] text-white'} px-2 py-0.5 rounded-full">${p.valid?'OK':'ERR'}</span>
+            <span class="text-white/50">Belt ${p.belt} • ${esc(p.topic||'no topic')} • ${esc(p.type)} • Ans ${p.answer>=0?String.fromCharCode(65+p.answer):esc(p.answerRaw||'?')}</span>
+          </div>
+          <div class="text-[12px] font-bold mt-1 leading-snug">${esc(p.q||'(no question)')}</div>
+          <div class="text-[11px] text-white/60 mt-1">${p.options.map((o,oi)=>`<span class="${oi===p.answer?'text-[#FFD93D] font-bold':''}">${String.fromCharCode(65+oi)}) ${esc(o)}</span>`).join(' • ')}</div>
+          ${p.errors.length?`<div class="text-[11px] text-[#FF8A8A] mt-1 font-bold">${esc(p.errors.join(' | '))}</div>`:''}
+        </div>
+      `).join('') || '<div class="text-[12px] text-white/40 text-center py-4">Click Preview to validate</div>'}
+    </div>
+    <div class="mt-3 bg-white/5 rounded-2xl p-3 border border-white/10">
+      <div class="text-[11px] font-black tracking-widest text-white/50">PATTERN EXAMPLE</div>
+      <pre class="mt-1 text-[11px] font-mono leading-relaxed text-white/70 whitespace-pre-wrap">Belt: 1
+Topic: Concepts
+Type: mcq
+Q: What does Dojo mean?
+A) Place of the way
+B) Fighting arena
+C) Meditation hall
+D) Weapon store
+Answer: A
+Explanation: Dojo = place of the way
+---
+Belt: 2 | Topic: Tradition | Type: tf
+Q: Kata is improvised?
+A) True
+B) False
+Answer: B
+Explanation: Kata is pre-arranged.</pre>
+    </div>
+  </div>`;
+};
+
 const qPanel=()=>{
   const allQ=DojoData.getQuestions();
   const form=state.form&&state.form.kind==='q'?adminQForm(state.form.item):'';
   const filtered=(state.qBelt==='all'?allQ:allQ.filter(q=>q.belt===parseInt(state.qBelt,10))).slice().sort((a,b)=>a.belt-b.belt||String(a.id).localeCompare(String(b.id)));
+  const selCount=state.selected.size;
   return `
-  <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+  <div class="flex flex-col lg:flex-row gap-2 lg:items-center">
     <select id="aQBeltFilter" class="h-11 rounded-2xl border-2 border-black/10 bg-white px-3 font-semibold text-[13px] focus:border-black outline-none flex-1">
       <option value="all" ${state.qBelt==='all'?'selected':''}>All belts (${allQ.length})</option>
       ${belts.map(b=>`<option value="${b.id}" ${String(state.qBelt)===String(b.id)?'selected':''}>${b.short} • ${b.from} → ${b.to} (${(questions[b.id]||[]).length})</option>`).join('')}
     </select>
-    <button id="aQAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press shrink-0">+ Add Question</button>
+    <div class="flex gap-2">
+      <button id="aQBulk" class="h-11 px-5 rounded-full bg-[#FFD93D] border border-black/10 text-black font-black text-[13px] press shrink-0">📦 Bulk Add</button>
+      <button id="aQAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press shrink-0">+ Add Question</button>
+    </div>
   </div>
+  ${bulkPanel()}
   ${form}
+  ${selCount>0?`
+  <div class="mt-4 bg-black text-white rounded-[20px] p-3 flex flex-wrap items-center gap-2 border border-[#FFD93D]/20">
+    <span class="text-[12px] font-black px-2">${selCount} selected</span>
+    <button id="aSelAll" class="h-9 px-3 rounded-full bg-white/10 border border-white/10 text-[11px] font-bold">Select all ${filtered.length}</button>
+    <button id="aSelClear" class="h-9 px-3 rounded-full bg-white/10 border border-white/10 text-[11px] font-bold">Clear</button>
+    <div class="h-6 w-px bg-white/10"></div>
+    <select id="aBulkTargetBelt" class="h-9 rounded-full bg-white text-black px-3 font-bold text-[11px] outline-none">${belts.map(b=>`<option value="${b.id}">${b.short}</option>`).join('')}</select>
+    <button id="aBulkMove" class="h-9 px-4 rounded-full bg-[#14B8A6] text-black font-black text-[11px] press">Move to belt →</button>
+    <button id="aBulkCopy" class="h-9 px-4 rounded-full bg-[#FFD93D] text-black font-black text-[11px] press">Copy to belt +</button>
+    <button id="aBulkDel" class="h-9 px-3 rounded-full bg-[#FF4B4B]/20 border border-[#FF4B4B]/30 text-[#FFBDBD] text-[11px] font-bold press">Delete selected</button>
+  </div>`:`
+  <div class="mt-3 flex gap-2">
+    <button id="aSelAll" class="h-9 px-3 rounded-full bg-white border text-[11px] font-bold press">Select all ${filtered.length}</button>
+    ${selCount>0?'<button id="aSelClear" class="h-9 px-3 rounded-full bg-white border text-[11px] font-bold press">Clear</button>':''}
+  </div>`}
   <div class="mt-4 space-y-2">
     ${filtered.map(q=>`
-    <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
+    <div class="bg-white rounded-2xl border ${state.selected.has(String(q.id))?'border-[#14B8A6] ring-2 ring-[#14B8A6]/20':'border-black/5'} p-4 flex items-start gap-3">
+      <input type="checkbox" data-qsel="${esc(q.id)}" ${state.selected.has(String(q.id))?'checked':''} class="check mt-1 accent-black">
       <span class="text-[10px] font-black tracking-widest px-2 py-1 rounded-full bg-[#FAF8F5] border shrink-0">${esc((belts.find(b=>b.id===q.belt)||{}).short||('Belt '+q.belt))}</span>
-      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(q.q)}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(q.topic)} • ${String(q.type).toUpperCase()} • ${q.options.length} options</div></div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[13px] font-bold leading-snug">${esc(q.q)}</div>
+        <div class="text-[11px] font-semibold text-black/40 mt-1">${esc(q.topic)} • ${String(q.type).toUpperCase()} • ${q.options.length} opts • Ans ${String.fromCharCode(65+(q.answer||0))}</div>
+        <div class="mt-2 flex flex-wrap gap-1.5">
+          <select data-qmove="${esc(q.id)}" class="h-7 rounded-full bg-[#FAF8F5] border px-2 text-[10px] font-bold">
+            <option value="">Move / Copy to…</option>
+            ${belts.map(b=>`<option value="move-${b.id}">Move → ${b.short}</option><option value="copy-${b.id}">Copy → ${b.short}</option>`).join('')}
+          </select>
+        </div>
+      </div>
       <button data-qedit="${esc(q.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press" title="Edit">✎</button>
       <button data-qdel="${esc(q.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press" title="Delete">🗑</button>
     </div>`).join('')||'<div class="bg-white rounded-2xl border-2 border-dashed border-black/10 p-6 text-center text-[13px] font-bold text-black/40">No questions for this belt yet.</div>'}
   </div>`;
 };
-// ---------- RESEARCH ----------
+
+// ---------- RESEARCH etc (unchanged) ----------
 const adminRForm=(item)=>{
   const v=item||{};
   return `
@@ -239,7 +432,6 @@ const rPanel=()=>{
     </div>`).join('')}
   </div>`;
 };
-// ---------- DICTIONARY ----------
 const adminDForm=(item)=>{
   const v=item||{};
   return `
@@ -260,35 +452,35 @@ const adminDForm=(item)=>{
   </div>`;
 };
 const dPanel=()=>{
-  const all=DojoData.getDictionary();
   const form=state.form&&state.form.kind==='dict'?adminDForm(state.form.item):'';
   return `
   <div class="flex justify-end"><button id="aDAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press">+ Add Term</button></div>
   ${form}
   <div class="mt-4 space-y-2">
-    ${all.map(d=>`
+    ${dictionary.map(d=>`
     <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
-      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(d.term)}${d.reading?` <span class="text-black/40 font-semibold">(${esc(d.reading)})</span>`:''}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(d.category)}</div><div class="text-[12px] text-black/60 mt-1 leading-snug">${esc(d.definition)}</div></div>
+      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(d.term)} <span class="font-medium text-black/40">(${esc(d.reading||'')})</span></div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(d.category)} • ${esc(d.definition).slice(0,120)}</div></div>
       <button data-dedit="${esc(d.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press">✎</button>
       <button data-ddel="${esc(d.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press">🗑</button>
     </div>`).join('')}
   </div>`;
 };
-// ---------- LIBRARY ----------
 const adminLForm=(item)=>{
-  const v=item||{};
+  const v=item||{type:'book'};
   return `
   <div class="mt-4 bg-white rounded-[24px] border-2 border-[#14B8A6]/40 p-5">
     <h3 class="fredoka font-bold text-[16px]">${item?'Edit Resource':'New Resource'}</h3>
     <input type="hidden" id="aLId" value="${esc(v.id||'')}">
-    <div class="mt-3 grid sm:grid-cols-2 gap-3">
+    <div class="mt-3 grid sm:grid-cols-3 gap-3">
       <div><label class="text-[11px] font-black tracking-widest text-black/50">TITLE *</label><input id="aLTitle" value="${esc(v.title||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
       <div><label class="text-[11px] font-black tracking-widest text-black/50">AUTHOR</label><input id="aLAuthor" value="${esc(v.author||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
-      <div><label class="text-[11px] font-black tracking-widest text-black/50">TYPE</label><select id="aLType" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[13px] focus:border-black outline-none">${['Book','Reference','Article','Video','Link'].map(t=>`<option value="${t}" ${v.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div><label class="text-[11px] font-black tracking-widest text-black/50">CATEGORY</label><input id="aLCat" value="${esc(v.category||'')}" placeholder="e.g. Philosophy" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">TYPE</label><select id="aLType" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[13px] focus:border-black outline-none">${['book','article','video','tool'].map(t=>`<option value="${t}" ${v.type===t?'selected':''}>${t.toUpperCase()}</option>`).join('')}</select></div>
+    </div>
+    <div class="mt-3 grid sm:grid-cols-2 gap-3">
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">CATEGORY</label><input id="aLCat" value="${esc(v.category||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
+      <div><label class="text-[11px] font-black tracking-widest text-black/50">URL</label><input id="aLUrl" value="${esc(v.url||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
     </div>
     <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">DESCRIPTION *</label><textarea id="aLDesc" rows="2" class="mt-1 w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none">${esc(v.description||'')}</textarea></div>
-    <div class="mt-3"><label class="text-[11px] font-black tracking-widest text-black/50">URL (OPTIONAL)</label><input id="aLUrl" value="${esc(v.url||'')}" placeholder="https://..." class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
     <div class="mt-4 grid grid-cols-2 gap-2">
       <button id="aLSave" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Resource</button>
       <button id="aLCancel" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button>
@@ -296,21 +488,19 @@ const adminLForm=(item)=>{
   </div>`;
 };
 const lPanel=()=>{
-  const all=DojoData.getLibrary();
   const form=state.form&&state.form.kind==='lib'?adminLForm(state.form.item):'';
   return `
   <div class="flex justify-end"><button id="aLAdd" class="h-11 px-5 rounded-full bg-black text-white font-bold text-[13px] press">+ Add Resource</button></div>
   ${form}
   <div class="mt-4 space-y-2">
-    ${all.map(l=>`
+    ${library.map(l=>`
     <div class="bg-white rounded-2xl border border-black/5 p-4 flex items-start gap-3">
-      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(l.title)}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(l.author||'')} • ${esc(l.type)} • ${esc(l.category)}</div><div class="text-[12px] text-black/60 mt-1 leading-snug">${esc(l.description)}</div></div>
+      <div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-snug">${esc(l.title)}</div><div class="text-[11px] font-semibold text-black/40 mt-1">${esc(l.type)} • ${esc(l.category)} • ${esc(l.author)}</div></div>
       <button data-ledit="${esc(l.id)}" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[12px] shrink-0 press">✎</button>
       <button data-ldel="${esc(l.id)}" class="w-8 h-8 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] flex items-center justify-center text-[12px] shrink-0 press">🗑</button>
     </div>`).join('')}
   </div>`;
 };
-// ---------- SETTINGS ----------
 const sPanel=()=>{
   const srcLabel=DojoData.getSource();
   const cat=DojoData.getCatalog();
@@ -324,7 +514,7 @@ const sPanel=()=>{
       <div class="mt-3 bg-[#FAF8F5] rounded-2xl p-3 border border-black/5 text-[12px] font-medium text-black/60 leading-relaxed">${esc(counts)}</div>
     </div>
     <div class="bg-white rounded-[24px] border border-black/5 p-5">
-      <h3 class="fredoka font-bold text-[16px]">🤙 Dojo Contact &amp; Access</h3>
+      <h3 class="fredoka font-bold text-[16px]">🤙 Dojo Contact & Access</h3>
       <div class="mt-3 space-y-3">
         <div><label class="text-[11px] font-black tracking-widest text-black/50">SENSEI WHATSAPP (INTERNATIONAL, DIGITS ONLY)</label><input id="aWa" value="${esc(settings.senseiWhatsApp||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
         <div><label class="text-[11px] font-black tracking-widest text-black/50">SENSEI EMAIL (CONTRIBUTIONS)</label><input id="aEmail" value="${esc(settings.senseiEmail||'')}" class="mt-1 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px] focus:border-black outline-none"></div>
@@ -350,15 +540,129 @@ const panels={questions:qPanel,research:rPanel,dictionary:dPanel,library:lPanel,
 // ---------- BINDINGS ----------
 function bindQ(){
   const wrap=document.getElementById('aQFOpts');
-  document.getElementById('aQAdd').onclick=()=>{state.form={kind:'q', item:null}; render();};
-  document.getElementById('aQBeltFilter').onchange=e=>{state.qBelt=e.target.value; state.form=null; render();};
+  // Top controls
+  document.getElementById('aQAdd').onclick=()=>{state.form={kind:'q', item:null}; state.bulkOpen=false; render();};
+  document.getElementById('aQBulk').onclick=()=>{state.bulkOpen=!state.bulkOpen; state.form=null; render();};
+  document.getElementById('aQBeltFilter').onchange=e=>{state.qBelt=e.target.value; state.selected.clear(); state.form=null; render();};
+
   document.querySelectorAll('[data-qedit]').forEach(b=>b.onclick=()=>{
     const q=DojoData.getQuestions().find(x=>String(x.id)===String(b.dataset.qedit));
-    state.form={kind:'q', item:JSON.parse(JSON.stringify(q))}; render();
+    state.form={kind:'q', item:JSON.parse(JSON.stringify(q))}; state.bulkOpen=false; render();
   });
   document.querySelectorAll('[data-qdel]').forEach(b=>b.onclick=()=>arm(b,async()=>{
     await DojoData.deleteQuestion(b.dataset.qdel); state.form=null; refreshData(); render(); showToast('Question deleted');
   }));
+
+  // selection
+  document.querySelectorAll('[data-qsel]').forEach(cb=>{
+    cb.onchange=()=>{ if(cb.checked) state.selected.add(String(cb.dataset.qsel)); else state.selected.delete(String(cb.dataset.qsel)); render(); };
+  });
+  document.getElementById('aSelAll')?.addEventListener('click',()=>{
+    const allQ=DojoData.getQuestions();
+    const filtered=(state.qBelt==='all'?allQ:allQ.filter(q=>q.belt===parseInt(state.qBelt,10)));
+    filtered.forEach(q=>state.selected.add(String(q.id)));
+    render();
+  });
+  document.getElementById('aSelClear')?.addEventListener('click',()=>{ state.selected.clear(); render(); });
+
+  // bulk move/copy per card quick
+  document.querySelectorAll('[data-qmove]').forEach(sel=>{
+    sel.onchange=async()=>{
+      const val=sel.value; if(!val) return;
+      const [action, beltIdStr]=val.split('-');
+      const beltId=parseInt(beltIdStr,10);
+      const qId=sel.dataset.qmove;
+      const srcQ=DojoData.getQuestions().find(x=>String(x.id)===String(qId));
+      if(!srcQ){ showToast('Question not found'); return; }
+      if(action==='move'){
+        await DojoData.upsertQuestion({...srcQ, belt:beltId});
+      } else {
+        const copy={...JSON.parse(JSON.stringify(srcQ)), id:'q'+beltId+'-'+Date.now()+'-'+Math.floor(Math.random()*9999), belt:beltId};
+        await DojoData.upsertQuestion(copy);
+      }
+      refreshData(); render(); showToast(action==='move'?`Moved to ${belts.find(b=>b.id===beltId)?.short||beltId}`:`Copied to ${belts.find(b=>b.id===beltId)?.short||beltId}`);
+    };
+  });
+
+  // bulk toolbar actions
+  const doBulkAction=async (mode)=>{
+    const targetBelt=parseInt(document.getElementById('aBulkTargetBelt')?.value||belts[0]?.id,10);
+    if(state.selected.size===0){ showToast('Select questions first'); return; }
+    const ids=[...state.selected];
+    let count=0;
+    for(const id of ids){
+      const srcQ=DojoData.getQuestions().find(x=>String(x.id)===String(id));
+      if(!srcQ) continue;
+      if(mode==='move'){
+        await DojoData.upsertQuestion({...srcQ, belt:targetBelt});
+        count++;
+      } else if(mode==='copy'){
+        const copy={...JSON.parse(JSON.stringify(srcQ)), id:'q'+targetBelt+'-'+Date.now()+'-'+count+'-'+Math.floor(Math.random()*9999), belt:targetBelt};
+        await DojoData.upsertQuestion(copy);
+        count++;
+      } else if(mode==='delete'){
+        await DojoData.deleteQuestion(id);
+        count++;
+      }
+    }
+    refreshData();
+    if(mode!=='copy') state.selected.clear();
+    render();
+    showToast(mode==='move'?`${count} moved to ${belts.find(b=>b.id===targetBelt)?.short||targetBelt}`: mode==='copy'?`${count} copied to ${belts.find(b=>b.id===targetBelt)?.short||targetBelt}`:`${count} deleted`);
+  };
+  document.getElementById('aBulkMove')?.addEventListener('click',()=>doBulkAction('move'));
+  document.getElementById('aBulkCopy')?.addEventListener('click',()=>doBulkAction('copy'));
+  document.getElementById('aBulkDel')?.addEventListener('click',()=>arm(document.getElementById('aBulkDel'),()=>doBulkAction('delete')));
+
+  // bulk importer bindings
+  if(state.bulkOpen){
+    const bulkTextEl=document.getElementById('aBulkText');
+    const bulkBeltEl=document.getElementById('aBulkBelt');
+    if(bulkTextEl){
+      bulkTextEl.addEventListener('input',e=>{ state.bulkText=e.target.value; });
+    }
+    if(bulkBeltEl){
+      bulkBeltEl.addEventListener('change',e=>{ state.bulkDefaultBelt=e.target.value; });
+    }
+    document.getElementById('aBulkClose')?.addEventListener('click',()=>{ state.bulkOpen=false; render(); });
+    document.getElementById('aBulkParse')?.addEventListener('click',()=>{
+      state.bulkText=document.getElementById('aBulkText').value;
+      state.bulkDefaultBelt=document.getElementById('aBulkBelt').value;
+      state.bulkParsed=parseBulk(state.bulkText);
+      render();
+      showToast(`${state.bulkParsed.filter(x=>x.valid).length}/${state.bulkParsed.length} valid — ready to import`);
+    });
+    document.getElementById('aBulkImport')?.addEventListener('click',async()=>{
+      // ensure parsed
+      if(state.bulkParsed.length===0){
+        state.bulkText=document.getElementById('aBulkText').value;
+        state.bulkParsed=parseBulk(state.bulkText);
+      }
+      const valids=state.bulkParsed.filter(x=>x.valid);
+      if(valids.length===0){ showToast('No valid questions to import'); return; }
+      let imported=0;
+      for(const p of valids){
+        const item={
+          id:'q'+p.belt+'-'+Date.now()+'-'+imported+'-'+Math.floor(Math.random()*9999),
+          belt:p.belt,
+          type:p.type,
+          topic:p.topic,
+          q:p.q,
+          options:p.options,
+          answer:p.answer,
+          explanation:p.explanation
+        };
+        await DojoData.upsertQuestion(item);
+        imported++;
+      }
+      refreshData();
+      showToast(`${imported} questions imported — OSS!`);
+      state.bulkOpen=false;
+      state.bulkParsed=[];
+      render();
+    });
+  }
+
   if(!wrap) return;
   const typeSel=document.getElementById('aQFType');
   const ansSel=document.getElementById('aQFAns');
@@ -499,7 +803,7 @@ function bindS(){
 }
 
 render();
-console.log('ORAL DOJO ADMIN loaded. Data source:', DojoData.getSource(), '| catalog v'+DojoData.getCatalog().version);
+console.log('ORAL DOJO ADMIN v2 loaded. Data source:', DojoData.getSource(), '| catalog v'+DojoData.getCatalog().version);
 </script>
 </body>
 </html>
