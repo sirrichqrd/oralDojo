@@ -621,6 +621,7 @@ function renderApp(){
                         <div class="mt-2 flex flex-wrap gap-1">${(b.focus||[]).slice(0,2).map(f=>`<span class="text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:${b.id>=9?'rgba(255,255,255,.18)':'rgba(0,0,0,.06)'}; color:${b.id>=9?'#fff':'#333'}">${f}</span>`).join('')}</div>
                         ${passed?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-[#2ECC71] text-white">${I.check} PASSED</div>`:''}
                         ${isCurrent?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-black text-white">CURRENT</div>`:''}
+                        ${isCurrent?'<div class="absolute top-5 right-3 w-7 h-7 bg-[#14B8A6] rounded-full border-2 border-white flex items-center justify-center shadow-md animate-bounce"><span class="text-white text-[12px]">🥋</span></div>':''}
                         ${b.id>=11?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-[#FFD93D] text-black">FULL EDITION</div>`:''}
                       </div>
                     </div>
