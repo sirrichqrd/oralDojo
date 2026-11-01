@@ -225,16 +225,16 @@ function buildThesisMsg(list){
     msg+='Contribution: '+t.contribution+'\n';
     if(t.link) msg+='Link: '+t.link+'\n';
   });
-  msg+='\n— Submitted from the Oral Dojo Research Hub (Yondan+)';
+  msg+='\n— Submitted from the Oral Dojo Research Hub (Godan+)';
   return msg;
 }
-const T_GRADES=['Yondan (4th Dan)','Godan (5th Dan)','Rokudan (6th Dan)','Nanadan (7th Dan)','Hachidan (8th Dan)','Kudan (9th Dan)','Judan (10th Dan)','Other Senior Grade'];
+const T_GRADES=['Godan (5th Dan)','Rokudan (6th Dan)','Rokudan (6th Dan)','Nanadan (7th Dan)','Hachidan (8th Dan)','Kudan (9th Dan)','Judan (10th Dan)','Other Senior Grade'];
 function thesisModalHtml(saved){
   const mode=state.thesisModal;
   const shell=inner=>`<div id="tBackdrop" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-y-auto overscroll-contain p-3 sm:p-4 md:p-6 flex min-h-[100dvh] sm:min-h-screen items-end sm:items-center justify-center"><div class="bg-white rounded-[24px] sm:rounded-[28px] w-full max-w-[640px] max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto overscroll-contain my-2 sm:my-6 p-5 sm:p-7 belt-shadow relative">${inner}</div></div>`;
   if(mode==='form'){
     return shell(`
-      <div class="flex items-center justify-between"><span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-black text-white">YONDAN+ • THESIS SUBMISSION</span><button class="tCloseBtn w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center press">✕</button></div>
+      <div class="flex items-center justify-between"><span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-black text-white">GODAN+ • THESIS SUBMISSION</span><button class="tCloseBtn w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center press">✕</button></div>
       <h2 class="fredoka text-[22px] font-bold mt-3">Submit Your Thesis</h2>
       <p class="text-[13px] font-medium text-black/50 mt-1">Share what you learned in your martial art journey. Methodology + contribution required — Sensei reviews every submission.</p>
       <form id="thesisForm" class="mt-5 space-y-4">
@@ -257,7 +257,7 @@ function thesisModalHtml(saved){
       <div class="flex items-center justify-between flex-wrap gap-2"><h2 class="fredoka text-[22px] font-bold">Pending Theses</h2><div class="flex items-center gap-2"><span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-black text-white">${saved.length} SAVED</span><button class="tCloseBtn w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center press">✕</button></div></div>
       <div class="mt-4 space-y-3">
         ${saved.length?saved.map((t,i)=>`<div class="rounded-2xl border-2 border-black/5 bg-[#FAF8F5] p-4">
-          <div class="flex items-center gap-2"><span class="text-[10px] font-black tracking-widest px-2 py-0.5 rounded-full bg-white border">${esc(t.grade||'Yondan+')}</span><span class="text-[10px] font-bold text-black/40">#${i+1}</span><button data-tdel="${i}" class="tDel ml-auto w-7 h-7 rounded-full bg-white border flex items-center justify-center text-[12px] press" title="Remove from batch">✕</button></div>
+          <div class="flex items-center gap-2"><span class="text-[10px] font-black tracking-widest px-2 py-0.5 rounded-full bg-white border">${esc(t.grade||'Godan+')}</span><span class="text-[10px] font-bold text-black/40">#${i+1}</span><button data-tdel="${i}" class="tDel ml-auto w-7 h-7 rounded-full bg-white border flex items-center justify-center text-[12px] press" title="Remove from batch">✕</button></div>
           <div class="font-bold text-[14px] mt-2 leading-snug">${esc(t.title)}</div>
           <div class="text-[12px] text-black/50 mt-1 leading-snug"><b class="text-black/70">Method:</b> ${esc(t.method)}</div>
           <div class="text-[12px] text-black/50 mt-1 leading-snug"><b class="text-black/70">Contribution:</b> ${esc(t.contribution)}</div>
@@ -309,6 +309,7 @@ let state={
  wobble:false,
  outOfHearts:false,
  thesisModal:null,
+ lockedBelt:false,
 };
 
 const app=document.getElementById('app');
@@ -336,6 +337,9 @@ function getLesson(){
 }
 
 function renderApp(){
+  try{ if(window.__wSlideTimer){ clearInterval(window.__wSlideTimer); window.__wSlideTimer=null; } }catch(_){}
+  document.onkeydown=null;
+  if(state.view!=='path') state.lockedBelt=false;
   const belt = belts.find(b=>b.id===state.belt) || belts[0];
   const lesson = getLesson();
   const q = lesson[state.qIndex];
@@ -343,11 +347,31 @@ function renderApp(){
 
   if(state.view==='welcome'){
     const WK=new Date().toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();
-    const pathPct=Math.min(100,Math.round(state.completed.length/Math.max(belts.length,1)*100));
-    const pos=Math.min(94,Math.max(6,pathPct));
     const FB='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true" class="ic"><path d="M13.4 21v-6.9h2.3l.35-2.7h-2.65V9.7c0-.78.22-1.31 1.34-1.31h1.43V5.97c-.25-.03-1.1-.1-2.08-.1-2.06 0-3.47 1.25-3.47 3.56v1.97H8.3v2.7h2.32V21h2.78z"/></svg>';
     const IG='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.1" cy="6.9" r="0.6" fill="currentColor" stroke="none"/></svg>';
+    const ARR_L='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg>';
+    const ARR_R='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>';
+    // ---- Slideshow content: a tour of everything the app does (real catalog data, graceful fallbacks) ----
+    const dictDemo=(dictionary.length?dictionary:[{term:'Rei',reading:'れい',definition:'Bow — respect made visible.',category:'Command'},{term:'Zanshin',reading:'ざんしん',definition:'Awareness that remains after the technique ends.',category:'Concept'}]).slice(0,2);
+    const libDemo=(library.length?library:[{type:'Book',category:'Philosophy',title:'Karate-Do: My Way of Life',author:'Gichin Funakoshi'},{type:'Reference',category:'Rules',title:'WKF Kata Rules',author:'World Karate Federation'}]).slice(0,2);
+    const resDemo=(research.length?research:[{tag:'Methodology',title:'Oral grading as a tool for kata understanding',author:'Sensei Bola',rank:'Rokudan'},{tag:'Original Research',title:'Retention drills that work on the dojo floor',author:'Sensei Ada',rank:'Godan'}]).slice(0,2);
+    const beltChips=belts.map((b,i)=>{
+      const dark=(b.id>=9);
+      const curB=(b.id===state.belt);
+      const passed=state.completed.includes(b.id);
+      return `<span title="Step ${i+1} — ${esc(b.from)} → ${esc(b.to)}" class="relative w-[22px] sm:w-8 h-9 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center fredoka font-black text-[10px] sm:text-[13px] ${dark?'text-white':'text-black/70'} ${curB?'ring-2 ring-white ring-offset-2 ring-offset-[#14B8A6] -translate-y-2':''}" style="background:${b.color||b.bg||'#FFFFFF'};border:1px solid rgba(0,0,0,.14)">${b.kanji||String(i+1)}${passed?`<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#2ECC71] border-2 border-[#14B8A6]"></span>`:''}</span>`;
+    }).join('');
+    const slideLabels=['Welcome','Belt Path','Dictionary','Contribute & Feedback','Library','Research Hub'];
+    const dots=slideLabels.map((lb,i)=>`<button data-dot="${i}" aria-label="Slide ${i+1}: ${lb}" class="h-1.5 rounded-full transition-all duration-300 ${i===0?'w-6 bg-white':'w-1.5 bg-white/40 hover:bg-white/70'}"></button>`).join('');
+    const eyebrow=(icon,txt)=>`<div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 text-[9.5px] sm:text-[10.5px] font-black tracking-[0.22em] text-white">${icon} ${txt}</div>`;
+    const cta=(go,txt)=>`<div class="mt-4 sm:mt-6"><button data-go="${go}" class="inline-flex items-center gap-2 h-11 pl-5 pr-4 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[13px] sm:text-[14px] shadow-[0_8px_20px_-6px_rgba(0,0,0,0.35)] hover:bg-white/90 transition-all">${txt} <span aria-hidden="true">→</span></button></div>`;
     app.innerHTML=`
+    <style>
+    #wSlides{display:grid;grid-template-columns:minmax(0,1fr);min-width:0}
+    .wslide{grid-area:1/1;opacity:0;pointer-events:none;transform:translateX(26px);transition:opacity .55s cubic-bezier(.2,.8,.2,1),transform .55s cubic-bezier(.2,.8,.2,1)}
+    .wslide.wOn{opacity:1;pointer-events:auto;transform:translateX(0)!important}
+    @media (prefers-reduced-motion:reduce){.wslide{transition:opacity .3s ease;transform:none!important}}
+    </style>
     <div class="min-h-[100dvh] w-full flex flex-col bg-[#FAF8F5]">
       <section class="relative flex-1 flex flex-col bg-[#14B8A6] rounded-bl-[64px] sm:rounded-bl-[100px] lg:rounded-bl-[150px] overflow-hidden">
         <div class="absolute inset-y-0 right-0 w-[46%] pointer-events-none select-none overflow-hidden" aria-hidden="true">
@@ -361,35 +385,97 @@ function renderApp(){
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.gem} ${state.gems}</span>
             </div>
           </div>
-          <div class="flex-1 flex flex-col justify-center py-9 sm:py-12 max-w-[680px]">
-            <svg viewBox="0 0 24 24" width="36" height="36" fill="#FFD93D" aria-hidden="true"><path d="M10.2 6.5H6.4c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5zm9.8 0h-3.8c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5z"/></svg>
-            <h1 class="fredoka text-[50px] sm:text-[76px] lg:text-[92px] leading-[0.98] font-bold tracking-tight text-white mt-5 sm:mt-7">Welcome<br>to the<br>Dojo.</h1>
-            <p class="mt-5 sm:mt-6 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">The oral path from white belt to 10th Dan. History, technique, tradition, philosophy &amp; research — graded the way the masters intended: out loud.</p>
-            <div class="mt-6 sm:mt-8 flex gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span></div>
-            <div class="relative h-12 mt-3 flex items-center max-w-[540px]">
+          <div class="flex-1 flex flex-col justify-center py-6 sm:py-8 max-w-[680px] w-full">
+            <div id="wSlides" aria-roledescription="carousel" aria-label="Everything Oral Dojo does">
+              <div class="wslide" role="group" aria-label="Welcome">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="#FFD93D" aria-hidden="true"><path d="M10.2 6.5H6.4c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5zm9.8 0h-3.8c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5z"/></svg>
+                <h1 class="fredoka text-[46px] sm:text-[72px] lg:text-[92px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-6">Welcome<br>to the<br>Dojo.</h1>
+                <p class="mt-4 sm:mt-6 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">The oral path from white belt to 10th Dan — graded the way the masters intended: out loud. Here is everything inside the Dojo.</p>
+                <div class="mt-5 sm:mt-7"><button data-next class="inline-flex items-center gap-2 h-11 pl-5 pr-4 rounded-full border border-white/30 text-white fredoka font-bold text-[13px] sm:text-[14px] hover:bg-white/10 transition-all">See what is inside <span aria-hidden="true">→</span></button></div>
+              </div>
+              <div class="wslide" role="group" aria-label="Belt Path">
+                ${eyebrow(I.belt,'THE BELT PATH • ORAL GRADING')}
+                <h2 class="fredoka text-[38px] sm:text-[60px] lg:text-[72px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-5">${belts.length} belts.<br>One voice.</h2>
+                <p class="mt-3 sm:mt-4 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[540px]">From white belt to 10th Dan — history, technique, philosophy and tradition, graded out loud. Tap a belt, face Sensei, earn your rank.</p>
+                <div class="mt-4 sm:mt-6 flex flex-wrap items-center gap-1.5 sm:gap-2 max-w-[600px]">${beltChips}</div>
+                <div class="mt-2.5 text-[9.5px] sm:text-[11px] font-black tracking-[0.2em] text-white/70">NOW GRADING: ${esc(belt.from).toUpperCase()} → ${esc(belt.to).toUpperCase()}</div>
+                ${cta('path','View Your Path')}
+              </div>
+              <div class="wslide" role="group" aria-label="Dictionary">
+                ${eyebrow(I.alphabet,'DOJO DICTIONARY')}
+                <h2 class="fredoka text-[38px] sm:text-[60px] lg:text-[72px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-5">Speak the<br>language.</h2>
+                <p class="mt-3 sm:mt-4 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">Japanese terms, commands and concepts every karateka should know — search, learn, then use them on the floor.</p>
+                <div class="mt-4 sm:mt-6 grid sm:grid-cols-2 gap-2.5 max-w-[560px]">
+                  ${dictDemo.map(d=>`
+                  <div class="bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-left">
+                    <div class="flex items-baseline gap-2 flex-wrap"><span class="fredoka font-bold text-[15px] sm:text-[17px] text-white">${esc(d.term)}</span>${d.reading?`<span class="text-[11px] text-white/60 font-semibold">${esc(d.reading)}</span>`:''}<span class="ml-auto text-[8.5px] font-black tracking-[0.14em] text-white/50 uppercase">${esc(d.category||'')}</span></div>
+                    <p class="text-[12px] sm:text-[13px] text-white/75 font-medium leading-snug mt-1.5 line-clamp-2">${esc(d.definition)}</p>
+                  </div>`).join('')}
+                </div>
+                ${cta('dictionary','Open Dictionary')}
+              </div>
+              <div class="wslide" role="group" aria-label="Contribution and Feedback">
+                ${eyebrow(I.handshake,'CONTRIBUTION & FEEDBACK')}
+                <h2 class="fredoka text-[38px] sm:text-[60px] lg:text-[72px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-5">Grow the<br>Dojo.</h2>
+                <p class="mt-3 sm:mt-4 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">Add grading questions for the students coming after you, or tell Sensei what the dojo should do next — every voice shapes the path.</p>
+                <div class="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 max-w-[560px]">
+                  <button data-go="contribute" class="bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-left hover:bg-white/20 transition-all">
+                    <div class="w-9 h-9 rounded-full border border-white/30 text-white flex items-center justify-center text-[15px]">${I.handshake}</div>
+                    <div class="fredoka font-bold text-[14px] sm:text-[15px] text-white mt-2.5">Add Questions</div>
+                    <p class="text-[11px] sm:text-[12px] text-white/70 font-medium leading-snug mt-1">Write oral grading questions for any belt.</p>
+                  </button>
+                  <button data-go="feedback" class="bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-left hover:bg-white/20 transition-all">
+                    <div class="w-9 h-9 rounded-full border border-white/30 text-white flex items-center justify-center text-[15px]">${I.chat}</div>
+                    <div class="fredoka font-bold text-[14px] sm:text-[15px] text-white mt-2.5">Give Feedback</div>
+                    <p class="text-[11px] sm:text-[12px] text-white/70 font-medium leading-snug mt-1">Tell Sensei what the dojo should do next.</p>
+                  </button>
+                </div>
+              </div>
+              <div class="wslide" role="group" aria-label="Library">
+                ${eyebrow(I.archive,'DOJO LIBRARY')}
+                <h2 class="fredoka text-[38px] sm:text-[60px] lg:text-[72px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-5">Read the<br>masters.</h2>
+                <p class="mt-3 sm:mt-4 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">Books, references, articles and videos for every step of the path — from Funakoshi's autobiography to the WKF rulebook.</p>
+                <div class="mt-4 sm:mt-6 grid sm:grid-cols-2 gap-2.5 max-w-[560px]">
+                  ${libDemo.map(l=>`
+                  <div class="bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-left">
+                    <div class="flex items-center gap-2"><span class="text-[8.5px] font-black tracking-[0.14em] px-2 py-0.5 rounded-full bg-[#FFD93D] text-black uppercase shrink-0">${esc(l.type||'')}</span><span class="text-[9px] font-bold text-white/60 uppercase tracking-widest truncate">${esc(l.category||'')}</span></div>
+                    <div class="fredoka font-bold text-[14px] sm:text-[16px] text-white leading-tight mt-2 line-clamp-2">${esc(l.title)}</div>
+                    ${l.author?`<div class="text-[11px] text-white/60 font-semibold mt-0.5">${esc(l.author)}</div>`:''}
+                  </div>`).join('')}
+                </div>
+                ${cta('library','Browse Library')}
+              </div>
+              <div class="wslide" role="group" aria-label="Research Hub">
+                ${eyebrow(I.books,'GODAN RESEARCH HUB • 5TH DAN+')}
+                <h2 class="fredoka text-[38px] sm:text-[60px] lg:text-[72px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-5">The<br>Theses.</h2>
+                <p class="mt-3 sm:mt-4 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">From 5th Dan the Dojo asks: what have you contributed? Original research, methodology and testimony from Godan to Judan.</p>
+                <div class="mt-4 sm:mt-6 grid sm:grid-cols-2 gap-2.5 max-w-[560px]">
+                  ${resDemo.map(r=>`
+                  <div class="bg-white/10 border border-white/15 rounded-2xl p-3.5 sm:p-4 text-left">
+                    <div class="flex items-center gap-2"><span class="text-[8.5px] font-black tracking-[0.14em] px-2 py-0.5 rounded-full bg-white text-black uppercase shrink-0">${esc(r.tag||'Research')}</span></div>
+                    <div class="text-[13px] sm:text-[14px] font-bold text-white leading-snug mt-2 line-clamp-2">${esc(r.title)}</div>
+                    <div class="text-[11px] text-white/60 font-semibold mt-1">by ${esc(r.author)} • ${esc(r.rank||'')}</div>
+                  </div>`).join('')}
+                </div>
+                ${cta('research','Enter Research Hub')}
+              </div>
+            </div>
+            <div class="mt-5 sm:mt-7 flex items-center gap-3 sm:gap-4">
+              <button id="wSlidePrev" aria-label="Previous slide" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/30 text-white flex items-center justify-center hover:bg-white/10 transition shrink-0">${ARR_L}</button>
+              <div id="wDots" class="flex items-center gap-1.5 sm:gap-2">${dots}</div>
+              <button id="wSlideNext" aria-label="Next slide" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/30 text-white flex items-center justify-center hover:bg-white/10 transition shrink-0">${ARR_R}</button>
+              <div class="ml-auto hidden md:flex items-center gap-2 text-[9.5px] font-black tracking-[0.24em] text-white/60">AUTO-PLAYS • SWIPE • ARROW KEYS</div>
+            </div>
+            <div class="relative h-12 mt-3 sm:mt-5 flex items-center max-w-[540px]">
               <div class="relative w-full h-[2px] bg-white/30 rounded-full">
-                <div class="absolute left-0 top-0 h-full bg-white/90 rounded-full transition-all" style="width:${pathPct}%"></div>
+                <div id="wProgFill" class="absolute left-0 top-0 h-full bg-white/90 rounded-full transition-all" style="width:0%"></div>
                 <div class="absolute -top-[4px] right-0 w-[2px] h-[10px] bg-white/50 rounded-full"></div>
               </div>
-              <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 rounded-full bg-white flex items-center justify-center shadow-[0_6px_16px_-4px_rgba(0,0,0,0.25)] z-10" style="left:${pos}%">
-                <span class="fredoka text-[11px] font-bold text-[#0F766E]">${pathPct}%</span>
+              <div id="wProgBubble" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 rounded-full bg-white flex items-center justify-center shadow-[0_6px_16px_-4px_rgba(0,0,0,0.25)] z-10" style="left:6%">
+                <span class="fredoka text-[11px] font-bold text-[#0F766E]">0%</span>
               </div>
             </div>
             <div class="mt-2 text-[10px] sm:text-[11px] font-black tracking-[0.24em] text-white">${WK} IS <span class="text-white/60">GRADING DAY</span></div>
-            <div class="mt-8 sm:mt-10 flex gap-8 sm:gap-10">
-              <button id="wDictionary" title="Open Dictionary" class="flex flex-col items-center gap-1.5 press">
-                <span class="w-10 h-10 rounded-full border border-white/30 text-white flex items-center justify-center text-[16px] hover:bg-white/10 transition">${I.alphabet}</span>
-                <span class="text-[8.5px] font-black tracking-[0.18em] text-white/70">DICTIONARY</span>
-              </button>
-              <button id="wLibrary" title="Open Library" class="flex flex-col items-center gap-1.5 press">
-                <span class="w-10 h-10 rounded-full border border-white/30 text-white flex items-center justify-center text-[16px] hover:bg-white/10 transition">${I.archive}</span>
-                <span class="text-[8.5px] font-black tracking-[0.18em] text-white/70">LIBRARY</span>
-              </button>
-              <button id="wFeedback" title="Give Feedback" class="flex flex-col items-center gap-1.5 press">
-                <span class="w-10 h-10 rounded-full border border-white/30 text-white flex items-center justify-center text-[16px] hover:bg-white/10 transition">${I.chat}</span>
-                <span class="text-[8.5px] font-black tracking-[0.18em] text-white/70">FEEDBACK</span>
-              </button>
-            </div>
           </div>
           <div class="pb-5 sm:pb-7 flex justify-end">
             <div class="text-right leading-tight">
@@ -417,17 +503,58 @@ function renderApp(){
         </div>
       </footer>
     </div>`;
+    // ---- Slideshow engine (auto-advance, arrows, dots, swipe, keyboard; cleaned up on every render) ----
+    const stageEl=document.getElementById('wSlides');
+    const slideEls=[...stageEl.querySelectorAll('.wslide')];
+    const dotEls=[...document.querySelectorAll('#wDots [data-dot]')];
+    let cur=0; const NSL=slideEls.length;
+    function wPaint(){
+      slideEls.forEach((el,i)=>{
+        const on=(i===cur);
+        el.classList.toggle('wOn',on);
+        el.style.transform=on?'translateX(0)':(i<cur?'translateX(-26px)':'translateX(26px)');
+        el.setAttribute('aria-hidden',on?'false':'true');
+      });
+      dotEls.forEach((d,i)=>{
+        d.className='h-1.5 rounded-full transition-all duration-300 '+(i===cur?'w-6 bg-white':'w-1.5 bg-white/40 hover:bg-white/70');
+      });
+      // Progress bar tracks the tour: 0% on Welcome -> 100% on the last slide
+      const pct=Math.round(cur/(NSL-1)*100);
+      const fill=document.getElementById('wProgFill'); const bub=document.getElementById('wProgBubble');
+      if(fill) fill.style.width=pct+'%';
+      if(bub){ bub.style.left=Math.min(94,Math.max(6,pct))+'%'; const t=bub.querySelector('span'); if(t) t.textContent=pct+'%'; }
+    }
+    function wGo(n,manual){ cur=((n%NSL)+NSL)%NSL; wPaint(); if(manual) wStart(); }
+    function wStop(){ if(window.__wSlideTimer){ clearInterval(window.__wSlideTimer); window.__wSlideTimer=null; } }
+    function wStart(){ wStop(); window.__wSlideTimer=setInterval(()=>{ if(document.visibilityState==='visible') wGo(cur+1); },6500); }
+    wPaint(); wStart();
+    document.getElementById('wSlidePrev').addEventListener('click',()=>wGo(cur-1,true));
+    document.getElementById('wSlideNext').addEventListener('click',()=>wGo(cur+1,true));
+    document.getElementById('wDots').addEventListener('click',e=>{ const d=e.target.closest('[data-dot]'); if(d) wGo(parseInt(d.dataset.dot,10),true); });
+    stageEl.addEventListener('click',e=>{
+      const go=e.target.closest('[data-go]');
+      if(go){ wStop(); transition(go.dataset.go); return; }
+      if(e.target.closest('[data-next]')) wGo(cur+1,true);
+    });
+    let touchX=null;
+    stageEl.addEventListener('touchstart',e=>{ touchX=e.changedTouches[0].clientX; },{passive:true});
+    stageEl.addEventListener('touchend',e=>{ if(touchX===null)return; const dx=e.changedTouches[0].clientX-touchX; if(Math.abs(dx)>42) wGo(cur+(dx<0?1:-1),true); touchX=null; },{passive:true});
+    stageEl.addEventListener('pointermove',wStop);
+    stageEl.addEventListener('pointerleave',wStart);
+    document.onkeydown=e=>{
+      if(!document.getElementById('wSlides')) return;
+      if(e.key==='ArrowRight') wGo(cur+1,true);
+      else if(e.key==='ArrowLeft') wGo(cur-1,true);
+    };
     document.getElementById('startBtn').onclick=()=>transition('path');
-    document.getElementById('wDictionary')?.addEventListener('click',()=>transition('dictionary'));
-    document.getElementById('wLibrary')?.addEventListener('click',()=>transition('library'));
     document.getElementById('wContributeMain')?.addEventListener('click',()=>transition('contribute'));
-    document.getElementById('wFeedback')?.addEventListener('click',()=>transition('feedback'));
   } else if(state.view==='path'){
     app.innerHTML=`
-    <div class="min-h-screen">
-      <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06] backdrop-blur-xl">
+    <div class="min-h-screen bg-[#14B8A6] relative overflow-x-clip">
+      <div class="absolute inset-y-0 right-0 w-[46%] pointer-events-none select-none overflow-hidden" aria-hidden="true"><div class="fredoka text-[300px] sm:text-[430px] leading-none font-black text-white/[0.07] -mr-8 -mt-14">道</div></div>
+      <header class="sticky top-0 z-30 bg-[#14B8A6]/85 border-b border-white/10 backdrop-blur-xl">
         <div class="max-w-[980px] mx-auto px-4 h-[64px] flex items-center justify-between">
-          <div class="flex items-center gap-3"><img src="assets/logo/oldo-logo.png" alt="CD Logo" class="h-8 w-auto max-w-[110px] object-contain"><div class="hidden sm:block"><div class="text-[11px] font-semibold text-black/50 tracking-wide">DEMO EDITION</div></div><button id="toWelcome" class="ml-2 sm:ml-4 w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</button></div>
+          <div class="flex items-center gap-3"><img src="assets/logo/oldo-logo.png" alt="CD Logo" class="h-8 w-auto max-w-[110px] object-contain"><div class="hidden sm:block"><div class="text-[11px] font-semibold text-white/70 tracking-wide">DEMO EDITION</div></div><button id="toWelcome" class="ml-2 sm:ml-4 w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</button></div>
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-1.5 bg-white border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.flame}<span class="text-[13px] font-bold">${state.streak}</span></div>
             <div class="flex items-center gap-1.5 bg-white border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.heart}<span class="text-[13px] font-bold">∞</span></div>
@@ -438,9 +565,9 @@ function renderApp(){
           </div>
         </div>
       </header>
-      <div class="max-w-[980px] mx-auto px-4 py-6 grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-start">
-        <div class="relative bg-white rounded-[28px] belt-shadow border border-black/5 p-5 sm:p-7 overflow-hidden">
-          <div class="relative -mx-5 sm:-mx-7 -mt-5 sm:-mt-7 mb-6 bg-[#14B8A6] rounded-bl-[44px] px-5 sm:px-7 py-5 overflow-hidden">
+      <div class="relative z-10 max-w-[980px] mx-auto px-4 py-6 grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-start">
+        <div class="relative bg-white/10 border border-white/15 rounded-[28px] rounded-bl-[64px] p-5 sm:p-7 overflow-hidden backdrop-blur-sm">
+          <div class="relative -mx-5 sm:-mx-7 -mt-5 sm:-mt-7 mb-6 bg-[#0F766E]/60 rounded-bl-[44px] rounded-tr-[44px] px-5 sm:px-7 py-5 overflow-hidden">
             <div class="absolute -right-3 -top-7 fredoka text-[120px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
             <div class="relative flex items-center justify-between gap-3"><div><h2 class="fredoka text-[24px] sm:text-[26px] font-bold leading-none text-white">Belt Path</h2><p class="text-[10px] font-black text-white/70 mt-1.5 tracking-[0.22em]">ORAL GRADING • TAP TO START LESSON</p></div><button id="researchBtn" class="h-9 px-4 rounded-full bg-white/15 border border-white/25 text-white text-[12px] font-bold flex items-center gap-1.5 hover:bg-white/25 transition shrink-0">${I.book} Research Hub</button></div>
           </div>
@@ -469,7 +596,7 @@ function renderApp(){
           .belt-ribbon .kanji-badge{ font-family:"Fredoka"; font-weight:900; font-size:18px }
           .belt-ribbon.completed .belt-node{ outline:3px solid #2ECC71; outline-offset:2px }
           .belt-ribbon.locked{ opacity:.92; filter:saturate(.85) }
-          .belt-track-hint{ display:flex; gap:8px; align-items:center; justify-content:center; margin-top:6px; font-size:11px; font-weight:700; letter-spacing:.08em; color:rgba(0,0,0,.35) }
+          .belt-track-hint{ display:flex; gap:8px; align-items:center; justify-content:center; margin-top:6px; font-size:11px; font-weight:700; letter-spacing:.08em; color:rgba(255,255,255,.6) }
           </style>
           <div class="belt-track-wrap">
             <div class="belt-track" id="beltTrack">
@@ -494,7 +621,7 @@ function renderApp(){
                         <div class="mt-2 flex flex-wrap gap-1">${(b.focus||[]).slice(0,2).map(f=>`<span class="text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:${b.id>=9?'rgba(255,255,255,.18)':'rgba(0,0,0,.06)'}; color:${b.id>=9?'#fff':'#333'}">${f}</span>`).join('')}</div>
                         ${passed?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-[#2ECC71] text-white">${I.check} PASSED</div>`:''}
                         ${isCurrent?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-black text-white">CURRENT</div>`:''}
-                        ${isCurrent?'<div class="absolute top-5 right-3 w-7 h-7 bg-[#14B8A6] rounded-full border-2 border-white flex items-center justify-center shadow-md animate-bounce"><span class="text-white text-[12px]">🥋</span></div>':''}
+                        ${b.id>=11?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-[#FFD93D] text-black">FULL EDITION</div>`:''}
                       </div>
                     </div>
                   </div>
@@ -505,7 +632,7 @@ function renderApp(){
               }).join('')}
             </div>
             <div class="belt-track-hint"><span>←</span> SCROLL TO SEE ALL BELTS — ${belts.length} LEVELS <span>→</span></div>
-            <div class="mt-5 bg-[#FAF8F5] rounded-[18px] border border-dashed border-black/10 p-3.5 text-center"><div class="fredoka font-bold text-[13px]">The path ends at Judan — mastery never ends ${I.belt}</div><div class="text-[11px] text-black/50 font-medium mt-1">All 13 belts are open: train, grade, and contribute to the dojo. Current belt pops to top.</div></div>
+            <div class="mt-5 bg-white/10 rounded-[18px] border border-dashed border-white/25 p-3.5 text-center"><div class="fredoka font-bold text-[13px] text-white">The path ends at Judan — mastery never ends ${I.belt}</div><div class="text-[11px] text-white/70 font-medium mt-1">All 13 belts are open: train, grade, and contribute to the dojo. Current belt pops to top.</div></div>
           </div>
 
         </div>
@@ -518,14 +645,15 @@ function renderApp(){
             </div>
             <div class="mt-4"><div class="flex justify-between text-[11px] font-bold mb-2"><span class="text-black/50">NEXT: ${belt.from} → ${belt.to}</span><span>${Math.round(state.completed.length/13*100)}%</span></div><div class="h-2.5 bg-[#FAF8F5] rounded-full overflow-hidden border border-black/5"><div class="h-full bg-black rounded-full progress-stripe transition-all" style="width:${state.completed.length/13*100}%"></div></div></div>
           </div>
-          <div class="bg-black text-white rounded-[24px] belt-shadow border border-white/10 p-5 relative overflow-hidden"><div class="absolute -right-10 -top-10 w-40 h-40 bg-[#FFD93D] rounded-full blur-[40px] opacity-20"></div><div class="relative"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">${I.books}</div><div><div class="fredoka font-bold text-[14px] leading-none">Yondan Research Hub</div><div class="text-[11px] text-white/60 font-medium">4th Dan+ theses & stories</div></div><span class="ml-auto bg-[#FFD93D] text-black text-[10px] font-black px-2 py-1 rounded-full">NEW</span></div><div class="space-y-2">${research.slice(0,2).map(r=>`<div class="bg-white/10 rounded-2xl p-3 border border-white/10"><div class="text-[12px] font-bold leading-tight line-clamp-2">${r.title}</div><div class="text-[11px] text-white/60 mt-1">by ${r.author} • ${r.rank}</div></div>`).join('')}</div><button id="openResearch2" class="mt-4 w-full h-10 rounded-full bg-white text-black fredoka font-bold text-[13px] flex items-center justify-center gap-1.5">Open Research Hub →</button></div></div>
+          <div class="bg-black text-white rounded-[24px] belt-shadow border border-white/10 p-5 relative overflow-hidden"><div class="absolute -right-10 -top-10 w-40 h-40 bg-[#FFD93D] rounded-full blur-[40px] opacity-20"></div><div class="relative"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">${I.books}</div><div><div class="fredoka font-bold text-[14px] leading-none">Godan Research Hub</div><div class="text-[11px] text-white/60 font-medium">5th Dan+ theses & stories</div></div><span class="ml-auto bg-[#FFD93D] text-black text-[10px] font-black px-2 py-1 rounded-full">NEW</span></div><div class="space-y-2">${research.slice(0,2).map(r=>`<div class="bg-white/10 rounded-2xl p-3 border border-white/10"><div class="text-[12px] font-bold leading-tight line-clamp-2">${r.title}</div><div class="text-[11px] text-white/60 mt-1">by ${r.author} • ${r.rank}</div></div>`).join('')}</div><button id="openResearch2" class="mt-4 w-full h-10 rounded-full bg-white text-black fredoka font-bold text-[13px] flex items-center justify-center gap-1.5">Open Research Hub →</button></div></div>
           <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5"><div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[16px]">${I.handshake} Dojo Community</h3><span class="text-[10px] font-black tracking-widest bg-[#FFD93D] px-2 py-1 rounded-full">OPEN</span></div><p class="text-[12px] font-medium text-black/50 mt-1">Help grow the dojo — add grading questions or tell Sensei what you think.</p><div class="grid grid-cols-2 gap-2 mt-3"><button id="sideContribute" class="h-11 rounded-2xl bg-black text-white font-bold text-[12px] press">Add Questions</button><button id="sideFeedback" class="h-11 rounded-2xl bg-[#FAF8F5] border font-bold text-[12px] press">Give Feedback</button></div></div>
           <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold flex items-center gap-2">${I.star} Dojo Leaderboard</h3><span class="text-[11px] font-bold bg-[#FAF8F5] border px-2 py-1 rounded-full">Weekly</span></div><div class="space-y-2.5">${leaderboard.map((u,i)=>`<div class="flex items-center gap-3 p-2.5 rounded-2xl border ${u.name==="You"?"bg-black text-white border-black":"bg-[#FAF8F5] border-black/5"}"><div class="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold ${i===0?'bg-[#FFD93D] text-black':i===1?'bg-[#E5E5E5]':'bg-white border'}">${i+1}</div><div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-none ${u.name==="You"?"text-white":"text-black"}">${u.name}</div><div class="text-[11px] ${u.name==="You"?"text-white/60":"text-black/50"}">${u.belt}</div></div><div class="text-right"><div class="text-[12px] font-bold ${u.name==="You"?"text-[#FFD93D]":""}">${u.xp} XP</div><div class="flex items-center gap-1 text-[11px] font-bold text-[#FF8C42]">${I.flame} ${u.streak}</div></div></div>`).join('')}</div></div>
-          <div class="text-center text-[11px] font-medium text-black/30 py-2">Oral Grading • History • Techniques • Philosophy • Tradition • Research</div>
+          <div class="text-center text-[11px] font-medium text-white/50 py-2">Oral Grading • History • Techniques • Philosophy • Tradition • Research</div>
         </div>
       </div>
     </div>
-    ${state.menu?`<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex items-end sm:items-center justify-center"><div class="bg-white rounded-[28px] w-full max-w-[380px] p-5 belt-shadow"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold text-[18px]">Dojo Menu</h3><button id="closeMenu" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">✕</button></div><div class="space-y-2"><button data-go="path" class="menuGo w-full h-12 rounded-2xl bg-black text-white font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.belt} Belt Path</span>→</button><button data-go="dictionary" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.alphabet} Dictionary</span>→</button><button data-go="library" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.archive} Library</span>→</button><button data-go="research" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.books} Research Hub</span>→</button><button data-go="contribute" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.handshake} Contribution</span>→</button><button data-go="feedback" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.chat} Feedback</span>→</button><button data-go="welcome" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.users} Welcome</span>→</button></div></div></div>`:''}
+    ${state.menu?`<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex items-end sm:items-center justify-center"><div class="bg-white rounded-[28px] w-full max-w-[380px] p-5 belt-shadow"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold text-[18px]">Dojo Menu</h3><button id="closeMenu" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">✕</button></div><div class="space-y-2"><button data-go="path" class="menuGo w-full h-12 rounded-2xl bg-black text-white font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.belt} Belt Path</span>→</button><button data-go="dictionary" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.alphabet} Dictionary</span>→</button><button data-go="library" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.archive} Library</span>→</button><button data-go="research" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.books} Research Hub</span>→</button><button data-go="contribute" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.handshake} Contribution</span>→</button><button data-go="feedback" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.chat} Feedback</span>→</button><button data-go="welcome" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><button data-go="welcome" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.users} Welcome</span>→</button></div></div></div></div>`:''}
+      ${state.lockedBelt?`<div id="lockBackdrop" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex items-end sm:items-center justify-center"><div class="relative bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] w-full max-w-[400px] p-7 overflow-hidden belt-shadow"><div class="absolute -right-3 -top-8 fredoka text-[150px] leading-none font-black text-white/10 select-none pointer-events-none">道</div><div class="relative"><span class="inline-flex items-center bg-[#FFD93D] text-black text-[10px] font-black px-2.5 py-1 rounded-full tracking-[0.18em]">FULL EDITION</span><h3 class="fredoka text-[26px] font-bold leading-[1.05] mt-3">Coming in the<br>Full Edition.</h3><p class="text-[13px] font-medium text-white/80 mt-2.5 leading-relaxed">Yondan and Godan oral gradings — live Sensei sessions, thesis defence and the senior curriculum — are part of the Oral Dojo Full Edition, coming soon.</p><div class="mt-5 space-y-2"><button id="lockClose" class="w-full h-12 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[14px] press">OSS! Got it</button><button id="lockWelcome" class="w-full h-11 rounded-full border border-white/30 text-white fredoka font-bold text-[13px] press">Back to Welcome</button></div></div></div></div>`:''}
     `;
     // events
     document.getElementById('toWelcome')?.addEventListener('click',()=>transition('welcome'));
@@ -539,8 +667,12 @@ function renderApp(){
     document.querySelectorAll('.menuGo').forEach(b=>b.addEventListener('click',e=>{state.menu=false; transition(e.currentTarget.dataset.go)}));
     document.getElementById('sideContribute')?.addEventListener('click',()=>transition('contribute'));
     document.getElementById('sideFeedback')?.addEventListener('click',()=>transition('feedback'));
+    document.getElementById('lockClose')?.addEventListener('click',()=>{state.lockedBelt=false; render();});
+    document.getElementById('lockWelcome')?.addEventListener('click',()=>{state.lockedBelt=false; transition('welcome');});
+    document.getElementById('lockBackdrop')?.addEventListener('click',e=>{ if(e.target.id==='lockBackdrop'){ state.lockedBelt=false; render(); } });
     document.querySelectorAll('.beltBtn').forEach(b=>b.addEventListener('click',e=>{
       const id=parseInt(e.currentTarget.dataset.belt);
+      if(id>=11){ state.lockedBelt=true; render(); return; }
       state.belt=id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.hearts=3; state.lastCompleted=id;
       transition('lesson');
     }));
@@ -666,7 +798,9 @@ function renderApp(){
       </div>
     </div>`;
     document.getElementById('continuePath').onclick=()=>{
-      if(nextPlayable){
+      if(nextPlayable && nextBelt.id>=11){
+        state.lockedBelt=true; transition('path');
+      } else if(nextPlayable){
         // Go straight into the next belt lesson - no need to re-select the belt
         state.lastCompleted=nextBelt.id;
         state.belt=nextBelt.id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.hearts=3;
@@ -681,14 +815,15 @@ function renderApp(){
     const saved=JSON.parse(localStorage.getItem('oralDojo_contributions')||'[]');
     const beltOptions=belts.map(b=>`<option value="${b.id}">${b.from} → ${b.to} (${b.short})</option>`).join('');
     app.innerHTML=`
-    <div class="min-h-screen">
-      <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
+    <div class="min-h-screen bg-[#14B8A6] relative overflow-x-clip">
+      <div class="absolute inset-y-0 right-0 w-[46%] pointer-events-none select-none overflow-hidden" aria-hidden="true"><div class="fredoka text-[260px] sm:text-[400px] leading-none font-black text-white/[0.07] -mr-8 -mt-12">道</div></div>
+      <header class="sticky top-0 z-30 bg-[#14B8A6]/85 border-b border-white/10 backdrop-blur-xl">
         <div class="max-w-[980px] mx-auto px-4 h-[64px] flex items-center justify-between">
           <button id="cfBack" class="flex items-center gap-2 font-bold"><div class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</div><span class="fredoka">Contribution</span></button>
           <span class="text-[11px] font-black tracking-widest bg-black text-[#FFD93D] px-3 py-1.5 rounded-full">DEMO EDITION</span>
         </div>
       </header>
-      <div class="max-w-[620px] mx-auto px-4 py-8">
+      <div class="relative z-10 max-w-[620px] mx-auto px-4 py-8">
       ${step==='gate'?`
         <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-7 text-center">
           <div class="w-16 h-16 mx-auto rounded-full bg-[#F5F0FF] border border-[#8E44AD]/20 flex items-center justify-center text-[30px]" style="color:#6C3483">${I.belt}</div>
@@ -870,14 +1005,15 @@ function renderApp(){
     }
   } else if(state.view==='feedback'){
     app.innerHTML=`
-    <div class="min-h-screen">
-      <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
+    <div class="min-h-screen bg-[#14B8A6] relative overflow-x-clip">
+      <div class="absolute inset-y-0 right-0 w-[46%] pointer-events-none select-none overflow-hidden" aria-hidden="true"><div class="fredoka text-[260px] sm:text-[400px] leading-none font-black text-white/[0.07] -mr-8 -mt-12">道</div></div>
+      <header class="sticky top-0 z-30 bg-[#14B8A6]/85 border-b border-white/10 backdrop-blur-xl">
         <div class="max-w-[980px] mx-auto px-4 h-[64px] flex items-center justify-between">
           <button id="fbBack" class="flex items-center gap-2 font-bold"><div class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</div><span class="fredoka">Feedback</span></button>
           <span class="text-[11px] font-black tracking-widest bg-black text-[#FFD93D] px-3 py-1.5 rounded-full">DEMO EDITION</span>
         </div>
       </header>
-      <div class="max-w-[620px] mx-auto px-4 py-8">
+      <div class="relative z-10 max-w-[620px] mx-auto px-4 py-8">
         <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-6 sm:p-7">
           <div class="w-16 h-16 mx-auto rounded-full bg-[#FFF8D6] border border-[#FFD93D]/40 flex items-center justify-center text-[30px]" style="color:#8A6D00">${I.chat}</div>
           <h2 class="fredoka text-[24px] font-bold mt-4 text-center">Tell us about it</h2>
@@ -996,21 +1132,21 @@ function renderApp(){
       <header class="sticky top-0 z-30 glass-dark border-b border-black/5">
         <div class="max-w-[980px] mx-auto px-4 h-[64px] flex items-center justify-between">
           <button id="backPath2" class="flex items-center gap-2 font-bold"><div class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</div><span class="fredoka">Research Hub</span></button>
-          <div class="flex items-center gap-2"><span class="hidden sm:flex text-[11px] font-bold tracking-widest bg-black text-white px-3 py-1.5 rounded-full">YONDAN+ • 4TH DAN AND ABOVE</span><button id="closeResearch" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">✕</button></div>
+          <div class="flex items-center gap-2"><span class="hidden sm:flex text-[11px] font-bold tracking-widest bg-black text-white px-3 py-1.5 rounded-full">GODAN+ • 5TH DAN AND ABOVE</span><button id="closeResearch" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">✕</button></div>
         </div>
       </header>
       <div class="max-w-[980px] mx-auto px-4 py-6 grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
         <div>
-          <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow"><div class="absolute -right-3 -top-9 fredoka text-[190px] leading-none font-black text-white/10 select-none pointer-events-none">道</div><div class="relative"><div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.books} 4TH DAN RESEARCH HUB</div><h1 class="fredoka text-[28px] sm:text-[36px] font-bold leading-[0.95] mt-4">Theses from the<br>martial journey.</h1><p class="text-[14px] leading-relaxed text-white/70 mt-3 max-w-[520px]">From 4th Dan, Karate-Do asks: what have you contributed? Here, Yondan to Judan share original research, methodology, business lessons, and personal testimonies. This is where karate becomes scholarship.</p><div class="mt-6 flex flex-wrap gap-2">${["Original Research","Methodology","Contribution","Bunkai","Business","Philosophy"].map(k=>`<span class="text-[11px] font-bold px-3 py-1.5 rounded-full bg-white text-black">${k}</span>`).join('')}</div></div></div>
+          <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow"><div class="absolute -right-3 -top-9 fredoka text-[190px] leading-none font-black text-white/10 select-none pointer-events-none">道</div><div class="relative"><div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.books} 5TH DAN RESEARCH HUB</div><h1 class="fredoka text-[28px] sm:text-[36px] font-bold leading-[0.95] mt-4">Theses from the<br>martial journey.</h1><p class="text-[14px] leading-relaxed text-white/70 mt-3 max-w-[520px]">From 5th Dan, Karate-Do asks: what have you contributed? Here, Godan to Judan share original research, methodology, business lessons, and personal testimonies. This is where theses live.</p><div class="mt-6 flex flex-wrap gap-2">${["Original Research","Methodology","Contribution","Bunkai","Business","Philosophy"].map(k=>`<span class="text-[11px] font-bold px-3 py-1.5 rounded-full bg-white text-black">${k}</span>`).join('')}</div></div></div>
           <div class="mt-6 grid sm:grid-cols-2 gap-4">${research.map(r=>`
             <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5 flex flex-col"><div class="flex items-center justify-between"><span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-[#FAF8F5] border">${r.tag}</span><span class="text-[11px] font-bold text-black/40 flex items-center gap-1">${I.heart} ${r.likes}</span></div><h3 class="fredoka font-bold text-[16px] leading-tight mt-3">${r.title}</h3><p class="text-[13px] leading-relaxed text-black/60 mt-2 flex-1">${r.excerpt}</p><div class="mt-4 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">${r.rank[0]}</div><div><div class="text-[12px] font-bold leading-none">${r.author}</div><div class="text-[11px] text-black/50 font-semibold">${r.rank} • 12 min read</div></div><button class="ml-auto w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">↗</button></div></div>
           `).join('')}</div>
-          <div class="mt-6 bg-white rounded-[24px] border-2 border-dashed border-black/10 p-6"><h3 class="fredoka font-bold text-[18px]">How to write a Yondan thesis?</h3><div class="mt-4 grid sm:grid-cols-2 gap-3 text-[13px] font-medium">${[{n:"1",t:"Question: What problem in karate are you solving?",d:"e.g., Why beginners quit after 3 months"},{n:"2",t:"Literature: What did old masters say?",d:"Reference Funakoshi, Mabuni, primary sources"},{n:"3",t:"Method: How did you test?",d:"Data from your dojo, HRV, interviews, video analysis"},{n:"4",t:"Contribution: What can others use?",d:"Drills, curriculum, business model that others can copy"}].map(k=>`<div class="bg-[#FAF8F5] rounded-2xl p-4 border border-black/5"><div class="flex items-center gap-2 font-black"><span class="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-[12px]">${k.n}</span>${k.t}</div><div class="text-black/60 mt-1 text-[12px]">${k.d}</div></div>`).join('')}</div></div>
+          <div class="mt-6 bg-white rounded-[24px] border-2 border-dashed border-black/10 p-6"><h3 class="fredoka font-bold text-[18px]">How to write a Godan thesis?</h3><div class="mt-4 grid sm:grid-cols-2 gap-3 text-[13px] font-medium">${[{n:"1",t:"Question: What problem in karate are you solving?",d:"e.g., Why beginners quit after 3 months"},{n:"2",t:"Literature: What did old masters say?",d:"Reference Funakoshi, Mabuni, primary sources"},{n:"3",t:"Method: How did you test?",d:"Data from your dojo, HRV, interviews, video analysis"},{n:"4",t:"Contribution: What can others use?",d:"Drills, curriculum, business model that others can copy"}].map(k=>`<div class="bg-[#FAF8F5] rounded-2xl p-4 border border-black/5"><div class="flex items-center gap-2 font-black"><span class="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-[12px]">${k.n}</span>${k.t}</div><div class="text-black/60 mt-1 text-[12px]">${k.d}</div></div>`).join('')}</div></div>
         </div>
         <div class="space-y-4">
           <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5"><h3 class="fredoka font-bold">What 10th Dan means</h3><p class="text-[13px] leading-relaxed text-black/60 mt-2">Judan is not given for fighting. It's for a life that embodied Do. Teaching thousands, preserving kata, writing, building community. Our app ends at 10th but journey never ends.</p><div class="mt-4 flex items-center gap-2 text-[11px] font-bold"><span class="px-3 py-1.5 rounded-full bg-black text-white">Shu</span>→<span class="px-3 py-1.5 rounded-full bg-[#FAF8F5] border">Ha</span>→<span class="px-3 py-1.5 rounded-full bg-[#FFD93D] border border-black/10">Ri</span></div></div>
-          <div class="bg-[#FFD93D] rounded-[24px] belt-shadow border border-black/10 p-5"><div class="fredoka font-bold text-[16px]">Submit your thesis</div><p class="text-[13px] font-medium mt-1 leading-relaxed">Are you Yondan+? Share what you learned in your martial art journey. Methodology + contribution required.</p>${thesisSaved.length?`<button id="thesisReview" class="mt-4 w-full h-11 rounded-full bg-[#14B8A6] hover:bg-[#0F766E] text-white font-bold text-[13px] flex items-center justify-center gap-2 press shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]"><span>Review &amp; Share ${thesisSaved.length} Pending Submission${thesisSaved.length===1?'':'s'}</span>→</button>`:''}<button id="openThesis" class="mt-4 w-full h-11 rounded-full bg-black text-white font-bold text-[13px] flex items-center justify-center gap-2 press"><span>Open Submission Form</span>→</button><p class="text-[11px] font-medium text-black/60 mt-2 text-center">Curated by senior grades • No McDojo content</p>${thesisSaved.length?`<p class="text-[11px] font-bold tracking-widest text-black/50 mt-2 text-center">${thesisSaved.length} SUBMISSION${thesisSaved.length===1?'':'S'} IN YOUR BATCH ON THIS DEVICE</p>`:''}</div>
-          <div class="bg-white rounded-[24px] border border-black/5 p-5"><h4 class="fredoka font-bold text-[14px]">Sample oral questions for Yondan</h4><ul class="mt-3 space-y-2 text-[13px] font-medium"><li class="flex gap-2"><span class="text-black/30">•</span> Explain your thesis methodology in 2 minutes</li><li class="flex gap-2"><span class="text-black/30">•</span> How does your research change how we teach Heian?</li><li class="flex gap-2"><span class="text-black/30">•</span> What is your contribution to karate-do beyond your dojo?</li><li class="flex gap-2"><span class="text-black/30">•</span> How do you handle a student who wants rank without time?</li></ul></div>
+          <div class="bg-[#FFD93D] rounded-[24px] belt-shadow border border-black/10 p-5"><div class="fredoka font-bold text-[16px]">Submit your thesis</div><p class="text-[13px] font-medium mt-1 leading-relaxed">Are you Godan+? Share what you learned in your martial art journey. Methodology + contribution required.</p>${thesisSaved.length?`<button id="thesisReview" class="mt-4 w-full h-11 rounded-full bg-[#14B8A6] hover:bg-[#0F766E] text-white font-bold text-[13px] flex items-center justify-center gap-2 press shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]"><span>Review &amp; Share ${thesisSaved.length} Pending Submission${thesisSaved.length===1?'':'s'}</span>→</button>`:''}<button id="openThesis" class="mt-4 w-full h-11 rounded-full bg-black text-white font-bold text-[13px] flex items-center justify-center gap-2 press"><span>Open Submission Form</span>→</button><p class="text-[11px] font-medium text-black/60 mt-2 text-center">Curated by senior grades • No McDojo content</p>${thesisSaved.length?`<p class="text-[11px] font-bold tracking-widest text-black/50 mt-2 text-center">${thesisSaved.length} SUBMISSION${thesisSaved.length===1?'':'S'} IN YOUR BATCH ON THIS DEVICE</p>`:''}</div>
+          <div class="bg-white rounded-[24px] border border-black/5 p-5"><h4 class="fredoka font-bold text-[14px]">Sample oral questions for Godan</h4><ul class="mt-3 space-y-2 text-[13px] font-medium"><li class="flex gap-2"><span class="text-black/30">•</span> Explain your thesis methodology in 2 minutes</li><li class="flex gap-2"><span class="text-black/30">•</span> How does your research change how we teach Heian?</li><li class="flex gap-2"><span class="text-black/30">•</span> What is your contribution to karate-do beyond your dojo?</li><li class="flex gap-2"><span class="text-black/30">•</span> How do you handle a student who wants rank without time?</li></ul></div>
         </div>
       </div>
       ${state.thesisModal?thesisModalHtml(thesisSaved):''}
