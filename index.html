@@ -342,80 +342,85 @@ function renderApp(){
   const progress = lesson.length ? (state.qIndex/lesson.length*100) : 0;
 
   if(state.view==='welcome'){
+    const WK=new Date().toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();
+    const pathPct=Math.min(100,Math.round(state.completed.length/Math.max(belts.length,1)*100));
+    const pos=Math.min(94,Math.max(6,pathPct));
+    const FB='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true" class="ic"><path d="M13.4 21v-6.9h2.3l.35-2.7h-2.65V9.7c0-.78.22-1.31 1.34-1.31h1.43V5.97c-.25-.03-1.1-.1-2.08-.1-2.06 0-3.47 1.25-3.47 3.56v1.97H8.3v2.7h2.32V21h2.78z"/></svg>';
+    const IG='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.1" cy="6.9" r="0.6" fill="currentColor" stroke="none"/></svg>';
     app.innerHTML=`
-    <div class="min-h-screen w-full flex flex-col">
-      <div class="max-w-[1100px] w-full mx-auto px-5 sm:px-8 py-5 flex-1 flex flex-col">
-        <div class="flex items-center justify-between py-2">
-          <div class="flex items-center gap-2.5"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-10 w-auto max-w-[150px] object-contain"></div>
-          <div class="flex items-center gap-2 text-[12px] font-semibold">
-            <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm border border-black/5">${I.flame} ${state.streak} day streak</span>
-            <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm border border-black/5">${I.gem} ${state.gems}</span>
-          </div>
+    <div class="min-h-[100dvh] w-full flex flex-col bg-[#FAF8F5]">
+      <section class="relative flex-1 flex flex-col bg-[#14B8A6] rounded-bl-[64px] sm:rounded-bl-[100px] lg:rounded-bl-[150px] overflow-hidden">
+        <div class="absolute inset-y-0 right-0 w-[46%] pointer-events-none select-none overflow-hidden" aria-hidden="true">
+          <div class="fredoka text-[230px] sm:text-[330px] lg:text-[470px] leading-none font-black text-white/[0.08] -mr-5 sm:-mr-8 -mt-8 sm:-mt-14">道</div>
         </div>
-        <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 xl:gap-16 items-center flex-1 py-6 lg:py-10">
-          <div class="text-center lg:text-left">
-            <div class="flex justify-center lg:justify-start"><span class="text-[10px] font-black tracking-[0.22em] bg-black text-[#FFD93D] px-3.5 py-2 rounded-full">${I.belt} DEMO EDITION</span></div>
-            <h1 class="fredoka text-[40px] sm:text-[60px] xl:text-[68px] leading-[0.94] font-bold tracking-tight mt-5">Welcome<br>to the Dojo.</h1>
-            <p class="mt-5 text-[15px] sm:text-[17px] leading-[1.5] text-[#6B6B68] font-medium max-w-[540px] mx-auto lg:mx-0">The oral path from white belt to 10th Dan. History, technique, tradition, philosophy &amp; research — graded the way the masters intended: out loud.</p>
-            <div class="mt-7 space-y-2.5 max-w-[480px] mx-auto lg:mx-0 text-left">
-              <div class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 border border-black/[0.06] shadow-sm"><div class="w-9 h-9 rounded-full bg-[#FAF8F5] flex items-center justify-center shrink-0" style="color:#F5A623">${I.bolt}</div><span class="text-[13px] sm:text-[14px] font-semibold">5-min oral lessons</span></div>
-              <div class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 border border-black/[0.06] shadow-sm"><div class="w-9 h-9 rounded-full bg-[#FAF8F5] flex items-center justify-center shrink-0">${I.target}</div><span class="text-[13px] sm:text-[14px] font-semibold">Earn XP, keep streak, unlock belts</span></div>
-              <div class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 border border-black/[0.06] shadow-sm"><div class="w-9 h-9 rounded-full bg-[#FAF8F5] flex items-center justify-center shrink-0" style="color:#8E44AD">${I.books}</div><span class="text-[13px] sm:text-[14px] font-semibold">4th Dan+ research hub</span></div>
-            </div>
-            <div class="mt-8 max-w-[480px] mx-auto lg:mx-0">
-              <div class="flex flex-col sm:flex-row gap-3 w-full">
-                <button id="startBtn" class="w-full sm:flex-1 h-[58px] px-8 sm:px-10 rounded-full bg-[#14B8A6] hover:bg-[#0F766E] text-white font-bold fredoka text-[16px] sm:text-[17px] tracking-wide shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)] press transition flex items-center justify-center gap-2">Start Training →</button>
-                <button id="wContributeMain" class="w-full sm:flex-1 h-[58px] px-8 sm:px-10 rounded-full bg-white border-2 border-black/10 hover:border-black/20 hover:bg-[#FAF8F5] text-black font-bold fredoka text-[16px] sm:text-[17px] tracking-wide press transition flex items-center justify-center gap-2"><span>${I.handshake}</span> Contribute</button>
-              </div>
-              <p class="text-center lg:text-left text-[12px] mt-3 text-[#9A9A96] font-medium">No email needed • Instant dojo • OSS!</p>
-            </div>
-            <div class="mt-8 flex flex-wrap justify-center lg:justify-start gap-2">
-              <div class="glass rounded-full px-3.5 py-2 text-[11px] font-bold flex items-center gap-1.5"><span class="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px]">初</span> 12k karateka training</div>
-              <div class="glass rounded-full px-3.5 py-2 text-[11px] font-bold">${I.star} 4.9/5 oral prep</div>
+        <div class="relative flex-1 flex flex-col max-w-[1200px] w-full mx-auto px-5 sm:px-8 lg:px-12">
+          <div class="flex items-center justify-between pt-4 sm:pt-5">
+            <span class="bg-white rounded-full pl-2 pr-4 py-1.5 shadow-sm flex items-center"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-7 w-auto max-w-[110px] object-contain"></span>
+            <div class="flex items-center gap-2 text-[12px] font-semibold">
+              <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.flame} ${state.streak} day streak</span>
+              <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.gem} ${state.gems}</span>
             </div>
           </div>
-          <div class="w-full max-w-[500px] mx-auto lg:max-w-none lg:justify-self-end">
-            <div class="relative">
-              <div class="absolute inset-0 bg-gradient-to-br from-[#FFD93D]/20 via-white/40 to-[#2ECC71]/20 rounded-[28px] blur-xl"></div>
-              <div class="relative glass rounded-[28px] p-5 sm:p-7 border border-white/70 belt-shadow">
-                <div class="flex justify-center">
-                  <div class="relative w-[220px] h-[190px] sm:w-[260px] sm:h-[215px]">
-                    <div class="absolute inset-0 bg-gradient-to-b from-white to-[#F5F5F0] rounded-[22px] shadow-inner flex flex-col items-center justify-center border border-black/5">
-                      <div class="text-[64px] sm:text-[76px] leading-none">🥋</div>
-                      <div class="mt-2 flex gap-1"><div class="w-16 h-3 rounded-full bg-gradient-to-r from-white via-[#FFD93D] to-[#FF8C42] border border-black/10"></div></div>
-                      <div class="mt-1 fredoka text-[11px] font-bold tracking-widest text-black/40">WHITE TO JUDAN</div>
-                    </div>
-                    <div class="absolute -right-3 -top-2 w-12 h-12 bg-[#2ECC71] rounded-full flex items-center justify-center text-white font-bold shadow-lg rotate-12 float">緑</div>
-                    <div class="absolute -left-2 bottom-6 w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold shadow-lg -rotate-12 float" style="animation-delay:.6s">初</div>
-                    <div class="absolute right-8 -bottom-2 px-3 py-1 bg-white rounded-full shadow-md border flex items-center gap-1 text-[11px] font-bold">${I.star} Oral Grading</div>
-                  </div>
-                </div>
-                <div class="text-center mt-4">
-                  <h2 class="fredoka text-[20px] sm:text-[22px] font-bold tracking-tight">White to Judan — one path.</h2>
-                  <p class="text-[13px] text-[#6B6B68] font-medium mt-1"> Oral grading for every kyu and dan.</p>
-                </div>
-                <div class="mt-5 grid grid-cols-3 gap-2">
-                  <div class="bg-white rounded-2xl p-3 border border-black/5 text-center"><div class="text-[20px]" style="color:#FF8C42">${I.castle}</div><div class="text-[11px] font-bold mt-1 tracking-wide">History</div></div>
-                  <div class="bg-white rounded-2xl p-3 border border-black/5 text-center"><div class="text-[20px]" style="color:#14B8A6">${I.shield}</div><div class="text-[11px] font-bold mt-1 tracking-wide">Technique</div></div>
-                  <div class="bg-white rounded-2xl p-3 border border-black/5 text-center"><div class="text-[20px]" style="color:#8E44AD">${I.scroll}</div><div class="text-[11px] font-bold mt-1 tracking-wide">Philosophy</div></div>
-                </div>
-                <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <button id="wDictionary" class="h-11 rounded-full bg-white border border-black/10 text-[12px] font-bold press flex items-center justify-center gap-1.5">${I.alphabet} Dictionary</button>
-                  <button id="wLibrary" class="h-11 rounded-full bg-white border border-black/10 text-[12px] font-bold press flex items-center justify-center gap-1.5">${I.archive} Library</button>
-                  <button id="wContribute" class="h-11 rounded-full bg-white border border-black/10 text-[12px] font-bold press flex items-center justify-center gap-1.5">${I.handshake} Contribute</button>
-                  <button id="wFeedback" class="h-11 rounded-full bg-white border border-black/10 text-[12px] font-bold press flex items-center justify-center gap-1.5">${I.chat} Feedback</button>
-                </div>
+          <div class="flex-1 flex flex-col justify-center py-9 sm:py-12 max-w-[680px]">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="#FFD93D" aria-hidden="true"><path d="M10.2 6.5H6.4c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5zm9.8 0h-3.8c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5z"/></svg>
+            <h1 class="fredoka text-[50px] sm:text-[76px] lg:text-[92px] leading-[0.98] font-bold tracking-tight text-white mt-5 sm:mt-7">Welcome<br>to the<br>Dojo.</h1>
+            <p class="mt-5 sm:mt-6 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">The oral path from white belt to 10th Dan. History, technique, tradition, philosophy &amp; research — graded the way the masters intended: out loud.</p>
+            <div class="mt-6 sm:mt-8 flex gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span><span class="w-1.5 h-1.5 rounded-full bg-white/60"></span></div>
+            <div class="relative h-12 mt-3 flex items-center max-w-[540px]">
+              <div class="relative w-full h-[2px] bg-white/30 rounded-full">
+                <div class="absolute left-0 top-0 h-full bg-white/90 rounded-full transition-all" style="width:${pathPct}%"></div>
+                <div class="absolute -top-[4px] right-0 w-[2px] h-[10px] bg-white/50 rounded-full"></div>
+              </div>
+              <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 rounded-full bg-white flex items-center justify-center shadow-[0_6px_16px_-4px_rgba(0,0,0,0.25)] z-10" style="left:${pos}%">
+                <span class="fredoka text-[11px] font-bold text-[#0F766E]">${pathPct}%</span>
               </div>
             </div>
-            <p class="text-center text-[10px] mt-5 tracking-widest font-bold text-black/30">Oral Grading • History • Techniques • Philosophy • Tradition • Research</p>
+            <div class="mt-2 text-[10px] sm:text-[11px] font-black tracking-[0.24em] text-white">${WK} IS <span class="text-white/60">GRADING DAY</span></div>
+            <div class="mt-8 sm:mt-10 flex gap-8 sm:gap-10">
+              <button id="wDictionary" title="Open Dictionary" class="flex flex-col items-center gap-1.5 press">
+                <span class="w-10 h-10 rounded-full border border-white/30 text-white flex items-center justify-center text-[16px] hover:bg-white/10 transition">${I.alphabet}</span>
+                <span class="text-[8.5px] font-black tracking-[0.18em] text-white/70">DICTIONARY</span>
+              </button>
+              <button id="wLibrary" title="Open Library" class="flex flex-col items-center gap-1.5 press">
+                <span class="w-10 h-10 rounded-full border border-white/30 text-white flex items-center justify-center text-[16px] hover:bg-white/10 transition">${I.archive}</span>
+                <span class="text-[8.5px] font-black tracking-[0.18em] text-white/70">LIBRARY</span>
+              </button>
+              <button id="wFeedback" title="Give Feedback" class="flex flex-col items-center gap-1.5 press">
+                <span class="w-10 h-10 rounded-full border border-white/30 text-white flex items-center justify-center text-[16px] hover:bg-white/10 transition">${I.chat}</span>
+                <span class="text-[8.5px] font-black tracking-[0.18em] text-white/70">FEEDBACK</span>
+              </button>
+            </div>
+          </div>
+          <div class="pb-5 sm:pb-7 flex justify-end">
+            <div class="text-right leading-tight">
+              <div class="fredoka text-[13px] sm:text-[14px] font-bold text-white">Oral Dojo</div>
+              <div class="text-[10px] font-semibold text-white/60">by Sensei Richqrd</div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+      <footer class="bg-white">
+        <div class="max-w-[1200px] w-full mx-auto px-5 sm:px-8 lg:px-12 py-4 flex items-center gap-2 sm:gap-3">
+          <span title="5-minute oral lessons" class="h-11 px-4 rounded-2xl border border-black/10 shadow-sm flex items-center fredoka text-[14px] font-bold text-[#1A1A1A] shrink-0">05:00</span>
+          <div class="flex-1 flex items-center justify-evenly min-w-0">
+            <button id="wContributeMain" title="Contribute" class="w-11 h-11 rounded-full text-[#1A1A1A]/60 hover:text-[#1A1A1A] hover:bg-black/5 flex items-center justify-center text-[19px] press transition shrink-0">${I.handshake}</button>
+            <a href="https://www.facebook.com/sir.richqrd" target="_blank" rel="noopener" title="Facebook" class="w-11 h-11 rounded-full text-[#1A1A1A]/60 hover:text-[#1A1A1A] hover:bg-black/5 flex items-center justify-center text-[19px] transition shrink-0">${FB}</a>
+            <a href="https://www.instagram.com/sir.richqrd" target="_blank" rel="noopener" title="Instagram" class="w-11 h-11 rounded-full text-[#1A1A1A]/60 hover:text-[#1A1A1A] hover:bg-black/5 flex items-center justify-center text-[19px] transition shrink-0">${IG}</a>
+          </div>
+          <button id="startBtn" title="Start Training" aria-label="Start Training" class="w-12 h-12 rounded-full bg-[#14B8A6] hover:bg-[#0F766E] text-white shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)] press transition flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+        <div class="px-4 pb-[max(12px,env(safe-area-inset-bottom))] text-center">
+          <p class="text-[9px] sm:text-[10px] tracking-widest font-bold text-black/30">DEMO EDITION • NO EMAIL NEEDED • INSTANT DOJO • OSS!</p>
+          <p class="text-[9px] sm:text-[10px] tracking-widest font-bold text-black/30 mt-1 hidden sm:block">ORAL GRADING • HISTORY • TECHNIQUES • PHILOSOPHY • TRADITION • RESEARCH</p>
+        </div>
+      </footer>
     </div>`;
     document.getElementById('startBtn').onclick=()=>transition('path');
     document.getElementById('wDictionary')?.addEventListener('click',()=>transition('dictionary'));
     document.getElementById('wLibrary')?.addEventListener('click',()=>transition('library'));
-    document.getElementById('wContribute')?.addEventListener('click',()=>transition('contribute'));
+    document.getElementById('wContributeMain')?.addEventListener('click',()=>transition('contribute'));
     document.getElementById('wFeedback')?.addEventListener('click',()=>transition('feedback'));
   } else if(state.view==='path'){
     app.innerHTML=`
@@ -435,8 +440,11 @@ function renderApp(){
       </header>
       <div class="max-w-[980px] mx-auto px-4 py-6 grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-start">
         <div class="relative bg-white rounded-[28px] belt-shadow border border-black/5 p-5 sm:p-7 overflow-hidden">
-          <div class="flex items-center justify-between mb-6"><div><h2 class="fredoka text-[24px] font-bold leading-none">Belt Path</h2><p class="text-[12px] font-semibold text-black/50 mt-1 tracking-wide">ORAL GRADING • TAP TO START LESSON</p></div><button id="researchBtn" class="h-9 px-4 rounded-full bg-[#FAF8F5] border text-[12px] font-bold flex items-center gap-1.5">${I.book} Research Hub</button></div>
-          
+          <div class="relative -mx-5 sm:-mx-7 -mt-5 sm:-mt-7 mb-6 bg-[#14B8A6] rounded-bl-[44px] px-5 sm:px-7 py-5 overflow-hidden">
+            <div class="absolute -right-3 -top-7 fredoka text-[120px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
+            <div class="relative flex items-center justify-between gap-3"><div><h2 class="fredoka text-[24px] sm:text-[26px] font-bold leading-none text-white">Belt Path</h2><p class="text-[10px] font-black text-white/70 mt-1.5 tracking-[0.22em]">ORAL GRADING • TAP TO START LESSON</p></div><button id="researchBtn" class="h-9 px-4 rounded-full bg-white/15 border border-white/25 text-white text-[12px] font-bold flex items-center gap-1.5 hover:bg-white/25 transition shrink-0">${I.book} Research Hub</button></div>
+          </div>
+
           <style>
           .belt-track-wrap{position:relative}
           .belt-track{ display:flex; align-items:stretch; overflow-x:auto; overflow-y:visible; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; padding:18px 8px 32px 8px; gap:0; scrollbar-width:thin; scrollbar-color:rgba(0,0,0,.15) transparent }
@@ -486,6 +494,7 @@ function renderApp(){
                         <div class="mt-2 flex flex-wrap gap-1">${(b.focus||[]).slice(0,2).map(f=>`<span class="text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:${b.id>=9?'rgba(255,255,255,.18)':'rgba(0,0,0,.06)'}; color:${b.id>=9?'#fff':'#333'}">${f}</span>`).join('')}</div>
                         ${passed?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-[#2ECC71] text-white">${I.check} PASSED</div>`:''}
                         ${isCurrent?`<div class="mt-2 inline-flex items-center gap-1 text-[9px] font-black tracking-widest px-2 py-1 rounded-full bg-black text-white">CURRENT</div>`:''}
+                        ${isCurrent?'<div class="absolute top-5 right-3 w-7 h-7 bg-[#14B8A6] rounded-full border-2 border-white flex items-center justify-center shadow-md animate-bounce"><span class="text-white text-[12px]">🥋</span></div>':''}
                       </div>
                     </div>
                   </div>
@@ -541,7 +550,7 @@ function renderApp(){
       <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-black/5">
         <div class="max-w-[900px] mx-auto px-4 h-[64px] flex items-center gap-3">
           <button id="backPath" class="w-9 h-9 rounded-full bg-[#FAF8F5] border flex items-center justify-center press">✕</button>
-          <div class="flex-1 h-3 bg-[#EFEDE8] rounded-full overflow-hidden border border-black/5"><div class="h-full bg-[#2ECC71] rounded-full transition-all duration-500 progress-stripe" style="width:${progress}%"></div></div>
+          <div class="flex-1 h-3 bg-[#EFEDE8] rounded-full overflow-hidden border border-black/5"><div class="h-full bg-[#14B8A6] rounded-full transition-all duration-500 progress-stripe" style="width:${progress}%"></div></div>
           <div class="flex items-center gap-2"><div class="flex items-center gap-1 bg-white border px-3 py-1 rounded-full shadow-sm">${I.heart}<span class="text-[13px] font-bold">${state.hearts}</span></div><div class="hidden sm:flex items-center gap-1 bg-[#FFD93D] border px-3 py-1 rounded-full shadow-sm">${I.bolt}<span class="text-[13px] font-bold">${state.xpEarned} XP</span></div></div>
         </div>
       </div>
@@ -587,7 +596,7 @@ function renderApp(){
         </div>`:`
         <div class="max-w-[900px] mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-3">
           <div class="flex-1 hidden sm:block text-[11px] font-bold tracking-widest text-black/30">LISTEN • SPEAK • GRADE</div>
-          <button id="actionBtn" ${state.selected===null?'disabled':''} class="w-full sm:w-auto sm:min-w-[280px] h-[50px] rounded-2xl font-bold fredoka text-[16px] tracking-wide press transition flex items-center justify-center gap-2 ${state.selected===null?'bg-[#EFEDE8] text-black/30 cursor-not-allowed':'bg-black text-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.45)]'}">Check Answer →</button>
+          <button id="actionBtn" ${state.selected===null?'disabled':''} class="w-full sm:w-auto sm:min-w-[280px] h-[50px] rounded-2xl font-bold fredoka text-[16px] tracking-wide press transition flex items-center justify-center gap-2 ${state.selected===null?'bg-[#EFEDE8] text-black/30 cursor-not-allowed':'bg-[#14B8A6] hover:bg-[#0F766E] text-white shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]'}">Check Answer →</button>
         </div>`}
       </div>
       ${state.outOfHearts?`<div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"><div class="bg-white rounded-[28px] w-full max-w-[380px] p-6 belt-shadow text-center"><div class="w-16 h-16 mx-auto rounded-full bg-[#FFE8E8] border-2 border-[#FF4B4B]/20 flex items-center justify-center text-[28px]">${I.heartCrack}</div><h3 class="fredoka text-[22px] font-bold mt-4">Out of spirit!</h3><p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">In real grading, composure matters. Take a breath, review, and try again. Hearts refill.</p><div class="mt-5 grid grid-cols-2 gap-2"><button id="backDojo" class="h-12 rounded-full bg-[#FAF8F5] border font-bold">Back to Dojo</button><button id="retry" class="h-12 rounded-full bg-black text-white font-bold">Refill & Retry</button></div></div></div>`:''}
@@ -651,7 +660,7 @@ function renderApp(){
           <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${nextPlayable?nextBelt.gradient:'from-black to-black'} flex items-center justify-center font-black text-white border">${nextPlayable?nextBelt.kanji:'極'}</div>
           <div><div class="text-[11px] font-black tracking-widest text-black/40">${nextPlayable?'NEXT UNLOCKED':'PATH COMPLETE'}</div><div class="fredoka font-bold">${nextPlayable?`${nextBelt.from} → ${nextBelt.to}`:'You reached the top of the path'}</div><div class="text-[11px] font-semibold text-black/50">${nextPlayable?nextBelt.focus.join(' • '):'White to Judan complete — train, teach, contribute. OSS!'}</div></div>
         </div>
-        <button id="continuePath" class="mt-6 w-full h-[52px] rounded-full bg-black text-white fredoka font-bold text-[16px] flex items-center justify-center gap-2 press">${nextPlayable?'Continue to Next Belt':'Back to Belt Path'} →</button>
+        <button id="continuePath" class="mt-6 w-full h-[52px] rounded-full bg-[#14B8A6] hover:bg-[#0F766E] text-white fredoka font-bold text-[16px] flex items-center justify-center gap-2 press shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]">${nextPlayable?'Continue to Next Belt':'Back to Belt Path'} →</button>
         <button id="practiceAgain" class="mt-3 w-full h-[48px] rounded-full bg-[#FAF8F5] border font-bold text-[14px]">Practice Again</button>
         <p class="text-[10px] font-bold tracking-widest text-black/30 mt-5">Oral Grading • History • Techniques • Philosophy • Tradition • Research</p>
       </div>
@@ -902,8 +911,8 @@ function renderApp(){
         </div>
       </header>
       <div class="max-w-[980px] mx-auto px-4 py-6">
-        <div class="bg-black text-white rounded-[28px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
-          <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#14B8A6] rounded-full blur-[60px] opacity-20"></div>
+        <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
+          <div class="absolute -right-2 -top-8 fredoka text-[170px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
           <div class="relative"><div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.alphabet} DOJO DICTIONARY</div><h1 class="fredoka text-[28px] sm:text-[34px] font-bold leading-[0.95] mt-4">Speak the<br>language of karate.</h1><p class="text-[14px] text-white/70 mt-3 max-w-[520px]">Japanese terms, commands and concepts every karateka should know — from Rei to Zanshin. Search, learn, use them on the floor.</p></div>
         </div>
         <input id="dictSearch" placeholder="Search a term or meaning — try 'zanshin'..." class="mt-5 w-full h-12 rounded-2xl border-2 border-black/10 px-4 font-semibold text-[14px] focus:border-black outline-none">
@@ -946,8 +955,8 @@ function renderApp(){
         </div>
       </header>
       <div class="max-w-[980px] mx-auto px-4 py-6">
-        <div class="bg-black text-white rounded-[28px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
-          <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#FFD93D] rounded-full blur-[60px] opacity-20"></div>
+        <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
+          <div class="absolute -right-2 -top-8 fredoka text-[170px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
           <div class="relative"><div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.archive} DOJO LIBRARY</div><h1 class="fredoka text-[28px] sm:text-[34px] font-bold leading-[0.95] mt-4">Read what the<br>masters wrote.</h1><p class="text-[14px] text-white/70 mt-3 max-w-[520px]">Books, references, articles and videos for every step of the path — from Funakoshi's autobiography to the WKF rulebook.</p></div>
         </div>
         <div class="mt-5 flex flex-wrap gap-2">${libTypes.map(t=>`<button data-type="${t}" class="libType text-[11px] font-bold px-3 py-1.5 rounded-full border ${t==='All'?'bg-black text-white border-black':'bg-white border-black/10'}">${t}</button>`).join('')}</div>
@@ -992,7 +1001,7 @@ function renderApp(){
       </header>
       <div class="max-w-[980px] mx-auto px-4 py-6 grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
         <div>
-          <div class="bg-black text-white rounded-[28px] p-6 sm:p-8 relative overflow-hidden belt-shadow"><div class="absolute -right-20 -top-20 w-[300px] h-[300px] bg-[#FFD93D] rounded-full blur-[60px] opacity-20"></div><div class="relative"><div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.books} 4TH DAN RESEARCH HUB</div><h1 class="fredoka text-[28px] sm:text-[36px] font-bold leading-[0.95] mt-4">Theses from the<br>martial journey.</h1><p class="text-[14px] leading-relaxed text-white/70 mt-3 max-w-[520px]">From 4th Dan, Karate-Do asks: what have you contributed? Here, Yondan to Judan share original research, methodology, business lessons, and personal testimonies. This is where karate becomes scholarship.</p><div class="mt-6 flex flex-wrap gap-2">${["Original Research","Methodology","Contribution","Bunkai","Business","Philosophy"].map(k=>`<span class="text-[11px] font-bold px-3 py-1.5 rounded-full bg-white text-black">${k}</span>`).join('')}</div></div></div>
+          <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow"><div class="absolute -right-3 -top-9 fredoka text-[190px] leading-none font-black text-white/10 select-none pointer-events-none">道</div><div class="relative"><div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.books} 4TH DAN RESEARCH HUB</div><h1 class="fredoka text-[28px] sm:text-[36px] font-bold leading-[0.95] mt-4">Theses from the<br>martial journey.</h1><p class="text-[14px] leading-relaxed text-white/70 mt-3 max-w-[520px]">From 4th Dan, Karate-Do asks: what have you contributed? Here, Yondan to Judan share original research, methodology, business lessons, and personal testimonies. This is where karate becomes scholarship.</p><div class="mt-6 flex flex-wrap gap-2">${["Original Research","Methodology","Contribution","Bunkai","Business","Philosophy"].map(k=>`<span class="text-[11px] font-bold px-3 py-1.5 rounded-full bg-white text-black">${k}</span>`).join('')}</div></div></div>
           <div class="mt-6 grid sm:grid-cols-2 gap-4">${research.map(r=>`
             <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5 flex flex-col"><div class="flex items-center justify-between"><span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-[#FAF8F5] border">${r.tag}</span><span class="text-[11px] font-bold text-black/40 flex items-center gap-1">${I.heart} ${r.likes}</span></div><h3 class="fredoka font-bold text-[16px] leading-tight mt-3">${r.title}</h3><p class="text-[13px] leading-relaxed text-black/60 mt-2 flex-1">${r.excerpt}</p><div class="mt-4 flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-[11px] font-bold">${r.rank[0]}</div><div><div class="text-[12px] font-bold leading-none">${r.author}</div><div class="text-[11px] text-black/50 font-semibold">${r.rank} • 12 min read</div></div><button class="ml-auto w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">↗</button></div></div>
           `).join('')}</div>
