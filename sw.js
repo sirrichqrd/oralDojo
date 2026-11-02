@@ -10,7 +10,7 @@ const ASSETS = [
   '/assets/social-preview.png',
   '/assets/logo/oldo-logo.png',
   '/dojo-data.js',
-  '/favicon.ico'
+  '/favicon.svg'
 ];
 
 self.addEventListener('install', event => {
