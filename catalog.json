@@ -1,6 +1,6 @@
 {
-  "version": 59,
-  "updatedAt": "2026-11-01T07:31:52.995Z",
+  "version": 621,
+  "updatedAt": "2026-11-02T09:46:31.842Z",
   "settings": {
     "senseiWhatsApp": "2348074001613",
     "senseiEmail": "oraldojo@ttosr.com",
@@ -192,211 +192,6 @@
   ],
   "questions": [
     {
-      "id": "0-1",
-      "type": "mcq",
-      "topic": "History • Meaning",
-      "q": "What does 'Karate-Do' literally translate to?",
-      "options": [
-        "Empty hand way",
-        "Way of the warrior",
-        "School of hard knocks",
-        "Fist of fury way"
-      ],
-      "answer": 0,
-      "explanation": "Kara = empty, Te = hand, Do = way/path. It's the way of the empty hand - no weapons, just character.",
-      "belt": 0
-    },
-    {
-      "id": "0-2",
-      "type": "mcq",
-      "topic": "Etiquette • Dojo Kun",
-      "q": "The Dojo Kun are five principles. What is their main purpose?",
-      "options": [
-        "To memorize kata names",
-        "To build character first, technique second",
-        "To win tournaments",
-        "To count in Japanese"
-      ],
-      "answer": 1,
-      "explanation": "Seek perfection of character, be faithful, endeavor, respect others, refrain from violent behavior. Character > technique.",
-      "belt": 0
-    },
-    {
-      "id": "0-3",
-      "type": "image",
-      "topic": "Awareness • Zanshin",
-      "q": "Which describes Zanshin?",
-      "options": [
-        "Remaining mind after technique",
-        "Beginner belt",
-        "Loud shout",
-        "Fast kick"
-      ],
-      "emojiOptions": [
-        "🧘‍♂️",
-        "🥋",
-        "🗣️",
-        "🦶"
-      ],
-      "answer": 0,
-      "explanation": "Zanshin is lingering awareness. After you punch, you don't drop your guard. You stay present. Essential for safety and control.",
-      "belt": 9
-    },
-    {
-      "id": "0-4",
-      "type": "mcq",
-      "topic": "Rei • Respect",
-      "q": "What does Rei mean and when do you do it?",
-      "options": [
-        "Bow of respect - entering/leaving dojo, to partner, sensei",
-        "Attack signal",
-        "Block with forearm",
-        "Tournament bow only"
-      ],
-      "answer": 0,
-      "explanation": "Rei is respect made physical. You bow entering, leaving, before/after kumite, to show mutual respect.",
-      "belt": 0
-    },
-    {
-      "id": "0-5",
-      "type": "mcq",
-      "topic": "Kihon • Oi-Zuki",
-      "q": "Oi-Zuki is:",
-      "options": [
-        "Lunge punch with same leg and arm forward",
-        "Reverse punch",
-        "Uppercut",
-        "Elbow strike"
-      ],
-      "answer": 0,
-      "explanation": "Oi = chasing/lunge. You step forward with front leg, same side punch. First power punch every white belt learns.",
-      "belt": 0
-    },
-    {
-      "id": "0-6",
-      "type": "mcq",
-      "topic": "Basics • Three Pillars",
-      "q": "Karate is divided into three main parts. Name them:",
-      "options": [
-        "Kihon, Kata and Kumite",
-        "Punching, Kicking and Blocking",
-        "Kata, Games and Grading",
-        "Stretching, Shouting and Resting"
-      ],
-      "answer": 0,
-      "explanation": "Kihon = fundamentals, Kata = forms, Kumite = sparring. These three pillars carry every grading from white belt to Judan.",
-      "belt": 0
-    },
-    {
-      "id": "1-1",
-      "type": "mcq",
-      "topic": "Language • Counting",
-      "q": "Count 1-5 correctly in Japanese dojo counting:",
-      "options": [
-        "Ichi, Ni, San, Shi, Go",
-        "One, Two, Three, Four, Five",
-        "Ichi, Ni, San, Yon, Go",
-        "Uno, Dos, Tres, Cuatro, Cinco"
-      ],
-      "answer": 0,
-      "explanation": "Ichi (1), Ni (2), San (3), Shi (4), Go (5). Sensei counts like this for kihon. Shi is used in dojo vs Yon.",
-      "belt": 1
-    },
-    {
-      "id": "1-2",
-      "type": "image",
-      "topic": "Stances",
-      "q": "Zenkutsu Dachi is which stance?",
-      "options": [
-        "Front stance - long, strong forward",
-        "Back stance",
-        "Cat stance",
-        "Horse stance"
-      ],
-      "emojiOptions": [
-        "🦵↗️",
-        "🦵↙️",
-        "🐱",
-        "🐴"
-      ],
-      "answer": 0,
-      "explanation": "Zenkutsu = front. 60% weight front, front knee bent, back leg straight. Power stance for Oi-Zuki.",
-      "belt": 1
-    },
-    {
-      "id": "1-3",
-      "type": "mcq",
-      "topic": "Spirit • Kiai",
-      "q": "What is the real purpose of Kiai?",
-      "options": [
-        "Focus breath, tighten core, commit spirit",
-        "Scare opponent",
-        "Get extra points",
-        "Show off"
-      ],
-      "answer": 0,
-      "explanation": "Kiai unites breath, body, and intent. Tenses core for protection and power transfer. Not just shouting.",
-      "belt": 1
-    },
-    {
-      "id": "1-4",
-      "type": "tf",
-      "topic": "Etiquette • Dojo Hygiene",
-      "q": "TRUE or FALSE: Removing shoes before stepping on dojo floor is optional if you're in a rush.",
-      "options": [
-        "True",
-        "False"
-      ],
-      "answer": 1,
-      "explanation": "False. Always. It's hygiene, respect, and safety. First lesson before any technique is etiquette.",
-      "belt": 1
-    },
-    {
-      "id": "1-5",
-      "type": "mcq",
-      "topic": "Kihon",
-      "q": "Kihon means:",
-      "options": [
-        "Fundamentals / basics",
-        "Sparring",
-        "Forms",
-        "Philosophy"
-      ],
-      "answer": 0,
-      "explanation": "Kihon is basics. Without strong kihon, kata is empty, kumite is sloppy.",
-      "belt": 1
-    },
-    {
-      "id": "1-6",
-      "type": "mcq",
-      "topic": "Basics • Target Areas",
-      "q": "In karate, your body is divided into three target levels. Name them:",
-      "options": [
-        "Jodan, Chudan and Gedan",
-        "Ue, Naka and Shita",
-        "Head, Body and Feet",
-        "Tsuki, Uchi and Keri"
-      ],
-      "answer": 0,
-      "explanation": "Jodan = upper level (head), Chudan = middle (chest/stomach), Gedan = lower (below the belt). Every attack and block names its level.",
-      "belt": 1
-    },
-    {
-      "id": "1-7",
-      "belt": 1,
-      "type": "mcq",
-      "topic": "Hygiene • Dojo Health",
-      "q": "Why must fingernails and toenails be short and hands clean before training?",
-      "options": [
-        "Dojo hygiene",
-        "It looks fashionable",
-        "To grip the floor better",
-        "No reason - it is only tradition"
-      ],
-      "answer": 0,
-      "explanation": "It protects you and your partners from scratches and germs. Clean gi, short nails, no jewellery, washed hands and clean bare feet. Dojo hygiene is basic knowledge every early belt must know."
-    },
-    {
       "id": "2-1",
       "type": "mcq",
       "topic": "Kata • History",
@@ -502,21 +297,6 @@
       "belt": 3
     },
     {
-      "id": "3-2",
-      "type": "mcq",
-      "topic": "Technique • Power",
-      "q": "Where does Gyaku-Zuki power REALLY start?",
-      "options": [
-        "Floor → legs → hip rotation → core → fist",
-        "Shoulder only",
-        "Arm muscle",
-        "Wrist flick"
-      ],
-      "answer": 0,
-      "explanation": "Ground reaction force travels up chain. Hips turn, core whips, fist is just delivery. Not arm punching.",
-      "belt": 3
-    },
-    {
       "id": "3-3",
       "type": "mcq",
       "topic": "Origin • History",
@@ -607,21 +387,6 @@
       "belt": 4
     },
     {
-      "id": "4-4",
-      "type": "scenario",
-      "topic": "Teaching Methodology",
-      "q": "Adult beginner is frustrated vs kids. What do you do?",
-      "options": [
-        "Pair with patient sempai, emphasize personal progress not comparison",
-        "Put in kids class",
-        "Tell to quit",
-        "Ignore frustration"
-      ],
-      "answer": 0,
-      "explanation": "Adult psychology: ego, comparison, time-poor. Methodology must adapt.",
-      "belt": 4
-    },
-    {
       "id": "4-5",
       "type": "mcq",
       "topic": "Philosophy",
@@ -637,827 +402,2220 @@
       "belt": 4
     },
     {
-      "id": "5-1",
+      "id": "q0-1793609485127-0-8863",
+      "belt": 0,
       "type": "mcq",
-      "topic": "Bushido",
+      "topic": "History • Meaning",
+      "q": "What does 'Karate-Do' literally translate to?",
+      "options": [
+        "Way of the empty hand, a path",
+        "Way of the warrior in battle",
+        "School of hard fist fighting",
+        "Fist of fury way of power"
+      ],
+      "answer": 0,
+      "explanation": "Kara = empty, Te = hand, Do = way/path. No weapons - just character development through empty-hand training."
+    },
+    {
+      "id": "q0-1793609485129-1-4825",
+      "belt": 0,
+      "type": "mcq",
+      "topic": "Etiquette • Dojo Kun",
+      "q": "The Dojo Kun are five principles recited in the dojo. What is their main purpose?",
+      "options": [
+        "To help us memorize kata names",
+        "To guide us to build strong character first",
+        "To teach how to win tournaments",
+        "To learn counting in Japanese"
+      ],
+      "answer": 1,
+      "explanation": "Seek perfection of character, be faithful, endeavor to excel, respect others, refrain from violent behavior. Dojo Kun puts character before technique."
+    },
+    {
+      "id": "q0-1793609485130-2-9509",
+      "belt": 0,
+      "type": "mcq",
+      "topic": "Rei • Respect",
+      "q": "What does Rei mean and when do you perform it?",
+      "options": [
+        "Bow of respect - when entering/leaving dojo and to partner",
+        "Attack command to start kumite",
+        "Forearm block against a punch",
+        "Only the final bow at a tournament"
+      ],
+      "answer": 0,
+      "explanation": "Rei is respect made physical. You bow when entering/leaving dojo, to Sensei, Sempai and partner before/after kumite."
+    },
+    {
+      "id": "q0-1793609485132-3-2644",
+      "belt": 0,
+      "type": "mcq",
+      "topic": "Kihon • Oi-Zuki",
+      "q": "In Kihon, what is Oi-Zuki?",
+      "options": [
+        "Reverse punch from opposite side",
+        "Rising uppercut punch to chin",
+        "Elbow strike to close range",
+        "Lunge punch stepping forward with same side"
+      ],
+      "answer": 3,
+      "explanation": "Oi = chasing/lunge. You drive forward with front leg and punch with same-side arm. First power punch every white belt learns."
+    },
+    {
+      "id": "q0-1793609485133-4-9301",
+      "belt": 0,
+      "type": "mcq",
+      "topic": "Basics • Three Pillars",
+      "q": "Karate training stands on three main pillars. What are they?",
+      "options": [
+        "Stretching, shouting, and resting",
+        "Punching, kicking, and blocking only",
+        "Kihon, Kata and Kumite together",
+        "Kata, games, and grading events"
+      ],
+      "answer": 2,
+      "explanation": "Kihon = fundamentals, Kata = forms, Kumite = sparring. These three pillars carry you from white belt to Judan."
+    },
+    {
+      "id": "q0-1793609485135-5-9433",
+      "belt": 0,
+      "type": "mcq",
+      "topic": "Basics • Zenkutsu Dachi",
+      "q": "Zenkutsu Dachi - the first stance you learn - is described as:",
+      "options": [
+        "Cat stance with most weight on back leg",
+        "Front stance with long, strong forward base",
+        "Straddle stance with knees wide apart",
+        "Hourglass stance with feet turned inward"
+      ],
+      "answer": 1,
+      "explanation": "Zenkutsu = front stance. Front knee bent over toes, back leg straight, 60% weight front, 40% back. Root for Oi-Zuki and Gyaku-Zuki."
+    },
+    {
+      "id": "q0-1793609485136-6-8967",
+      "belt": 0,
+      "type": "mcq",
+      "topic": "Dojo Language • Commands",
+      "q": "Sensei says 'Yoi' and then 'Hajime' - what do they mean?",
+      "options": [
+        "Bow and then sit in seiza",
+        "Prepare ready stance, then begin",
+        "Turn around and then stop",
+        "Line up and then bow deeply"
+      ],
+      "answer": 1,
+      "explanation": "Yoi = get ready in Yoi Dachi, alert mind. Hajime = begin action. Yame = stop. These three run every kihon line."
+    },
+    {
+      "id": "q1-1793609639139-0-7001",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Language • Counting",
+      "q": "Count 1-5 correctly in Japanese dojo counting:",
+      "options": [
+        "Ichi, Ni, San, Yon, Go",
+        "Ichi, Ni, San, Shi, Go",
+        "Uno, Dos, Tres, Cuatro, Cinco",
+        "One, Two, Three, Four, Five"
+      ],
+      "answer": 1,
+      "explanation": "Ichi (1), Ni (2), San (3), Shi (4), Go (5). Sensei counts like this for kihon. In dojo, Shi is used for 4 instead of Yon to keep rhythm."
+    },
+    {
+      "id": "q1-1793609639141-1-9648",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Stances • Zenkutsu Dachi",
+      "q": "Zenkutsu Dachi is which stance?",
+      "options": [
+        "Back stance with weight on rear leg",
+        "Cat stance with high narrow posture",
+        "Horse stance with wide low base",
+        "Front stance - long, strong forward"
+      ],
+      "answer": 3,
+      "explanation": "Zenkutsu = front stance. 60% weight front, front knee bent over toes, back leg straight, hips forward. Power base for Oi-Zuki and Gyaku-Zuki."
+    },
+    {
+      "id": "q1-1793609639142-2-9511",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Spirit • Kiai",
+      "q": "What is the real purpose of Kiai?",
+      "options": [
+        "To scare opponent with loud noise",
+        "To focus breath, tighten core, commit spirit",
+        "To get extra points from judges",
+        "To show off and look tough"
+      ],
+      "answer": 1,
+      "explanation": "Kiai unites breath, body and intent. It tenses core for protection, drives hara power, and shows total commitment - not just shouting."
+    },
+    {
+      "id": "q1-1793609639143-3-8777",
+      "belt": 1,
+      "type": "tf",
+      "topic": "Etiquette • Dojo Hygiene",
+      "q": "TRUE or FALSE: Removing shoes before stepping on dojo floor is optional if you're in a rush.",
+      "options": [
+        "True - rush is an exception allowed",
+        "False - always remove shoes first"
+      ],
+      "answer": 1,
+      "explanation": "False. Always remove shoes. It's hygiene, respect for dojo, and safety. First lesson before any technique is etiquette."
+    },
+    {
+      "id": "q1-1793609639145-4-7447",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Kihon • Meaning",
+      "q": "Kihon means:",
+      "options": [
+        "Free sparring against partner",
+        "Pre-arranged forms and patterns",
+        "Philosophy of empty hand",
+        "Fundamentals and basic foundation"
+      ],
+      "answer": 3,
+      "explanation": "Kihon is basics. Kihon, Kata, Kumite are three pillars. Without strong kihon, kata is empty and kumite is sloppy."
+    },
+    {
+      "id": "q1-1793609639147-5-6230",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Basics • Target Areas",
+      "q": "In karate, your body is divided into three target levels. Name them:",
+      "options": [
+        "Head level, body level, leg level",
+        "Upper strike, middle strike, low kick",
+        "Jodan, Chudan and Gedan levels",
+        "Tsuki, Uchi and Keri attacks"
+      ],
+      "answer": 2,
+      "explanation": "Jodan = upper (head/neck), Chudan = middle (chest/stomach), Gedan = lower (below belt). Every attack and block names its level."
+    },
+    {
+      "id": "q1-1793609639148-6-2400",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Hygiene • Dojo Health",
+      "q": "Why must fingernails and toenails be short and hands clean before training?",
+      "options": [
+        "It looks more fashionable for grading",
+        "To grip the floor better for balance",
+        "No reason - it is only old tradition",
+        "To protect partners and maintain dojo hygiene"
+      ],
+      "answer": 3,
+      "explanation": "Short nails and clean hands/feet prevent scratches, cuts and infection. Clean gi, no jewellery, washed hands, short nails - basic safety and respect for partners."
+    },
+    {
+      "id": "q1-1793609639149-7-9955",
+      "belt": 1,
+      "type": "mcq",
+      "topic": "Kihon • Gedan Barai",
+      "q": "What is Gedan Barai and what level does it cover?",
+      "options": [
+        "Upper rising block that covers jodan level",
+        "Middle inside block that covers chudan",
+        "Lower sweeping block that covers gedan",
+        "Knife-hand block that covers all levels"
+      ],
+      "answer": 2,
+      "explanation": "Gedan = lower level, Barai = sweep. Gedan Barai sweeps attacks aimed below belt to side. First block taught with Zenkutsu Dachi."
+    },
+    {
+      "id": "q2-1793610166212-0-120",
+      "belt": 2,
+      "type": "mcq",
+      "topic": "Kata • History",
+      "q": "Traditionally, which kata is taught FIRST to beginners?",
+      "options": [
+        "Heian Shodan",
+        "Heian Godan",
+        "Kanku Dai",
+        "Taikyoku Shodan"
+      ],
+      "answer": 3,
+      "explanation": "Taikyoku Shodan (First Cause) has simplest embusen - only gedan barai and oi-zuki. Then Heian Shodan. Heian = peaceful mind."
+    },
+    {
+      "id": "q2-1793610166222-7-4165",
+      "belt": 2,
+      "type": "mcq",
+      "topic": "Stances • Kiba Dachi",
+      "q": "Kiba Dachi is also called horse stance. How do you stand?",
+      "options": [
+        "Long front stance like Zenkutsu forward",
+        "Back stance with weight shifted to rear",
+        "Straddle stance with feet wide, knees bent outward",
+        "Cat stance with 90% weight on back foot"
+      ],
+      "answer": 2,
+      "explanation": "Kiba = horse. Feet double shoulder width, toes slightly in, knees bent outward pushing knees open, back straight, like riding horse. Builds leg strength."
+    },
+    {
+      "id": "q2-1793610166223-8-7236",
+      "belt": 2,
+      "type": "mcq",
+      "topic": "Etiquette • Dojo Kun Line",
+      "q": "Which Dojo Kun line says 'I shall guard against impertious courage' in Japanese?",
+      "options": [
+        "Hitotsu, jinkaku kansei ni tsutomuru koto",
+        "Hitotsu, kekki no yu wo imashimuru koto",
+        "Hitotsu, doryoku no seishin wo yashinau koto",
+        "Hitotsu, reigi wo omonzuru koto"
+      ],
+      "answer": 1,
+      "explanation": "Kekki no yu = violent courage/impulsive bravery. Line 5: Hitotsu, kekki no yu wo imashimuru koto - refrain from violent behavior, use restraint."
+    },
+    {
+      "id": "q3-1793610454328-1-1450",
+      "belt": 3,
+      "type": "mcq",
+      "topic": "Technique • Power Chain",
+      "q": "Where does Gyaku-Zuki power REALLY start?",
+      "options": [
+        "Floor reaction through legs, hip rotation, core, then fist",
+        "Shoulder muscle pushing arm forward alone",
+        "Big arm muscle flexing to punch hard",
+        "Quick wrist flick at the very end"
+      ],
+      "answer": 0,
+      "explanation": "Power is ground reaction force. Push floor, drive legs, rotate hips, whip core, fist is just delivery. Not arm punching."
+    },
+    {
+      "id": "q3-1793610454334-5-810",
+      "belt": 3,
+      "type": "mcq",
+      "topic": "Kihon • Shuto Uke",
+      "q": "Shuto Uke is:",
+      "options": [
+        "Knife-hand block",
+        "Upper rising block with forearm",
+        "Lower sweeping block to gedan",
+        "Palm heel strike to the chin"
+      ],
+      "answer": 0,
+      "explanation": "Shuto = knife-hand. Using the outside edge of the hand from little finger to wrist. Shuto Uke deflects jodan/chudan attacks in Kokutsu Dachi, then counters with shuto strike."
+    },
+    {
+      "id": "q3-1793610454336-6-5217",
+      "belt": 3,
+      "type": "mcq",
+      "topic": "Kata • Heian Sandan",
+      "q": "What is the signature new technique introduced in Heian Sandan?",
+      "options": [
+        "Only oi-zuki and gedan barai repeated",
+        "Kiba dachi with tettsui and simultaneous blocks",
+        "High jump like Kanku Dai",
+        "Only kokutsu dachi stance"
+      ],
+      "answer": 1,
+      "explanation": "Heian Sandan introduces Kiba Dachi, tettsui (hammer fist), morote uke, and simultaneous gedan barai + uchi uke. First kiba stance kata."
+    },
+    {
+      "id": "q3-1793610454337-7-8499",
+      "belt": 3,
+      "type": "mcq",
+      "topic": "Stances • Shiko Dachi",
+      "q": "How is Shiko Dachi different from Kiba Dachi?",
+      "options": [
+        "Same as kiba dachi - just different name",
+        "Toes turned out 45°, lower, sumo-like",
+        "One leg lifted like crane stance",
+        "Very narrow feet together stance"
+      ],
+      "answer": 1,
+      "explanation": "Shiko = sumo stance. Like kiba but toes out 45 degrees, knees pushing out, lower. Builds inner thigh and rooted stability. Kiba toes more forward."
+    },
+    {
+      "id": "q3-1793610454339-8-4515",
+      "belt": 3,
+      "type": "mcq",
+      "topic": "Etiquette • Rei Details",
+      "q": "Ritsurei and Zarei - when do you use each?",
+      "options": [
+        "Both mean same - just bow any way",
+        "Ritsurei = standing bow Zarei = kneeling bow",
+        "Ritsurei = attack, Zarei = defend",
+        "Ritsurei = kick, Zarei = punch"
+      ],
+      "answer": 1,
+      "explanation": "Ritsurei = standing bow (entering dojo, to sensei, to partner). Zarei = kneeling seiza bow (start/end class to shomen and sensei). Both show respect."
+    },
+    {
+      "id": "q3-1793610454340-9-2902",
+      "belt": 3,
+      "type": "mcq",
+      "topic": "Kumite • Distance",
+      "q": "Maai means:",
+      "options": [
+        "Fighting spirit and loud kiai",
+        "Proper distance and timing between opponents",
+        "Type of tournament trophy",
+        "Color of belt ranking"
+      ],
+      "answer": 1,
+      "explanation": "Maai = engagement distance. Too close you get jammed, too far you miss. Sanbon Kumite teaches maai, timing, and zanshin."
+    },
+    {
+      "id": "q4-1793611061892-0-9161",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Tradition • Sempai Kohai",
+      "q": "In traditional dojo culture, the Sempai-Kohai relationship means:",
+      "options": [
+        "Senior students guide, support and set an example for juniors",
+        "Senior command Junior and give orders to follow",
+        "Seniors never speak to juniors at all",
+        "Everyone trains completely alone always"
+      ],
+      "answer": 0,
+      "explanation": "Sempai (senior) models etiquette and mentors; Kohai (junior) observes, respects and learns. This living chain passes tradition down without words."
+    },
+    {
+      "id": "q4-1793611061894-1-9771",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Pedagogy • Shu Ha Ri",
+      "q": "Shu Ha Ri describes:",
+      "options": [
+        "Three different kata with same name",
+        "Three types of belts in Shotokan",
+        "Stages of learning: obey form, break form, make form",
+        "Three different ways of bowing deeply"
+      ],
+      "answer": 2,
+      "explanation": "Shu (protect/obey form), Ha (break from form, question), Ri (transcend, make your own). Student → innovator → master."
+    },
+    {
+      "id": "q4-1793611061900-5-359",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Technique • Kime",
+      "q": "What is Kime in Shotokan technique?",
+      "options": [
+        "Focus of power with total body at impact moment",
+        "Shouting loudly to intimidate opponent",
+        "Dancing movement to look beautiful",
+        "Resting between techniques to recover"
+      ],
+      "answer": 0,
+      "explanation": "Kime = decision, focus. Whole body tenses for an instant at impact - muscles, breath, mind. Then relaxes again. Snap focus, not stiff."
+    },
+    {
+      "id": "q4-1793611061902-6-9916",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Kata • Heian Yondan",
+      "q": "Heian Yondan's signature technique that is new for this level is:",
+      "options": [
+        "Only oi-zuki repeated again",
+        "Shuto uke, kosa dachi and yoko geri keage",
+        "High jump like Kanku Dai does",
+        "Only zenkutsu dachi stance"
+      ],
+      "answer": 1,
+      "explanation": "Heian Yondan introduces Shuto Uke in Kokutsu, Kosa Dachi (cross stance), Yoko Geri Keage (side snap kick), and hiza geri. More complex embusen."
+    },
+    {
+      "id": "q4-1793611061903-7-8599",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Kata • Embusen",
+      "q": "Why does every kata have an Embusen (floor pattern)?",
+      "options": [
+        "Just for decoration to look nice",
+        "To train direction changes",
+        "To make grading harder on purpose",
+        "No reason - random walking around"
+      ],
+      "answer": 1,
+      "explanation": "Embusen = performance line. Teaches awareness, balance and spatial awareness. It forces you to turn, shift weight, maintain zanshin in 4 directions, and finish at same start point."
+    },
+    {
+      "id": "q4-1793611061905-8-3709",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Kumite • Go No Sen",
+      "q": "Go No Sen in kumite means:",
+      "options": [
+        "Attack first before opponent moves",
+        "Defend then counter",
+        "Both attack at same time together",
+        "Run away from opponent quickly"
+      ],
+      "answer": 1,
+      "explanation": "Go = after, Sen = initiative. Go No Sen = defensive initiative - block opponent's attack then counter. Most basic kumite strategy for purple belt."
+    },
+    {
+      "id": "q4-1793611061906-9-5236",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Philosophy • Zanshin",
+      "q": "Zanshin after delivering a technique means:",
+      "options": [
+        "Remaining awareness",
+        "Falling down to rest after kiai",
+        "Turning your back on opponent",
+        "Celebrating your point loudly"
+      ],
+      "answer": 0,
+      "explanation": "Zan = remain, Shin = mind/heart. Stay aware, keep guard, expect counter. Real fight doesn't end at one punch."
+    },
+    {
+      "id": "q4-1793611061908-10-9316",
+      "belt": 4,
+      "type": "mcq",
+      "topic": "Dojo Kun • Full",
+      "q": "How many lines does the Dojo Kun have?",
+      "options": [
+        "Five lines",
+        "Three lines for three pillars only",
+        "Ten lines for ten commandments",
+        "One line only - just bow"
+      ],
+      "answer": 0,
+      "explanation": "Five lines: Seek perfection of character, be faithful, endeavor, respect others, refrain from violent behavior. Each starts with Hitotsu - first, one thing, as one mind."
+    },
+    {
+      "id": "q5-1793611508769-0-6381",
+      "belt": 5,
+      "type": "mcq",
+      "topic": "Bushido • Gi",
       "q": "Bushido virtue 'Gi' means:",
       "options": [
-        "Rectitude / Right decision",
-        "Courage only",
-        "Money",
-        "Strength"
+        "Rectitude and right decision even when hard",
+        "Just courage to fight without thinking",
+        "Love of money and profit always",
+        "Physical strength alone to win"
       ],
       "answer": 0,
-      "explanation": "Gi is doing what's right even when hard. Core of warrior code.",
-      "belt": 5
+      "explanation": "Gi is doing what's right even when hard, not convenient. Core of warrior code, foundation of all other virtues."
     },
     {
-      "id": "5-2",
+      "id": "q5-1793611508772-1-4633",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Advanced Kata",
+      "topic": "Advanced Kata • Tekki",
       "q": "Tekki Shodan was originally called:",
       "options": [
-        "Naihanchi",
-        "Heian Shodan",
-        "Taikyoku",
-        "Enpi"
+        "Naihanchi - side-to-side iron horse form",
+        "Heian Shodan - peaceful mind first",
+        "Taikyoku - first cause for beginners",
+        "Empi - flying swallow kata"
       ],
       "answer": 0,
-      "explanation": "Naihanchi = side-to-side. Iron horse stance. Old Okinawan roots, close combat.",
-      "belt": 5
+      "explanation": "Naihanchi = side-to-side. Kiba Dachi iron horse stance. Old Okinawan roots for close combat with back to wall, grappling and elbows."
     },
     {
-      "id": "5-3",
+      "id": "q5-1793611508773-2-9897",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Breathing",
-      "q": "Ibuki vs Nogare breathing difference?",
+      "topic": "Breathing • Ibuki",
+      "q": "What is the difference between Ibuki and Nogare breathing?",
       "options": [
-        "Ibuki = hard/power, Nogare = soft/calm",
-        "Same",
-        "Only for black belts",
-        "Not used"
+        "Ibuki = hard power breathing, Nogare = soft calm breathing",
+        "Both are exactly the same breathing method",
+        "Only for black belts, not for brown belts",
+        "Not used at all in Shotokan training"
       ],
       "answer": 0,
-      "explanation": "Ibuki for tension and power, Nogare for recovery and flow.",
-      "belt": 5
+      "explanation": "Ibuki = hard, audible, tension for power and kime. Nogare = soft, silent, calm for recovery and flow between techniques. Both train breath control."
     },
     {
-      "id": "5-4",
+      "id": "q5-1793611508775-3-8569",
+      "belt": 5,
       "type": "tf",
-      "topic": "History",
-      "q": "Funakoshi Gichin brought Karate from Okinawa to mainland Japan.",
+      "topic": "History • Funakoshi",
+      "q": "Gichin Funakoshi brought Karate from Okinawa to mainland Japan in 1922.",
       "options": [
-        "True",
-        "False"
+        "True - demonstrated in Tokyo and spread Karate-Do",
+        "False - Karate started in Tokyo originally"
       ],
       "answer": 0,
-      "explanation": "True. 1922 demonstration in Tokyo. Father of modern Karate-Do.",
-      "belt": 5
+      "explanation": "True. 1922 demonstration in Tokyo. Father of modern Karate-Do. Wrote Karate-Do Kyohan and 20 Precepts. Changed Kara from Chinese hand to empty hand."
     },
     {
-      "id": "5-5",
+      "id": "q5-1793611508777-4-120",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Testing",
+      "topic": "Testing • Brown Belt",
       "q": "What should brown belt grading test most?",
       "options": [
-        "Consistency under pressure + basics never failing",
-        "Fancy kicks",
-        "Breaking 5 boards",
-        "Speed only"
+        "Fancy high kicks that look impressive",
+        "Breaking five boards with one punch",
+        "Consistency under pressure - basics never failing when tired",
+        "Speed only, no need for accuracy"
       ],
-      "answer": 0,
-      "explanation": "Brown is refinement. Basics must be automatic even when exhausted.",
-      "belt": 5
+      "answer": 2,
+      "explanation": "Brown is refinement. Basics must be automatic even when exhausted, under pressure, with zanshin. Flashy without foundation fails."
     },
     {
-      "id": "6-1",
+      "id": "q5-1793611508778-5-4091",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Kata • Bassai",
-      "q": "Bassai Dai translates to?",
+      "topic": "Kata • Bassai Dai",
+      "q": "Bassai Dai translates to:",
       "options": [
-        "To storm a fortress - breaking through",
-        "Peaceful mind",
-        "Iron horse",
-        "Flying swallow"
+        "To storm a fortress - breaking through defense",
+        "Peaceful mind like Heian series",
+        "Flying swallow like Empi kata",
+        "Iron horse like Tekki Shodan"
       ],
       "answer": 0,
-      "explanation": "Bassai = to extract from fortress. Explosive entry, change of momentum.",
-      "belt": 6
+      "explanation": "Bassai = to storm fortress. Dai = big. Kata teaches breaking through opponent's strong defense with power, changing rhythm and hip drive."
     },
     {
-      "id": "6-3",
-      "type": "scenario",
-      "topic": "Philosophy",
-      "q": "Student asks 'When will I be good enough?' Best answer?",
-      "options": [
-        "The path has no end, compare to yesterday not others",
-        "When you get black belt",
-        "Never",
-        "When you beat me"
-      ],
-      "answer": 0,
-      "explanation": "Do = way. Not destination. Growth mindset.",
-      "belt": 10
-    },
-    {
-      "id": "6-4",
-      "belt": 6,
+      "id": "q5-1793611508780-6-5570",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Kumite",
-      "q": "Jiyu Kumite vs Jiyu Ippon?",
+      "topic": "Kumite • Sen",
+      "q": "What is Sen No Sen in kumite?",
       "options": [
-        "Free vs one attack",
-        "Same",
-        "No difference",
-        "Point vs knockdown"
+        "Counter after opponent finishes attack completely",
+        "Attack at exact moment opponent starts to attack",
+        "Both fighters run away from each other",
+        "No initiative, just waiting forever"
       ],
-      "answer": 0,
-      "explanation": "Jiyu Ippon = free style one attack, Jiyu Kumite = free sparring. Progressive."
+      "answer": 1,
+      "explanation": "Sen No Sen = initiative within initiative. Attack on opponent's intention/start. Higher than Go No Sen. Requires reading maai and intention."
     },
     {
-      "id": "6-5",
+      "id": "q5-1793611508781-7-5330",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Anatomy",
-      "q": "Best core for karate?",
+      "topic": "Philosophy • Niju Kun",
+      "q": "Funakoshi's Niju Kun (20 Precepts) - how many precepts are there?",
       "options": [
-        "Anti-rotation + bracing + breathing",
-        "Six pack crunches only",
-        "No core needed",
-        "Situps fast"
+        "Five precepts like Dojo Kun",
+        "Twenty precepts for daily life and training",
+        "Ten precepts only for tournaments",
+        "One precept - just work hard"
       ],
-      "answer": 0,
-      "explanation": "Karate core is anti-movement and transfer, not just flex.",
-      "belt": 11
+      "answer": 1,
+      "explanation": "Niju Kun = 20 precepts. Karate begins and ends with courtesy, no first attack, karate is lifelong, etc. Dojo Kun is 5, Niju Kun is 20."
     },
     {
-      "id": "7-1",
+      "id": "q5-1793611508782-8-2683",
+      "belt": 5,
       "type": "mcq",
-      "topic": "Dojo Management • Safety",
-      "q": "First rule when a child is injured in class?",
+      "topic": "Technique • Kake Waza",
+      "q": "What is Kake Waza (hooking technique) example?",
       "options": [
-        "Stop, care, document, inform parent calmly",
-        "Tell them to walk it off",
-        "Ignore",
-        "Make them do pushups"
+        "Hooking block that pulls opponent off balance to counter",
+        "Straight punch with no hooking at all",
+        "High kick to head only",
+        "Bowing without technique"
       ],
       "answer": 0,
-      "explanation": "Safety protocol + empathy + documentation = trust. Parents need calm professionalism.",
-      "belt": 10
+      "explanation": "Kake = hook. Kake Uke, Kake Geri. Hook opponent's arm/leg to break balance, create opening. Brown belt level kumite uses hooking, trapping."
     },
     {
-      "id": "7-2",
+      "id": "q5-1793611508784-9-5357",
+      "belt": 5,
+      "type": "mcq",
+      "topic": "Kata • Empi",
+      "q": "Empi means flying swallow and includes:",
+      "options": [
+        "Only slow movements without jumps",
+        "Only Kiba Dachi stance",
+        "Jump, spinning, dropping to floor - swallow movements",
+        "Only punching without kicks"
+      ],
+      "answer": 2,
+      "explanation": "Empi = flying swallow. Light, fast, jump, 360 turn, drop to floor. Swallow evades and strikes. Signature of Empi kata, shows agility."
+    },
+    {
+      "id": "q5-1793611508785-10-7817",
+      "belt": 5,
+      "type": "mcq",
+      "topic": "Competition • WKF Rules",
+      "q": "In WKF Kumite, what scores Yuko (1 point)?",
+      "options": [
+        "Jodan kick or any scoring technique on fallen opponent",
+        "Chudan punch to body with good form, distance, timing",
+        "Sweep that drops opponent completely",
+        "Punch that misses target intentionally"
+      ],
+      "answer": 1,
+      "explanation": "Yuko = 1 point: Chudan or Jodan Tsuki/Uchi. Waza-ari = 2 points (chudan kick). Ippon = 3 points (jodan kick or technique on fallen opponent). All need 6 criteria."
+    },
+    {
+      "id": "q5-1793611508788-11-7466",
+      "belt": 5,
+      "type": "mcq",
+      "topic": "Etiquette • Dogi Care",
+      "q": "Why must Dogi (gi) be clean, white, and properly tied for grading?",
+      "options": [
+        "Just to look good for photos",
+        "Clean white gi shows respect",
+        "Any color is fine for grading",
+        "Dirty gi shows hard training only"
+      ],
+      "answer": 1,
+      "explanation": "Dogi = way clothing. Discipline and readiness, Clean, white, no wrinkles, belt tied correctly shows discipline, respect for art, sensei and self. Mind and appearance connect."
+    },
+    {
+      "id": "q11-1793611826555-0-8209",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Anatomy • Core",
+      "q": "Best core training for karate power transfer?",
+      "options": [
+        "Anti-rotation, bracing and breathing control for transfer",
+        "Six pack crunches only for looks",
+        "No core needed for karate technique",
+        "Fast situps until failure only"
+      ],
+      "answer": 0,
+      "explanation": "Karate core is anti-movement and power transfer, not just flex. Planks, Pallof press, dead bug with breathing, bracing for kime. Not six pack."
+    },
+    {
+      "id": "q11-1793611826557-1-7964",
+      "belt": 11,
       "type": "mcq",
       "topic": "Dojo Management • Structure",
       "q": "A well-managed traditional class always:",
       "options": [
-        "Opens and closes with formal rei, mokuso and a set structure",
-        "Starts with free sparring",
-        "Has no fixed plan",
-        "Ends whenever students like"
+        "Opens and closes with formal rei, mokuso and set structure",
+        "Starts immediately with free sparring hard",
+        "Has no fixed plan, random each time",
+        "Ends whenever students feel like leaving"
       ],
       "answer": 0,
-      "explanation": "Rei-in, warm-up, kihon, kata, kumite, rei-out. Predictable structure builds discipline, safety and respect.",
-      "belt": 11
+      "explanation": "Rei-in, warm-up, kihon, kata, kumite, cool down, rei-out. Predictable structure builds discipline, safety, respect, and learning progression."
     },
     {
-      "id": "7-3",
-      "type": "mcq",
-      "topic": "Dojo Management • Records",
-      "q": "Why does a dojo keep accurate attendance and grading records?",
-      "options": [
-        "To verify time-in-grade and keep grading fair and transparent",
-        "To sell student data",
-        "For decoration",
-        "Only for tournaments"
-      ],
-      "answer": 0,
-      "explanation": "Good management protects belt integrity - attendance, time-in-grade and syllabus checks must be documented.",
-      "belt": 7
-    },
-    {
-      "id": "7-4",
+      "id": "q11-1793611826559-2-2732",
+      "belt": 11,
       "type": "mcq",
       "topic": "Dojo Management • Kumite Control",
       "q": "Before allowing kumite, the sensei managing the class must:",
       "options": [
-        "Inspect the space, pair students by size and grade, and set the contact level",
-        "Leave students to fight freely",
-        "Allow full contact for everyone",
-        "Skip the warm-up"
+        "Inspect space, pair by size and grade, set contact level clearly",
+        "Leave students to fight freely without rules",
+        "Allow full contact for everyone regardless",
+        "Skip warm-up to save time"
       ],
       "answer": 0,
-      "explanation": "Class management is prevention: safe space, smart pairing and clear rules before any sparring begins.",
-      "belt": 11
+      "explanation": "Class management is prevention: safe space check, smart pairing (size/grade/experience), clear rules, contact level, mouthguards, control. Safety first."
     },
     {
-      "id": "7-5",
+      "id": "q11-1793611826561-3-887",
       "belt": 11,
       "type": "mcq",
       "topic": "Dojo Management • Responsibility",
       "q": "A senior student accidentally damages dojo equipment. The right response?",
       "options": [
-        "Repair it in secret",
-        "Hide it",
-        "Report it immediately and help repair or replace it",
-        "Ignore it"
+        "Repair it in secret without telling anyone",
+        "Hide damage and hope no one notices",
+        "Report immediately and help repair or replace it",
+        "Ignore it and leave dojo"
       ],
       "answer": 2,
-      "explanation": "Dojo management runs on honesty and responsibility - the same character karate builds on the floor."
+      "explanation": "Dojo management runs on honesty and responsibility - same character karate builds on floor. Own mistake, report to sensei, fix. Sempai models integrity."
     },
     {
-      "id": "8-1",
+      "id": "q11-1793611826562-4-8707",
+      "belt": 11,
+      "type": "scenario",
+      "topic": "Dojo Business • Ethics",
+      "q": "Student offers extra money to grade early before time-in-grade. You as Sandan?",
+      "options": [
+        "Explain standard, time in grade matters, integrity over fee",
+        "Grade anyway for money",
+        "Charge double and grade quickly",
+        "Ignore request completely"
+      ],
+      "answer": 0,
+      "explanation": "Business ethics: belt integrity is dojo reputation. Short-term money kills long-term trust. Time in grade builds character and ensures standard."
+    },
+    {
+      "id": "q11-1793611826564-5-5654",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Kata • Meikyo",
+      "q": "Meikyo means \"Bright Mirror\" - Sandan kata. What defines it?",
+      "options": [
+        "Only horse stance with no jumps",
+        "Sankaku jump and mirror-like calm reflecting opponent",
+        "Beginner kata for white belts",
+        "Only punching without defense"
+      ],
+      "answer": 1,
+      "explanation": "Meikyo = bright mirror. Sankaku tobi (triangle jump), calm mind reflecting like mirror. First move like holding mirror. Tests balance and clear mind."
+    },
+    {
+      "id": "q11-1793611826566-6-8558",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Physiology • Hip Mobility",
+      "q": "For Sandan teaching mawashi geri safely, what hip action prevents injury?",
+      "options": [
+        "Hip locked, only knee twisting forcefully",
+        "Hip opens fully, support foot pivots 180°, knee tracks",
+        "No pivot needed, just kick high",
+        "Lean back excessively"
+      ],
+      "answer": 1,
+      "explanation": "Hip opens, support foot pivots on ball, knee tracks over toes, hip and shoulder in line. Hip mobility plus core prevents knee injury."
+    },
+    {
+      "id": "q11-1793611826568-7-7394",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Kata • Gojushiho Dai/Sho",
+      "q": "Gojushiho means 54 Steps. Difference between Dai and Sho for Sandan?",
+      "options": [
+        "Dai = big, slow powerful; Sho = small, fast intricate - same origin",
+        "Same kata exactly",
+        "One is beginner, one advanced only",
+        "No difference"
+      ],
+      "answer": 0,
+      "explanation": "Go = 5, Ju = 10, Shi = 4, Ho = steps. Dai = big - powerful, Sho = small - fast, intricate hand techniques. Both from same root, show yin/yang."
+    },
+    {
+      "id": "q11-1793611826569-8-5864",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Kumite • Kizami",
+      "q": "What is Kizami Zuki used for in Sandan Jiyu Kumite?",
+      "options": [
+        "Lead jab to control distance, probe and set up Gyaku Zuki",
+        "Only for kata without kumite use",
+        "Kick to head",
+        "Block only"
+      ],
+      "answer": 0,
+      "explanation": "Kizami = jab with lead hand. Controls maai, breaks rhythm, measures distance, sets up gyaku, scores. Key for WKF style kumite."
+    },
+    {
+      "id": "q11-1793611826572-9-933",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Philosophy • Fudoshin",
+      "q": "Fudoshin means:",
+      "options": [
+        "Immovable mind - stable under pressure, not disturbed",
+        "Angry mind that attacks",
+        "Sleepy mind that rests",
+        "Confused mind"
+      ],
+      "answer": 0,
+      "explanation": "Fu = not, Do = move, Shin = mind. Immovable mind like mountain, calm under pressure, not frozen but stable. Developed through hard training and mokuso."
+    },
+    {
+      "id": "q11-1793611826574-10-1120",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Management • Class Levels",
+      "q": "How should Sandan manage mixed level class (white to brown together)?",
+      "options": [
+        "Teach same kata to all without adjustment",
+        "Layer instruction - same theme, different depth and tasks per grade",
+        "Only teach advanced kata",
+        "Only teach white belts"
+      ],
+      "answer": 1,
+      "explanation": "Layered teaching: same theme (e.g., oi-zuki), white learns stance, green learns hip, brown learns timing and application. Everyone challenged, safety kept."
+    },
+    {
+      "id": "q11-1793611826576-11-8100",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Anatomy • Breathing Under Load",
+      "q": "Best breathing during kata for power and endurance?",
+      "options": [
+        "Hold breath entire kata until dizzy",
+        "Breathe continuously with Nogare, exhale sharply with Ibuki on kime",
+        "Only breathe in, never out",
+        "Random breathing without pattern"
+      ],
+      "answer": 1,
+      "explanation": "Continuous breathing - inhale Nogare (soft), exhale with technique, short Ibuki on kime. Never hold breath. Breath powers movement."
+    },
+    {
+      "id": "q11-1793611826578-12-4459",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "History • JKA",
+      "q": "What is JKA and its importance?",
+      "options": [
+        "Japan Karate Association - founded 1949 by Funakoshi students to preserve Shotokan",
+        "Just a tournament name",
+        "A belt manufacturer",
+        "Only for Kyokushin"
+      ],
+      "answer": 0,
+      "explanation": "JKA = Japan Karate Association, founded 1949 by Funakoshi and students like Nakayama. Standardized Shotokan, spread worldwide, produced first instructors."
+    },
+    {
+      "id": "q11-1793611826580-13-1120",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Kata • Chinte",
+      "q": "Chinte means \"Strange Hands\" - what is unique for Sandan?",
+      "options": [
+        "Only normal blocks like others",
+        "Unusual hand techniques - double blocks, close finger strikes",
+        "Only kicks",
+        "Beginner kata"
+      ],
+      "answer": 1,
+      "explanation": "Chin = strange/unusual, Te = hands. Rare techniques: double blocks, nippon nukite (two-finger), circular movements, close defense. Tests adaptability."
+    },
+    {
+      "id": "q11-1793611826581-14-5914",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Business • Retention",
+      "q": "As Sandan managing dojo business, best student retention strategy?",
+      "options": [
+        "Only grade fast to keep them happy short term",
+        "Build community, clear progression, care, character over quick belts",
+        "Charge lowest price only",
+        "Never correct students"
+      ],
+      "answer": 1,
+      "explanation": "Retention is not cheap belts. Community, friendships, clear goals, caring sempai-kohai, character development, fair standards keep students for years."
+    },
+    {
+      "id": "q11-1793611826583-15-3726",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Ethics • Outside Conduct",
+      "q": "Sandan sees kohai bullying at school. Per Dojo Kun, what is correct?",
+      "options": [
+        "Encourage bullying to be tough",
+        "Teach that karate is for protection and character, intervene with compassion",
+        "Ignore as not dojo matter",
+        "Teach them to fight bully violently"
+      ],
+      "answer": 1,
+      "explanation": "Dojo Kun extends outside dojo. Jinkaku kansei - seek perfection of character. Refrain from violent behavior, protect weak. Karate is for courage to do right."
+    },
+    {
+      "id": "q11-1793611826585-16-3744",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Technique • Uraken",
+      "q": "Uraken Uchi (backfist) power comes from:",
+      "options": [
+        "Whip-like snap from elbow rotation and hip snap",
+        "Only arm muscle pushing",
+        "Shoulder only without body",
+        "Wrist only"
+      ],
+      "answer": 0,
+      "explanation": "Uraken = backfist. Elbow snaps, forearm whips, hip snaps. Fast, close, surprise. Not push. Sandan must show snap vs push difference."
+    },
+    {
+      "id": "q11-1793611826588-17-3110",
+      "belt": 11,
+      "type": "mcq",
+      "topic": "Kata • Wankan",
+      "q": "Wankan means \"King's Crown\" - short kata for Sandan. What defines it?",
+      "options": [
+        "Longest kata with 100 moves",
+        "Short 24 moves, one kiai, crown shape at start",
+        "Only horse stance",
+        "White belt kata"
+      ],
+      "answer": 1,
+      "explanation": "Wan = king, Kan = crown. 24 moves, shortest advanced kata, one kiai only, crown shape with hands. Tests precision in short form."
+    },
+    {
+      "id": "q12-1793612059709-0-2498",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Legacy • Yondan Role",
+      "q": "What changes at Yondan (4th Dan) level in traditional dojo?",
+      "options": [
+        "You focus only on your own training now",
+        "You become steward of style - preserving and passing tradition",
+        "You stop training kihon completely",
+        "You only compete for trophies"
+      ],
+      "answer": 1,
+      "explanation": "Yondan is not just stronger technique - it's stewardship. Preserve kata as taught, mentor black belts, protect dojo integrity for next generation."
+    },
+    {
+      "id": "q12-1793612059713-1-3542",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kata • Kanku Sho",
+      "q": "Kanku Sho vs Kanku Dai - what is Sho?",
+      "options": [
+        "Same kata with different name only",
+        "Small version - faster, intricate, 47 moves vs 65, same origin",
+        "Beginner kata for white belts",
+        "Only horse stance"
+      ],
+      "answer": 1,
+      "explanation": "Dai = big, Sho = small. Both view sky. Sho is small, fast, intricate, more jumps, tighter. Dai is big, powerful. Both required for Yondan."
+    },
+    {
+      "id": "q12-1793612059715-2-5899",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Philosophy • Kyu vs Dan",
+      "q": "Difference between Kyu and Dan grades philosophically?",
+      "options": [
+        "Kyu = learning technique, Dan = learning how to live technique",
+        "No difference at all",
+        "Kyu is higher than Dan",
+        "Dan means you stop learning"
+      ],
+      "answer": 0,
+      "explanation": "Kyu = student grades (9-1) learning form. Dan = steps on the way - living karate, refining character, teaching. Shodan = beginning."
+    },
+    {
+      "id": "q12-1793612059717-3-6682",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kumite • Jiyu Ippon",
+      "q": "What is Jiyu Ippon Kumite for Yondan level?",
+      "options": [
+        "One attack, free movement, defender must choose defense spontaneously",
+        "Three step pre-arranged only",
+        "No rules brawl",
+        "Only kata"
+      ],
+      "answer": 0,
+      "explanation": "Jiyu = free, Ippon = one. Attacker announces target (or not), free movement, one attack. Defender reads distance, blocks, counters freely. Bridge to Jiyu Kumite."
+    },
+    {
+      "id": "q12-1793612059718-4-6625",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Teaching • Feedback",
+      "q": "Best feedback method for Yondan correcting Shodan's kata?",
+      "options": [
+        "Only say \"wrong\" without why",
+        "One correction at a time, show why, let them feel, positive first",
+        "Correct 10 things at once loudly",
+        "Ignore mistakes"
+      ],
+      "answer": 1,
+      "explanation": "Yondan teaching is precise - one key correction, explain why, demonstrate, let student feel difference, praise effort. Not overload."
+    },
+    {
+      "id": "q12-1793612059720-5-9259",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Anatomy • Aging Karate",
+      "q": "How should Yondan (often 40+) adapt training for longevity?",
+      "options": [
+        "Same as 20 year old with no adaptation needed",
+        "More mobility, recovery, technique over brute force, smart load",
+        "Stop training completely",
+        "Only lift heavy weights"
+      ],
+      "answer": 1,
+      "explanation": "Longevity: joint mobility, core, recovery, breathing, technique efficiency over muscle. Ibuki/Nogare, stretching, anti-rotation core, not just hard impact."
+    },
+    {
+      "id": "q12-1793612059722-6-9219",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kata • Bassai Sho",
+      "q": "Bassai Sho theme vs Bassai Dai?",
+      "options": [
+        "Same as Dai exactly",
+        "Small fortress - more intricate, close defense, soft power",
+        "Beginner kata",
+        "Only kicks"
+      ],
+      "answer": 1,
+      "explanation": "Bassai Dai = storm big fortress with power. Sho = storm small fortress - close, intricate, subtle, softer. Both teach breaking defense."
+    },
+    {
+      "id": "q12-1793612059724-7-3770",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Management • Dojo Culture",
+      "q": "As Yondan, how do you build strong dojo culture?",
+      "options": [
+        "Rituals, shared language (Osu, Rei), sempai-kohai care, consistent standards",
+        "Only low fees",
+        "No etiquette needed",
+        "Allow disrespect"
+      ],
+      "answer": 0,
+      "explanation": "Culture is built by rituals: rei in/out, mokuso, dojo kun recitation, clean dojo, sempai helping kohai, consistent standards, celebrating effort."
+    },
+    {
+      "id": "q12-1793612059727-8-5297",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Philosophy • Empty Hand",
+      "q": "Why \"empty hand\" still matters at Yondan with weapons everywhere?",
+      "options": [
+        "It means no weapon in hand, but character is weapon - restraint and spirit",
+        "Means you have nothing",
+        "Outdated concept",
+        "Means you fight with empty hands only literally"
+      ],
+      "answer": 0,
+      "explanation": "Kara = empty, but meaning deepens: empty of ego, anger, malice. Hand empty but spirit full. Karate is for protection and character, not violence."
+    },
+    {
+      "id": "q12-1793612059729-9-2489",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kata • Jiin",
+      "q": "Jiin means \"Temple Grounds\" - Yondan kata. What defines it?",
+      "options": [
+        "Only horse stance like Tekki",
+        "Slow start, broken rhythm, open hand defenses",
+        "Beginner kata",
+        "Only jumps"
+      ],
+      "answer": 1,
+      "explanation": "Jiin = temple grounds. Similar to Jion/Jitte. Broken rhythm, slow to fast, open hands, guardian movements. Tests calm under irregular timing."
+    },
+    {
+      "id": "q12-1793612059731-10-7778",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kumite • Tai Sabaki",
+      "q": "What is Tai Sabaki for Yondan kumite?",
+      "options": [
+        "Body shifting - moving off line, not just blocking hard",
+        "Only blocking with force",
+        "Running away",
+        "Standing still"
+      ],
+      "answer": 0,
+      "explanation": "Tai = body, Sabaki = management. Move off attack line with ashi sabaki, evade and counter. Higher level than go no sen blocking."
+    },
+    {
+      "id": "q12-1793612059733-11-9209",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Business • Succession",
+      "q": "Yondan planning dojo succession - best practice?",
+      "options": [
+        "Train 2-3 trusted Sandan/Nidan to teach same standard, document syllabus",
+        "Keep everything secret to yourself",
+        "Sell belt grades quickly",
+        "No plan needed"
+      ],
+      "answer": 0,
+      "explanation": "Legacy: train successors, document kihon/kata/kumite curriculum, grading criteria, safety protocols. Dojo should outlive you."
+    },
+    {
+      "id": "q12-1793612059736-12-6087",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Ethics • Power",
+      "q": "With Yondan power, ethical use outside dojo is:",
+      "options": [
+        "Show off and intimidate others",
+        "Avoid conflict, de-escalate, protect weak, use karate last",
+        "Fight anyone who disrespects you",
+        "Use for profit only"
+      ],
+      "answer": 1,
+      "explanation": "Higher grade = higher restraint. Power brings responsibility. Karate ni sente nashi, kekki no yu wo imashimuru - avoid violent behavior, protect."
+    },
+    {
+      "id": "q12-1793612059738-13-9377",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Technique • Kakushi Waza",
+      "q": "What is Kakushi Waza (hidden technique) in advanced kata?",
+      "options": [
+        "Obvious block punch everyone sees",
+        "Hidden strike, sweep or lock inside apparent block",
+        "Only shouting",
+        "No hidden techniques exist"
+      ],
+      "answer": 1,
+      "explanation": "Kakushi = hidden. Kata hides throws, locks, chokes inside blocks. Bassai Dai first move is not block - it's break and throw. Yondan must find hidden."
+    },
+    {
+      "id": "q12-1793612059740-14-1253",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kata • Jitte",
+      "q": "Jitte means \"Ten Hands\" - Yondan kata. What does it teach?",
+      "options": [
+        "Fighting against bo staff - using hands as ten, staff defense",
+        "Only white belt basics",
+        "Only kicking",
+        "Meditation only"
+      ],
+      "answer": 0,
+      "explanation": "Jitte = ten hands. Originally defense against bo staff. Open hands, strong grips, staff defense movements. Power against weapon."
+    },
+    {
+      "id": "q12-1793612059742-15-9986",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Philosophy • Shu Ha Ri at Yondan",
+      "q": "Where should Yondan be in Shu Ha Ri?",
+      "options": [
+        "Still Shu - blindly obeying without question",
+        "Late Ha to early Ri - breaking form and making your understanding",
+        "Never reaching Ri",
+        "Ri means stop learning"
+      ],
+      "answer": 1,
+      "explanation": "Shu (obey), Ha (break, question), Ri (transcend, create). Yondan is Ha to Ri - understands why form exists, adapts teaching, begins to express own karate while preserving root."
+    },
+    {
+      "id": "q12-1793612059744-16-2380",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Kata • Gankaku",
+      "q": "Gankaku means \"Crane on Rock\" - Yondan kata. Signature?",
+      "options": [
+        "Sagi ashi dachi - crane stance on one leg, balance and precision",
+        "Only horse stance",
+        "No balance needed",
+        "Beginner kata"
+      ],
+      "answer": 0,
+      "explanation": "Formerly Chinto. Sagi ashi dachi (heron leg), crane stance, high kicks, balance on rock. Tests focus, balance, stillness like crane."
+    },
+    {
+      "id": "q12-1793612059747-17-7046",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Management • Grading Integrity",
+      "q": "Yondan on grading panel for Shodan - what fails a candidate even if kata looks good?",
+      "options": [
+        "Poor rei, ego, unsafe control hurting partner, lack of dojo kun spirit",
+        "Only if they forget kata completely",
+        "Nothing fails, everyone passes",
+        "Only gi color"
+      ],
+      "answer": 0,
+      "explanation": "Shodan is character grade. Poor etiquette, ego, unsafe kumite, disrespect to kohai, bad dojo kun understanding fails even if technique flashy. Character first."
+    },
+    {
+      "id": "q12-1793612059749-18-3269",
+      "belt": 12,
+      "type": "mcq",
+      "topic": "Teaching • Zanshin Teaching",
+      "q": "How do you teach Zanshin to brown belts as Yondan?",
+      "options": [
+        "Tell them to drop guard after scoring",
+        "Drill - after technique, scan, keep guard, expect counter, breathe",
+        "No need to teach zanshin",
+        "Only shout zanshin word"
+      ],
+      "answer": 1,
+      "explanation": "Teach by drill: after each combo, kiai, scan opponent, keep kamae, step back with guard. Zanshin is habit built through repetition and awareness."
+    },
+    {
+      "id": "q10-1793612484777-0-3379",
+      "belt": 10,
+      "type": "scenario",
+      "topic": "Philosophy • Mindset",
+      "q": "Student asks 'When will I be good enough?' Best answer as Nidan?",
+      "options": [
+        "When you get black belt, you are good then",
+        "The path has no end - compare to yesterday only",
+        "Never - you will never be good enough at all",
+        "When you finally beat me in sparring today"
+      ],
+      "answer": 1,
+      "explanation": "Do = way, not destination. Growth mindset, Shu Ha Ri is endless. Compare to yesterday's self, not others. Black belt is beginning, not end of path."
+    },
+    {
+      "id": "q10-1793612484780-1-3079",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Dojo Management • Safety",
+      "q": "First rule when a child is injured in class as instructor?",
+      "options": [
+        "Tell them to walk it off quickly and continue",
+        "Stop, care, document, inform parent calmly now",
+        "Ignore injury and continue class as normal",
+        "Make them do pushups to toughen up fast"
+      ],
+      "answer": 1,
+      "explanation": "Safety protocol + empathy + documentation = trust. Stop, assess, first aid, incident log, inform parent calmly, adjust training. Duty of care is first dan requirement."
+    },
+    {
+      "id": "q10-1793612484782-2-3187",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Kata • Unsu",
+      "q": "Unsu means \"Cloud Hands\" and is required for Nidan. What is its key theme?",
+      "options": [
+        "Only slow walking with no jumps or spins at all",
+        "Cloud hands with 360 spin, jump and ippon drop",
+        "Only horse stance like Tekki Shodan always",
+        "Beginner kata with simple blocks only easy"
+      ],
+      "answer": 1,
+      "explanation": "Un = cloud, Su = hands. Signature 360 spin on floor, jump with spinning shuto, ippon seoi nage motion. Symbolizes clouds gathering and dispersing. Tests agility and control."
+    },
+    {
+      "id": "q10-1793612484783-3-981",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Bunkai • Jion",
+      "q": "Jion kata is from Jion Temple. Its bunkai theme for Nidan is:",
+      "options": [
+        "Only punching without any throws at all now",
+        "Defense against bo staff using temple guardian moves",
+        "Only high kicks for points in tournaments today",
+        "Just sitting meditation without movement now"
+      ],
+      "answer": 1,
+      "explanation": "Jion = temple name. Rooted in Jionji temple. Contains juji uke (temple guardian), defense against bo staff, strong rooted stances. Bunkai shows temple guardian protecting."
+    },
+    {
+      "id": "q10-1793612484785-4-246",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Kumite • Sen No Sen",
+      "q": "What is Sen No Sen vs Go No Sen for Nidan kumite?",
+      "options": [
+        "Sen No Sen attacks on opponent's intention early",
+        "Go No Sen always means attack first quickly",
+        "Both mean running away from fight quickly",
+        "No difference between them at all really"
+      ],
+      "answer": 0,
+      "explanation": "Go No Sen = after attack (defend then counter). Sen No Sen = during opponent's initiation - seize initiative. Sen Sen No Sen = before opponent even moves, reading intention. Higher level."
+    },
+    {
+      "id": "q10-1793612484787-5-1739",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Teaching • Correction",
+      "q": "As Nidan, how do you correct a green belt's Zenkutsu Dachi that is too high?",
+      "options": [
+        "Just shout \"lower\" repeatedly without explanation",
+        "Explain knee over toes, hip forward, push floor well",
+        "Ignore mistake and hope it fixes itself later",
+        "Tell them to only do kata and skip kihon now"
+      ],
+      "answer": 1,
+      "explanation": "Good teaching is not just telling what is wrong but why and how to feel it. Use tactile cue, analogy like pushing wall, show benefit. Shu Ha Ri teaching approach."
+    },
+    {
+      "id": "q10-1793612484789-6-4802",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "History • 4 Founders",
+      "q": "Which 4 major styles came from Funakoshi's era students?",
+      "options": [
+        "Shotokan, Shito-Ryu, Goju-Ryu, Wado-Ryu main styles",
+        "Only Shotokan exists in Japan today only",
+        "Karate has only one style ever in history",
+        "Kyokushin is the only style that exists now"
+      ],
+      "answer": 0,
+      "explanation": "From Okinawa Te: Shotokan (Funakoshi), Shito-Ryu (Mabuni), Goju-Ryu (Miyagi), Wado-Ryu (Otsuka). All from early 20th century mainland spread."
+    },
+    {
+      "id": "q10-1793612484790-7-8663",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Physiology • Knee Safety",
+      "q": "For Nidan teaching Kiba Dachi safely, what prevents knee injury?",
+      "options": [
+        "Toes straight forward with knees caving inward badly",
+        "Toes slightly out, knees tracking over toes outward",
+        "Knees locked straight and stiff all the time now",
+        "Standing on toes only without heel support now"
+      ],
+      "answer": 1,
+      "explanation": "Knee safety: toes slightly out 15-20 deg, knees push outward over toes, not caving in. Weight even, back straight. Builds strength not injury."
+    },
+    {
+      "id": "q10-1793612484792-8-9376",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Philosophy • Do",
+      "q": "\"Do\" in Karate-Do means:",
+      "options": [
+        "Way or path of lifelong development beyond technique",
+        "Just a sport for tournaments only for medals",
+        "Only self-defense tricks for street fighting now",
+        "Dance performance for entertainment only now"
+      ],
+      "answer": 0,
+      "explanation": "Do = way/path (like Judo, Kendo, Aikido). Not just jutsu (technique). Path of character, lifelong refinement. Nidan understands difference between jutsu and do."
+    },
+    {
+      "id": "q10-1793612484795-9-6551",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Kata • Sochin",
+      "q": "Sochin means \"Tranquil Force\" and is Nidan kata. What defines it?",
+      "options": [
+        "Only fast movements without any power at all now",
+        "Fudo Dachi rooted stance with slow then explosive force",
+        "Only jumping kicks for tournament points now",
+        "White belt kata for beginners only easy now"
+      ],
+      "answer": 1,
+      "explanation": "So = tranquil, Chin = force. Fudo Dachi (rooted/immovable stance), slow press then explosive. Strong, rooted, calm power like lion. Tests contrast of slow and fast."
+    },
+    {
+      "id": "q10-1793612484796-10-1596",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Competition • Kata Scoring",
+      "q": "In WKF Kata competition, what are two main scoring areas?",
+      "options": [
+        "Only speed matters for winning today in WKF",
+        "Technical and athletic performance plus bunkai demo",
+        "Only loud kiai shouting for points in WKF now",
+        "Gi color determines winner in WKF scoring now"
+      ],
+      "answer": 1,
+      "explanation": "WKF scoring: Technical (70% - stances, techniques, embusen) and Athletic (30% - strength, speed, balance). Final bouts require bunkai demonstration of kata."
+    },
+    {
+      "id": "q10-1793612484798-11-1158",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Ethics • Nidan Responsibility",
+      "q": "What is Nidan's ethical duty outside dojo per Dojo Kun?",
+      "options": [
+        "Show off to provoke fights outside dojo daily",
+        "Seek perfection of character, avoid violent behavior daily",
+        "Never help others outside dojo ever again now",
+        "Only care about belts and trophies always now"
+      ],
+      "answer": 1,
+      "explanation": "Hitotsu, Jinkaku kansei ni... and Kekki no yu wo imashimuru. Nidan carries dojo reputation outside. Restraint, humility, helping society, not provoking."
+    },
+    {
+      "id": "q10-1793612484801-12-874",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Technique • Choku Zuki",
+      "q": "What is difference between Choku Zuki and Oi-Zuki/Gyaku-Zuki?",
+      "options": [
+        "Choku Zuki is straight punch in place without step now",
+        "Same as Oi-Zuki exactly with no difference at all",
+        "Choku Zuki is a kick to head level only now",
+        "Choku Zuki is only for black belts advanced now"
+      ],
+      "answer": 0,
+      "explanation": "Choku Zuki = straight punch in shizentai or kiba dachi, no step. Used to teach straight line, elbow, seiken. Foundation before moving punches."
+    },
+    {
+      "id": "q10-1793612484803-13-7601",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Kata • Nijushiho",
+      "q": "Nijushiho means 24 Steps and is for Nidan. What is unique?",
+      "options": [
+        "Only 5 moves long and very short kata now",
+        "Flowing water-like rhythm with wall defense moves",
+        "Only horse stance without any other stance now",
+        "Beginner kata for white belts easy now only"
+      ],
+      "answer": 1,
+      "explanation": "Nijushiho = 24 steps. Flowing, water-like, irregular rhythm, empi strikes, defense with back to wall. Tests fluid power and smooth transitions."
+    },
+    {
+      "id": "q10-1793612484805-14-9816",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Dojo Kun • Complete",
+      "q": "Recite correct order of Dojo Kun 5 lines for Nidan test:",
+      "options": [
+        "Character, Faithfulness, Endeavor, Etiquette, No violence",
+        "Winning, money, fame, power, ego always now",
+        "Only one line about bowing in dojo only now",
+        "Random order is fine for Nidan test always now"
+      ],
+      "answer": 0,
+      "explanation": "1 Seek perfection of character, 2 Be faithful, 3 Endeavor, 4 Respect others, 5 Refrain from violent behavior. Each starts with Hitotsu. Must recite by heart for Nidan."
+    },
+    {
+      "id": "q10-1793612484808-15-8551",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Mind • Mushin",
+      "q": "Mushin means:",
+      "options": [
+        "No mind - clear mind without distraction, acting freely",
+        "Thinking too much about winning tournament now",
+        "Angry mind that attacks opponents always now",
+        "Sleepy mind that rests during class time now"
+      ],
+      "answer": 0,
+      "explanation": "Mu = no/empty, Shin = mind. Not empty mind but clear mind, no fixation. Allows spontaneous correct action. Developed through mokuso and repeated kata."
+    },
+    {
+      "id": "q10-1793612484811-16-7934",
+      "belt": 10,
+      "type": "mcq",
+      "topic": "Management • Grading Panel",
+      "q": "As Nidan on grading panel for kyu grades, what do you prioritize?",
+      "options": [
+        "Consistency, etiquette, effort and safety over flashy tricks",
+        "Only who can break boards with power now only",
+        "Only tallest students in class always selected now",
+        "Only those who shout loudest in dojo always now"
+      ],
+      "answer": 0,
+      "explanation": "Kyu grading is not tournament. Look for consistent kihon, good rei, effort, control, safety, spirit. Encourage growth, not perfection."
+    },
+    {
+      "id": "q9-1793612544293-0-3479",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Awareness • Zanshin",
+      "q": "Which describes Zanshin correctly for Shodan level?",
+      "options": [
+        "Beginner belt that means white belt level",
+        "Loud shout to intimidate opponent only now",
+        "Fast kick to jodan level only for points now",
+        "Remaining mind with guard after technique done"
+      ],
+      "answer": 3,
+      "explanation": "Zan = remain, Shin = mind. Zanshin is lingering awareness. After punch, you don't drop guard. You stay present, scan, ready for next. Essential for safety and real application."
+    },
+    {
+      "id": "q9-1793612544296-1-2403",
+      "belt": 9,
+      "type": "scenario",
+      "topic": "Teaching Methodology",
+      "q": "Adult beginner is frustrated because kids learn faster. As Shodan assistant instructor, what do you do?",
+      "options": [
+        "Pair with patient sempai, focus on personal progress not comparison",
+        "Put adult in kids class to compete directly with children now",
+        "Tell adult to quit if they cannot keep up quickly now",
+        "Ignore frustration and push harder only without support"
+      ],
+      "answer": 0,
+      "explanation": "Adult psychology: ego, comparison, time-poor, fear. Methodology must adapt - pair with supportive sempai, track personal progress, explain Shu Ha Ri stages."
+    },
+    {
+      "id": "q9-1793612544298-2-1371",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "History • Founder",
+      "q": "Who is recognized as founder of Shotokan and brought it from Okinawa to mainland Japan in 1922?",
+      "options": [
+        "Mas Oyama who founded Kyokushin full contact style",
+        "Gichin Funakoshi, father of Shotokan karate-do",
+        "Chojun Miyagi who founded Goju-Ryu style system",
+        "Kenwa Mabuni who founded Shito-Ryu style system"
+      ],
+      "answer": 1,
+      "explanation": "Gichin Funakoshi (1868-1957) father of Shotokan. Demonstrated at Ministry of Education exhibition in Tokyo 1922. Established Shotokan dojo, wrote Karate-Do Kyohan and 20 Precepts."
+    },
+    {
+      "id": "q9-1793612544300-3-3386",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Philosophy • Dojo Kun",
+      "q": "In Dojo Kun, what does \"Reigi o omonzuru koto\" truly demand from a Shodan?",
+      "options": [
+        "Perfecting technique before character development now",
+        "Seeking only victory in competition always for ego now",
+        "Respecting etiquette and manners above all in life",
+        "Avoiding physical conditioning completely as Shodan now"
+      ],
+      "answer": 2,
+      "explanation": "Reigi o omonzuru koto = respect etiquette. For Shodan, technique without respect, humility and proper reigi is not true karate-do. Begins and ends with courtesy."
+    },
+    {
+      "id": "q9-1793612544302-4-9428",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Tradition • Kata Syllabus",
+      "q": "What is significance of 26 Kata in Shotokan for 1st Dan examination?",
+      "options": [
+        "Only 5 Heian are required for Shodan test level now",
+        "Kata is no longer required after black belt level now",
+        "Only freestyle kata is needed for Shodan test now",
+        "Shodan must know all 26 including Bassai Dai core kata"
+      ],
+      "answer": 3,
+      "explanation": "Shodan must demonstrate mastery of full syllabus. Bassai Dai and Kanku Dai often mandatory for Shodan, representing bridge from Kihon to advanced principles of changing and viewing the sky."
+    },
+    {
+      "id": "q9-1793612544304-5-4922",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Technique • Oi vs Gyaku",
+      "q": "What is key biomechanical difference between Oi-zuki and Gyaku-zuki?",
+      "options": [
+        "Both use identical hip movement exactly same always now",
+        "Gyaku-zuki is only used while retreating backward now",
+        "Oi-zuki is actually a kick not a punch at all now",
+        "Oi uses closed hanmi lunge, Gyaku uses full shomen rotation"
+      ],
+      "answer": 3,
+      "explanation": "Oi-zuki drives forward same side arm/leg with hanmi. Gyaku-zuki anchors front leg and rotates hips fully to shomen to generate power from rear leg - core power technique."
+    },
+    {
+      "id": "q9-1793612544308-6-7665",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Philosophy • Kime",
+      "q": "What does concept of \"Kime\" represent which every Shodan must demonstrate?",
+      "options": [
+        "A loud kiai shout only for show without power now",
+        "Flexibility training for high kicks only for demo now",
+        "Total focus of body, mind, energy at impact moment",
+        "A type of free kumite tournament only for Shodan"
+      ],
+      "answer": 2,
+      "explanation": "Kime = decision, focus. Total focus of body, mind, energy into single moment at end of technique. Instant focus of spirit, body contraction, breath, ki. Without kime, only movement."
+    },
+    {
+      "id": "q9-1793612544310-7-3437",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Kata • Kanku Dai",
+      "q": "Kanku Dai means \"To View The Sky\" - what is its key theme for Shodan?",
+      "options": [
+        "Only low stances without jumps or vision at all now",
+        "First kata for white belt beginners only easy now",
+        "Viewing sky with first move up, jump and 360 vision",
+        "Horse stance only without movement at all now"
+      ],
+      "answer": 2,
+      "explanation": "Kan = view, Ku = sky. First move looks to sky, hands form triangle viewing sky. Includes manji uke, jump, 360 degree vision. 65 moves, most representative kata of Shotokan."
+    },
+    {
+      "id": "q9-1793612544312-8-4081",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Bunkai • Bassai",
+      "q": "Bassai Dai Bunkai for Shodan should show:",
+      "options": [
+        "Only block and punch as seen externally simple now",
+        "Storming fortress - breaking grip, close combat, throwing",
+        "Only high kicks for tournament points now easy now",
+        "Meditation only without application at all now now"
+      ],
+      "answer": 1,
+      "explanation": "Bassai = to storm fortress. Bunkai is not just block-punch. Entry breaking strong defense, grip breaks, close knee, throw, lock. Shodan must show application beyond omote."
+    },
+    {
+      "id": "q9-1793612544314-9-3350",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Kumite • Distance Control",
+      "q": "What does Maai and Hyoshi mean for Shodan Jiyu Kumite?",
+      "options": [
+        "Just shouting louder than opponent always for win now",
+        "Control of distance, timing and rhythm of attack now",
+        "Only wearing correct belt color for grading now now",
+        "Bowing without kumite at all in dojo now today"
+      ],
+      "answer": 1,
+      "explanation": "Maai = engagement distance, Hyoshi = rhythm/timing. Shodan kumite is not brawling. Control distance to be safe and effective, break opponent's rhythm, take initiative."
+    },
+    {
+      "id": "q9-1793612544316-10-2564",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Philosophy • Niju Kun",
+      "q": "\"Karate ni sente nashi\" from Niju Kun means what for Shodan conduct?",
+      "options": [
+        "No first attack in karate - restraint first always now",
+        "Always attack first to win quickly in dojo now now",
+        "First attack scores double points always in WKF now",
+        "No rules in kumite at all for Shodan now today"
+      ],
+      "answer": 0,
+      "explanation": "One of 20 Precepts. Karate is for character and protection, never to start violence. Shodan must embody restraint, karate as defense, not aggression."
+    },
+    {
+      "id": "q9-1793612544319-11-1411",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Technique • Shomen vs Hanmi",
+      "q": "When do you use Shomen vs Hanmi hip position in Shodan basics?",
+      "options": [
+        "Hanmi for defense evasion, Shomen for final power delivery",
+        "Shomen only for all techniques always without change",
+        "Hanmi only for kata without exception at all now",
+        "No difference between them at all really now now"
+      ],
+      "answer": 0,
+      "explanation": "Hanmi = half-facing, protects center, faster. Shomen = square facing, full power delivery. Oi-zuki uses hanmi to enter, Gyaku-zuki finishes with shomen rotation for power."
+    },
+    {
+      "id": "q9-1793612544322-12-1033",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Kata • Enbusen Rule",
+      "q": "What is Enbusen rule that Shodan must follow in grading?",
+      "options": [
+        "Start and end at same point with precise lines exact",
+        "Start anywhere and finish anywhere randomly now now",
+        "Only move forward without turns at all now now now",
+        "Random walking without pattern at all now now now"
+      ],
+      "answer": 0,
+      "explanation": "Enbusen = performance line. Kata must start and finish at same point (except Tekki). Shows control of balance, turns, spatial awareness. Shodan must keep exact embusen."
+    },
+    {
+      "id": "q9-1793612544325-13-7398",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Teaching • Oss and Rei",
+      "q": "As Shodan, when you teach kohai, what does correcting Oss and Rei first teach?",
+      "options": [
+        "Technique less important than spirit, respect, perseverance",
+        "Shouting is all that matters for grading now now",
+        "Belts are bought not earned in dojo now today now",
+        "Bowing is optional for Shodan kohai now today now"
+      ],
+      "answer": 0,
+      "explanation": "Oss = perseverance, Rei = respect. Shodan role is not to teach fancy kicks first, but to model spirit. Correct attitude before technique."
+    },
+    {
+      "id": "q9-1793612544327-14-7504",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "History • Shotokan Name",
+      "q": "Why is the style called \"Shotokan\"?",
+      "options": [
+        "Shoto was Funakoshi's pen name and Kan means hall - Shoto's hall",
+        "After a mountain in Japan called Shotokan mountain now",
+        "After a weapon type called Shoto used in Okinawa",
+        "After a tournament name called Shotokan Cup event now"
+      ],
+      "answer": 0,
+      "explanation": "Shoto = waving pines, Funakoshi's poetry pen name. His students wrote Shotokan above his dojo entrance - Hall of Shoto. Name stuck as style."
+    },
+    {
+      "id": "q9-1793612544330-15-2520",
+      "belt": 9,
+      "type": "mcq",
+      "topic": "Grading • Shodan Meaning",
+      "q": "Shodan literally means:",
+      "options": [
+        "First step / beginning grade - not expert level yet now",
+        "Master who knows everything in karate now today now",
+        "Final grade of karate and end of learning now today",
+        "Only tournament champion with trophy now today now"
+      ],
+      "answer": 0,
+      "explanation": "Sho = beginning, Dan = grade/step. Shodan = first step, beginning. Not mastery. It means you have learned basics enough to now really start learning karate-do."
+    },
+    {
+      "id": "q8-1793612605872-0-4460",
+      "belt": 8,
       "type": "mcq",
       "topic": "Shodan Prep • Meaning",
       "q": "What does achieving Shodan (1st Dan) truly mean?",
       "options": [
-        "The beginning of serious study - fundamentals mastered, the real journey starts",
-        "Retirement from training",
-        "You now know everything",
-        "Time to stop learning basics"
+        "Beginning of serious study - fundamentals mastered, journey starts",
+        "Retirement from training after getting black belt now",
+        "You now know everything in karate completely now",
+        "Time to stop learning basics forever now today"
       ],
       "answer": 0,
-      "explanation": "Sho = first. Shodan is the start of real depth: same basics, higher standard, deeper responsibility.",
-      "belt": 8
+      "explanation": "Sho = first. Shodan is start of real depth: same basics, higher standard, deeper responsibility. Beginning, not end."
     },
     {
-      "id": "8-2",
+      "id": "q8-1793612605875-1-5734",
+      "belt": 8,
       "type": "mcq",
       "topic": "Dojo Management • Grading Day",
       "q": "On grading day, the examiner's first responsibility is:",
       "options": [
-        "Check syllabus coverage, time-in-grade and safety before scoring anything",
-        "Entertain the parents",
-        "Pass everyone the same",
-        "Finish quickly"
+        "Entertain parents with jokes and stories during test",
+        "Pass everyone the same regardless of standard now",
+        "Finish grading as quickly as possible to save time",
+        "Check syllabus coverage, time-in-grade and safety first"
       ],
-      "answer": 0,
-      "explanation": "Orderly, fair, safe gradings are dojo management at its most visible. Integrity before convenience.",
-      "belt": 8
+      "answer": 3,
+      "explanation": "Orderly, fair, safe gradings are dojo management at its most visible. Check time-in-grade, syllabus, safety, then score. Integrity before convenience."
     },
     {
-      "id": "8-3",
+      "id": "q8-1793612605876-2-1894",
+      "belt": 8,
       "type": "mcq",
       "topic": "Tradition • Brown Belt",
       "q": "Traditionally, the brown belt symbolizes:",
       "options": [
-        "A maturing tree - technique hardening as the student approaches black",
-        "Failure",
-        "A beginner",
-        "A referee"
+        "A maturing tree - technique hardening near black belt level",
+        "Failure to achieve black belt in time now today",
+        "A beginner who just started karate training now",
+        "A referee who only judges tournaments now today"
       ],
       "answer": 0,
-      "explanation": "Brown means ripening: skills solidify, ego softens, and the student prepares to carry dojo responsibility.",
-      "belt": 8
+      "explanation": "Brown means ripening: skills solidify, ego softens, student prepares to carry dojo responsibility. Like tree bark hardening."
     },
     {
-      "id": "8-4",
+      "id": "q8-1793612605878-3-1301",
+      "belt": 8,
       "type": "mcq",
       "topic": "Dojo Management • Leadership",
-      "q": "What is expected of a 3rd Brown in the dojo?",
+      "q": "What is expected of a 3rd Brown in the dojo as leader?",
       "options": [
-        "Lead warm-ups, assist teaching and model the Dojo Kun daily",
-        "Arrive late",
-        "Train only for themselves",
-        "Avoid beginners"
+        "Arrive late and leave early without helping anyone",
+        "Train only for themselves without helping kohai now",
+        "Avoid beginners and only train with black belts now",
+        "Lead warm-ups, assist teaching and model Dojo Kun daily"
       ],
-      "answer": 0,
-      "explanation": "Senior kyu grades are the backbone of the dojo: management support, teaching help and visible discipline.",
-      "belt": 8
+      "answer": 3,
+      "explanation": "Senior kyu grades are backbone of dojo: management support, teaching help and visible discipline. Sempai models rei, effort, zanshin daily."
     },
     {
-      "id": "8-5",
+      "id": "q8-1793612605880-4-9675",
+      "belt": 8,
       "type": "mcq",
       "topic": "Philosophy • Onko Chishin",
       "q": "For Shodan prep, the phrase 'Onko Chishin' means:",
       "options": [
-        "Learning from the past to guide the future",
-        "Copying others",
-        "Forgetting tradition",
-        "Winning at all costs"
+        "Learning from past to guide future generations well",
+        "Copying others without understanding at all now",
+        "Forgetting tradition and doing your own thing now",
+        "Winning at all costs in tournaments always now"
       ],
       "answer": 0,
-      "explanation": "Honouring the elders' path. A Shodan studies history and tradition to carry karate forward faithfully.",
-      "belt": 8
+      "explanation": "Onko Chishin = study old to understand new. Honouring elders' path. Shodan studies history and tradition to carry karate forward faithfully."
     },
     {
-      "id": "9-5",
-      "type": "scenario",
-      "topic": "Dojo Business • Ethics",
-      "q": "Student wants to grade early for money. You?",
-      "options": [
-        "Explain standard, time in grade matters, integrity over fee",
-        "Grade anyway",
-        "Charge double",
-        "Ignore"
-      ],
-      "answer": 0,
-      "explanation": "Business ethics: belt integrity is dojo's reputation. Short-term money kills long-term trust.",
-      "belt": 11
-    },
-    {
-      "id": "q9-1793517299367-0-9915",
-      "belt": 9,
-      "type": "mcq",
-      "topic": "History",
-      "q": "Who is recognized as the founder of Shotokan Karate and brought it from Okinawa to mainland Japan in 1922?",
-      "options": [
-        "Gichin Funakoshi",
-        "Mas Oyama",
-        "Chojun Miyagi",
-        "Kenwa Mabuni"
-      ],
-      "answer": 0,
-      "explanation": "Gichin Funakoshi (1868-1957) is the father of Shotokan. He introduced karate to mainland Japan at the 【entity-Ministry of Education¦canonical_name=Ministry of Education】 exhibition in 1922 and established the Shotokan dojo."
-    },
-    {
-      "id": "q9-1793517299368-1-2438",
-      "belt": 9,
-      "type": "mcq",
-      "topic": "Philosophy",
-      "q": "In the Dojo Kun, what does the principle \"Reigi o omonzuru koto\" truly demand from a Shodan?",
-      "options": [
-        "Perfecting technique before character",
-        "To respect etiquette and manners above all",
-        "To seek only victory in competition",
-        "To avoid physical conditioning"
-      ],
-      "answer": 1,
-      "explanation": "Reigi o omonzuru koto means respect for etiquette. For a Shodan, it means understanding that technique without respect, humility, and proper reigi is not true karate-do."
-    },
-    {
-      "id": "q9-1793517299368-2-8531",
-      "belt": 9,
-      "type": "mcq",
-      "topic": "Tradition",
-      "q": "What is the significance of the 26 Kata in the Shotokan system for a 1st Dan examination?",
-      "options": [
-        "Only 5 Heian are required",
-        "Shodan must demonstrate mastery of all 26 including mastery of Tekki Shodan and Bassai Dai as core Shodan katas",
-        "Kata is no longer required after black belt",
-        "Only freestyle kata is needed"
-      ],
-      "answer": 1,
-      "explanation": "Tradition requires Shodan to understand the full kata syllabus. Bassai Dai and Kanku Dai are often mandatory for Shodan testing, representing the bridge from Kihon to advanced principles of changing and viewing the sky."
-    },
-    {
-      "id": "q9-1793517299369-3-7154",
-      "belt": 9,
-      "type": "mcq",
-      "topic": "Technique",
-      "q": "What is the key biomechanical difference between Oi-zuki and Gyaku-zuki regarding hip rotation and weight transfer?",
-      "options": [
-        "Oi-zuki uses closed hip (hanmi) with forward lunge, Gyaku-zuki uses full hip rotation (shomen) with opposite arm and leg",
-        "Both use identical hip movement",
-        "Gyaku-zuki is only used in retreat",
-        "Oi-zuki is a kick"
-      ],
-      "answer": 0,
-      "explanation": "Oi-zuki (lunge punch) drives forward with same side arm/leg using hanmi to chudan depth. Gyaku-zuki (reverse punch) anchors the front leg and rotates the hips fully to shomen to generate power from the rear leg - the core power technique of Shotokan."
-    },
-    {
-      "id": "q9-1793517299369-4-9438",
-      "belt": 9,
-      "type": "mcq",
-      "topic": "Philosophy & Technique",
-      "q": "What does the concept of \"Kime\" represent in Shotokan, which every Shodan must demonstrate?",
-      "options": [
-        "A loud kiai",
-        "Flexibility training",
-        "The total focus",
-        "A type of kumite"
-      ],
-      "answer": 2,
-      "explanation": "Kime is the culmination of karate technique - Total focus of body, mind, and energy into a single moment at the end of a technique. The instantaneous focus of mind (kime of spirit), body contraction, breath, and energy (ki) at the moment of impact. Without kime, there is no effective technique, only movement."
-    },
-    {
-      "id": "q8-1793518053552-0-8500",
+      "id": "q8-1793612605882-5-3175",
       "belt": 8,
       "type": "mcq",
-      "topic": "Kihon",
+      "topic": "Kihon • Sanbon Zuki",
       "q": "What is Sanbon Zuki in Zenkutsu Dachi?",
       "options": [
-        "Three Gyaku-zuki in place",
-        "One punch then two blocks",
-        "Chudan, Jodan, Chudan Gyaku",
-        "Three Jodan punches only"
+        "Three Gyaku-zuki in place without moving now today",
+        "One punch then two blocks in Zenkutsu now today",
+        "Chudan, Jodan, Chudan - level change sequence",
+        "Three Jodan punches only without level change now"
       ],
       "answer": 2,
       "explanation": "Sanbon Zuki teaches level change and distance: chudan oi-zuki, jodan oi-zuki, then chudan gyaku-zuki with full hip rotation and kime."
     },
     {
-      "id": "q8-1793518053553-1-2354",
+      "id": "q8-1793612605885-6-9617",
       "belt": 8,
       "type": "mcq",
-      "topic": "Kata",
+      "topic": "Kata • Heian",
       "q": "Which Heian introduces Kokutsu Dachi first?",
       "options": [
-        "Heian Shodan",
-        "Heian Nidan",
-        "Heian Godan",
-        "Heian Sandan"
+        "Heian Shodan with only zenkutsu dachi stance now",
+        "Heian Nidan with first kokutsu dachi introduction",
+        "Heian Godan with jump and kiai now today today",
+        "Heian Sandan with spinning embusen changes now now"
       ],
-      "answer": 3,
-      "explanation": "Heian Sandan is mandatory for San-kyu. It introduces kokutsu-dachi, simultaneous block-punch, and spinning embusen changes."
+      "answer": 1,
+      "explanation": "Heian Nidan is first to introduce Kokutsu Dachi, plus Yoko Geri Keage and Shuto Uke. Heian Shodan is only Zenkutsu. Correction: Actually Heian Nidan introduces Kokutsu. Note: Some schools say Shodan has kokutsu, but standard JKA - Nidan first."
     },
     {
-      "id": "q8-1793518053553-2-2368",
+      "id": "q8-1793612605886-7-1600",
       "belt": 8,
       "type": "mcq",
-      "topic": "History",
+      "topic": "History • Shotokan Name",
       "q": "What does Shotokan mean?",
       "options": [
-        "House of hard waves",
-        "Way of empty hand",
-        "Pine forest",
-        "House of Shoto"
+        "House of hard waves crashing loudly now today",
+        "Way of empty hand without weapons at all now",
+        "Pine forest with trees waving in wind only now",
+        "House of Shoto - Funakoshi's pen name hall"
       ],
       "answer": 3,
-      "explanation": "Shoto was Funakoshi's poetry pen name meaning rustling pines, Kan means house. Students put Shotokan sign over his dojo."
+      "explanation": "Shoto = waving pines, Funakoshi's poetry pen name. Kan = house/hall. Students put Shotokan sign over his dojo entrance. Hall of Shoto."
     },
     {
-      "id": "q8-1793518053554-3-242",
+      "id": "q8-1793612605888-8-2103",
       "belt": 8,
       "type": "mcq",
-      "topic": "Tradition",
+      "topic": "Tradition • Osu",
       "q": "What does OSU mean in dojo?",
       "options": [
-        "Means hello only",
-        "Means black belt coming",
-        "Means I want to fight",
-        "To persevere under pressure"
+        "Means hello only as casual greeting now today",
+        "Means black belt coming soon to grading now now",
+        "Means I want to fight right now today always now",
+        "To persevere under pressure with patience now"
       ],
       "answer": 3,
-      "explanation": "From Oshi Shinobu - to endure, to push, to never give up. Embodies respect, patience and determination for brown belt."
+      "explanation": "From Oshi Shinobu - to endure, to push, to never give up. Embodies respect"
     },
     {
-      "id": "q8-1793518053554-4-446",
-      "belt": 8,
-      "type": "mcq",
-      "topic": "Technique",
-      "q": "Difference between Soto Uke and Uchi Uke?",
-      "options": [
-        "Same name different school",
-        "One is kick, one is punch",
-        "Soto outside-in, Uchi inside-out",
-        "Both closed fist only"
-      ],
-      "answer": 2,
-      "explanation": "Describes forearm path. Soto travels outside to inside, Uchi inside to outside. Critical for correct line of defense."
-    },
-    {
-      "id": "q8-1793518053555-5-7899",
-      "belt": 8,
-      "type": "mcq",
-      "topic": "Philosophy",
-      "q": "Difference between Karate-Jutsu and Karate-Do?",
-      "options": [
-        "Do is sport, Jutsu is art",
-        "They are identical",
-        "Do for kids only",
-        "Jutsu is combat, Do is way of life"
-      ],
-      "answer": 3,
-      "explanation": "Funakoshi changed Jutsu (technique) to Do (way) to show karate is lifelong path for character, not just fighting."
-    },
-    {
-      "id": "q8-1793518053556-6-3419",
-      "belt": 8,
-      "type": "mcq",
-      "topic": "Kihon",
-      "q": "What are 3 points of Mae Geri?",
-      "options": [
-        "Swing from knee only",
-        "Knee up, snap, rechamber",
-        "Side kick only",
-        "Jump kick only"
-      ],
-      "answer": 1,
-      "explanation": "Correct form: 1) Knee lift chamber, 2) Snap with ball of foot, 3) Immediate rechamber with hip forward for power."
-    },
-    {
-      "id": "q8-1793518053557-7-7768",
-      "belt": 8,
-      "type": "mcq",
-      "topic": "Kumite",
-      "q": "What is Gohon Kumite?",
-      "options": [
-        "Free fighting",
-        "Five-step sparring, counter on 5th",
-        "One-step sparring",
-        "No partner needed"
-      ],
-      "answer": 1,
-      "explanation": "Five same attacks from attacker, defender blocks 4, counters on 5th. Teaches distance and timing for San-kyu."
-    },
-    {
-      "id": "q8-1793518053557-8-997",
-      "belt": 8,
-      "type": "mcq",
-      "topic": "Tradition",
-      "q": "Why Rei when entering dojo?",
-      "options": [
-        "To show off rank",
-        "To stretch back",
-        "Only for sensei",
-        "Respect and transition to dojo"
-      ],
-      "answer": 3,
-      "explanation": "Rei marks entering a special place of discipline, honors those before us, partners, and self. Not religious, but respect."
-    },
-    {
-      "id": "q8-1793518053558-9-8966",
-      "belt": 8,
-      "type": "mcq",
-      "topic": "Kihon",
-      "q": "What is Zanshin?",
-      "options": [
-        "A kata name",
-        "A punch type",
-        "White belt term",
-        "Remaining awareness after technique"
-      ],
-      "answer": 3,
-      "explanation": "Means mind remains. After every technique you stay aware, prepared, in control. No technique ends without zanshin."
-    },
-    {
-      "id": "q7-1793518083992-0-514",
+      "id": "q7-1793612723810-0-8176",
       "belt": 7,
       "type": "mcq",
-      "topic": "Kata",
-      "q": "What is challenge of Heian Godan?",
+      "topic": "Dojo Management • Records",
+      "q": "Why does a dojo keep accurate attendance and grading records?",
       "options": [
-        "Only punches inside",
-        "Slow movements only",
-        "First jump and combo of 1-4",
-        "Ground fighting only"
-      ],
-      "answer": 2,
-      "explanation": "Godan contains first jump (juji tobi), mikazuki geri, and combines all previous Heian lessons in one embusen. Required for Ni-kyu."
-    },
-    {
-      "id": "q7-1793518083993-1-692",
-      "belt": 7,
-      "type": "mcq",
-      "topic": "Technique",
-      "q": "What is Tai Sabaki with Ren Zuki?",
-      "options": [
-        "Moving arms only",
-        "Standing still position",
-        "Jumping backwards always",
-        "Body shift off line while punching"
-      ],
-      "answer": 3,
-      "explanation": "At Ni-kyu, not just block-punch but whole body moves off attack line. Makes Ren Zuki effective with angle and evasion."
-    },
-    {
-      "id": "q7-1793518083994-2-1105",
-      "belt": 7,
-      "type": "mcq",
-      "topic": "History",
-      "q": "Who were Funakoshi's 3 main teachers?",
-      "options": [
-        "Azato, Itosu, Matsumura",
-        "Bruce Lee, Ip Man, Tyson",
-        "Kano, Ueshiba, Oyama",
-        "Miyagi, Mabuni, Motobu"
+        "To verify time-in-grade and keep grading fair and transparent",
+        "To sell student data to marketing companies now today",
+        "For decoration on wall without any real purpose now",
+        "Only for tournaments and never for grading purposes"
       ],
       "answer": 0,
-      "explanation": "Anko Azato taught strategy, Anko Itosu created Heian kata, Sokon Matsumura taught Shuri-te basics. Shaped Shotokan."
+      "explanation": "Good management protects belt integrity - attendance, time-in-grade and syllabus checks must be documented. Fairness and transparency."
     },
     {
-      "id": "q7-1793518083995-3-7792",
+      "id": "q7-1793612723812-1-57",
       "belt": 7,
       "type": "mcq",
-      "topic": "Philosophy",
+      "topic": "Kata • Heian Godan",
+      "q": "What is challenge of Heian Godan for Ni-Kyu?",
+      "options": [
+        "Only punches inside without kicks at all now today",
+        "Slow movements only without power at all now today",
+        "First jump and combo of Heian 1-4 combined together",
+        "Ground fighting only without standing at all now today"
+      ],
+      "answer": 2,
+      "explanation": "Godan contains first jump (kosa tobi), mikazuki geri, and combines all previous Heian lessons in one embusen. Required for Ni-kyu. Tests previous."
+    },
+    {
+      "id": "q7-1793612723814-2-810",
+      "belt": 7,
+      "type": "mcq",
+      "topic": "Technique • Tai Sabaki",
+      "q": "What is Tai Sabaki with Ren Zuki?",
+      "options": [
+        "Moving arms only without body movement at all now",
+        "Standing still position without shifting at all now now",
+        "Jumping backwards always without forward movement now",
+        "Body shift off line while punching with angle now"
+      ],
+      "answer": 3,
+      "explanation": "At Ni-kyu, not just block-punch but whole body moves off attack line. Tai = body, Sabaki = shifting. Makes Ren Zuki effective with angle and evasion."
+    },
+    {
+      "id": "q7-1793612723816-3-3802",
+      "belt": 7,
+      "type": "mcq",
+      "topic": "History • Teachers",
+      "q": "Who were Funakoshi's 3 main teachers who shaped Shotokan?",
+      "options": [
+        "Azato, Itosu, Matsumura who taught Shuri-te system",
+        "Bruce Lee, Ip Man, Tyson who taught modern fighting",
+        "Kano, Ueshiba, Oyama who taught other martial arts",
+        "Miyagi, Mabuni, Motobu who taught different styles"
+      ],
+      "answer": 0,
+      "explanation": "Anko Azato taught strategy and philosophy, Anko Itosu created Heian kata for education, Sokon Matsumura taught Shuri-te basics. Shaped Shotokan foundation."
+    },
+    {
+      "id": "q7-1793612723818-4-7028",
+      "belt": 7,
+      "type": "mcq",
+      "topic": "Philosophy • Dojo Kun 1",
       "q": "What does Jinkaku Kansei ni Tsutomuru Koto mean?",
       "options": [
-        "Always win at all cost",
-        "Seek perfection of character",
-        "Only strength matters",
-        "Avoid school training"
+        "Always win at all cost without character at all now",
+        "Seek perfection of character as primary goal always",
+        "Only strength matters without character at all now",
+        "Avoid school training and focus on fighting only now"
       ],
       "answer": 1,
-      "explanation": "First Dojo Kun precept: character perfection is primary goal. Power without good character is dangerous approaching black belt."
+      "explanation": "First Dojo Kun precept: character perfection is primary goal. Power without good character is dangerous approaching black belt. Character first."
     },
     {
-      "id": "q7-1793518083995-4-9937",
+      "id": "q7-1793612723820-5-5296",
       "belt": 7,
       "type": "mcq",
-      "topic": "Kihon",
-      "q": "What makes Gyaku Mawashi Geri correct?",
+      "topic": "Kihon • Gyaku Mawashi Geri",
+      "q": "What makes Gyaku Mawashi Geri correct and safe?",
       "options": [
-        "Same as Mae Geri kick",
-        "No pivot needed at all",
-        "Punch with foot action",
-        "Opposite chamber, full hip turn"
+        "Same as Mae Geri kick without difference at all now",
+        "No pivot needed at all for kicking high now today",
+        "Punch with foot action without hip at all now today",
+        "Opposite chamber, full hip turn, support foot pivot"
       ],
       "answer": 3,
-      "explanation": "Requires knee chamber to opposite side, full hip turnover, 180-degree pivot of support foot, striking with heel or ball."
+      "explanation": "Requires knee chamber to opposite side, full hip turnover, 180-degree pivot of support foot, striking with heel or ball, rechamber fast."
     },
     {
-      "id": "q7-1793518083996-5-1330",
+      "id": "q7-1793612723822-6-3556",
       "belt": 7,
       "type": "mcq",
-      "topic": "Tradition",
-      "q": "What is Mokuso for?",
+      "topic": "Tradition • Mokuso",
+      "q": "What is Mokuso for at Ni-Kyu level?",
       "options": [
-        "Sleeping time in dojo",
-        "Push ups and fitness",
-        "Shouting and kiai",
-        "Silent meditation to clear mind"
+        "Sleeping time in dojo during class time now today",
+        "Push ups and fitness exercise for strength now now",
+        "Shouting and kiai to warm up lungs now today now",
+        "Silent meditation to clear mind and set intention"
       ],
       "answer": 3,
-      "explanation": "Moment of silence before to leave ego outside and set intention, after to reflect and calm. Core Shotokan tradition."
+      "explanation": "Moku = silent, So = thought. Moment of silence before to leave ego outside and set intention, after to reflect and calm. Core Shotokan tradition."
     },
     {
-      "id": "q7-1793518083996-6-3983",
+      "id": "q7-1793612723824-7-7544",
       "belt": 7,
       "type": "mcq",
-      "topic": "Kata",
-      "q": "Which Sentei kata starts at 2nd Brown?",
+      "topic": "Kata • Tekki Shodan",
+      "q": "Which Sentei kata starts at 2nd Brown level?",
       "options": [
-        "Unsu advanced",
-        "Gojushiho Dai",
-        "Tekki Shodan",
-        "Kanku Dai only"
+        "Unsu advanced kata for Nidan level only now today",
+        "Gojushiho Dai advanced kata for Sandan now today",
+        "Tekki Shodan - iron horse close combat kata now",
+        "Kanku Dai only for Shodan level now today today"
       ],
       "answer": 2,
-      "explanation": "Tekki Shodan is first brown belt kata outside Heian. Teaches Kiba Dachi strength and close-distance fighting."
+      "explanation": "Tekki Shodan (formerly Naihanchi) is first brown belt kata outside Heian. Teaches Kiba Dachi strength and close-distance fighting, side-to-side embusen."
     },
     {
-      "id": "q7-1793518083997-7-620",
+      "id": "q7-1793612723827-8-3914",
       "belt": 7,
       "type": "mcq",
-      "topic": "Technique",
-      "q": "What is correct Shuto Uke in Kokutsu?",
+      "topic": "Technique • Shuto Uke",
+      "q": "What is correct Shuto Uke in Kokutsu Dachi?",
       "options": [
-        "50-50 weight split",
-        "Leaning forward stance",
-        "No stance needed ever",
-        "70% back, thumb tucked, 90 deg"
+        "50-50 weight split evenly on both legs now today",
+        "Leaning forward stance with weight front now today now",
+        "No stance needed ever for Shuto Uke now today now",
+        "70% back, thumb tucked, elbow 90 degrees exact"
       ],
       "answer": 3,
-      "explanation": "Requires 70% weight back, front knee over foot, back leg straight, hips 45 deg, knife hand thumb tucked, elbow 90 degrees."
+      "explanation": "Requires 70% weight back, front knee over foot, back leg straight, hips 45 deg, knife hand thumb tucked, elbow 90 degrees, zanshin."
     },
     {
-      "id": "q7-1793518083998-8-2515",
+      "id": "q7-1793612723829-9-1886",
       "belt": 7,
       "type": "mcq",
-      "topic": "Kumite",
+      "topic": "Kumite • Kihon Ippon",
       "q": "What is Kihon Ippon Kumite?",
       "options": [
-        "Free for all fighting",
-        "One attack announced, one block-counter",
-        "No blocking allowed",
-        "Only kicking allowed"
+        "Free for all fighting without rules now today now",
+        "One attack announced, one block and counter now done",
+        "No blocking allowed at all in kumite now today now",
+        "Only kicking allowed without punching now today now"
       ],
       "answer": 1,
-      "explanation": "One-step basic sparring: attacker announces attack, one attack only, defender blocks and counters with kime. Teaches Maai."
+      "explanation": "One-step basic sparring: attacker announces attack (jodan, chudan), one attack only, defender blocks and counters with kime. Teaches Maai and timing."
     },
     {
-      "id": "q7-1793518083998-9-2121",
+      "id": "q7-1793612723832-10-5685",
       "belt": 7,
       "type": "mcq",
-      "topic": "Philosophy",
-      "q": "What does Karate ni Sente Nashi mean?",
+      "topic": "Philosophy • Sente Nashi",
+      "q": "What does Karate ni Sente Nashi mean for Ni-Kyu?",
       "options": [
-        "Always attack first fast",
-        "Sente means student rank",
-        "No meaning at all",
-        "No first attack, defend peace"
+        "Always attack first fast to win in kumite now today",
+        "Sente means student rank in dojo now today today now",
+        "No meaning at all in karate philosophy now today now",
+        "No first attack, defend peace with restraint always"
       ],
       "answer": 3,
-      "explanation": "Second Niju Kun: true karateka never initiates violence physically or verbally. Moral code of non-aggression and self-control."
+      "explanation": "Second Niju Kun: true karateka never initiates violence physically or verbally. Moral code of non-aggression and self-control. Character over aggression."
     },
     {
-      "id": "q6-1793518312989-0-2510",
-      "belt": 6,
+      "id": "q7-1793612723835-11-4222",
+      "belt": 7,
       "type": "mcq",
-      "topic": "Kata",
-      "q": "Why is Bassai Dai key for Ik-kyu?",
+      "topic": "Kihon • Ura Zuki",
+      "q": "What is Ura Zuki (close punch) used for at Ni-Kyu?",
       "options": [
-        "Easiest kata in list",
-        "Only for kids grading",
-        "No significance today",
-        "Storm a fortress, explosive power"
-      ],
-      "answer": 3,
-      "explanation": "Bassai Dai means to storm a fortress. Teaches explosive power change, hip switching, and breaking defense with spirit."
-    },
-    {
-      "id": "q6-1793518312990-1-3825",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "Kihon",
-      "q": "What is Chinkuchi or Kime at Ik-kyu?",
-      "options": [
-        "Loose technique always",
-        "Keep muscle tight always",
-        "Shout loud only",
-        "Total focus at impact then relax"
-      ],
-      "answer": 3,
-      "explanation": "Instant total muscle contraction, breath, hip vibration and mental focus at impact for microsecond, then immediate relaxation for shock power."
-    },
-    {
-      "id": "q6-1793518312991-2-8099",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "History",
-      "q": "What org did Funakoshi students create in 1949?",
-      "options": [
-        "WKF organization",
-        "【entity-UFC¦canonical_name=UFC】 organization",
-        "Japan Karate Association",
-        "ITKF only org"
-      ],
-      "answer": 2,
-      "explanation": "JKA formed in 1949 by Nakayama and seniors, formalizing Shotokan syllabus, Dan system, and spreading worldwide."
-    },
-    {
-      "id": "q6-1793518312991-3-2127",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "Tradition",
-      "q": "What is correct Obi knot for Ik-kyu?",
-      "options": [
-        "No meaning at all",
-        "Any knot works fine",
-        "Square knot, equal ends, balance",
-        "Left side longer always"
-      ],
-      "answer": 2,
-      "explanation": "Square knot with equal length symbolizes balance of mind/body, spirit/technique, unity and readiness with humility."
-    },
-    {
-      "id": "q6-1793518312992-4-4253",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "Technique",
-      "q": "What is key for Renzoku Oi, Gyaku, Mae Geri?",
-      "options": [
-        "Just speed matters",
-        "Jump high for power",
-        "Close eyes for focus",
-        "Keep depth, hip connection, kime each"
-      ],
-      "answer": 3,
-      "explanation": "Combination must not rise in stance, hips must connect each technique, each needs independent kime and correct Maai."
-    },
-    {
-      "id": "q6-1793518312993-5-5401",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "Philosophy",
-      "q": "What is Shu Ha Ri before Shodan?",
-      "options": [
-        "No relation to karate",
-        "Only Ri matters now",
-        "Means give up training",
-        "Obey, break, leave the form"
-      ],
-      "answer": 3,
-      "explanation": "Shu=obey form, Ha=break form, Ri=leave form. Ik-kyu is late Shu moving to Ha - perfecting basics before creating own expression."
-    },
-    {
-      "id": "q6-1793518312993-6-6941",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "Kata",
-      "q": "Which 3 katas required for Shodan from Ik-kyu?",
-      "options": [
-        "Heian 1-3 only needed",
-        "Unsu, Sochin, Meikyo",
-        "Tekki Shodan, Bassai Dai, Kanku Dai",
-        "Taikyoku only kata"
-      ],
-      "answer": 2,
-      "explanation": "JKA standard: Tekki shows rooted power, Bassai shows breaking power, Kanku shows flow and stamina - comprehensive test."
-    },
-    {
-      "id": "q6-1793518312994-7-7950",
-      "belt": 6,
-      "type": "mcq",
-      "topic": "Kihon",
-      "q": "Kihon as exercise vs application at Ik-kyu?",
-      "options": [
-        "Same exact thing",
-        "Exercise is form, application is Bunkai",
-        "Kihon has no use",
-        "Only for grading day"
+        "Long range punch like Oi-Zuki always now today now",
+        "Close range punch with palm up under opponent chin",
+        "High kick to head level only now today now today",
+        "Bowing without technique at all now today now now"
       ],
       "answer": 1,
-      "explanation": "Ik-kyu must transition from doing technique to understanding why. Every block has strike, every stance has meaning with target and distance."
+      "explanation": "Ura = reverse/inverted. Ura Zuki = close uppercut with palm up, elbow tight, under chin or solar plexus. Used"
     },
     {
-      "id": "q6-1793518312995-8-5419",
+      "id": "q6-1793612791816-0-9538",
       "belt": 6,
       "type": "mcq",
-      "topic": "Kumite",
-      "q": "What is Jiyu Ippon Kumite for Ik-kyu?",
+      "topic": "Kata • Bassai Meaning",
+      "q": "Bassai Dai translates to what?",
       "options": [
-        "Same as Gohon Kumite",
-        "Semi-free, attacker anytime, react freely",
-        "No rules at all",
-        "Only punching allowed"
+        "To storm a fortress - breaking through defense",
+        "Peaceful mind and calm meditation state now",
+        "Iron horse standing firm and rooted now today",
+        "Flying swallow moving lightly and swiftly now"
       ],
-      "answer": 1,
-      "explanation": "Semi-free one attack: attacker can attack anytime after warning, defender must react freely with block-counter. Teaches Sen and real timing."
+      "answer": 0,
+      "explanation": "Bassai = to extract from fortress. Explosive entry, change of momentum, breaking strong defense with power switch."
     },
     {
-      "id": "q6-1793518312995-9-6010",
+      "id": "q6-1793612791819-1-487",
       "belt": 6,
       "type": "mcq",
-      "topic": "Tradition",
-      "q": "As Ik-kyu Sempai, what is your duty?",
+      "topic": "Kumite • Jiyu Ippon vs Jiyu",
+      "q": "Jiyu Kumite vs Jiyu Ippon Kumite difference?",
       "options": [
-        "Only show off brown belt",
-        "Punish juniors always",
-        "No duty at all now",
-        "Guide Kohai, set example, service"
+        "Free vs one attack semi-free with reaction now",
+        "Same with no difference at all between them now",
+        "No difference between them at all now today now",
+        "Point vs knockdown only difference now today now"
+      ],
+      "answer": 0,
+      "explanation": "Jiyu Ippon = semi-free one attack, attacker can time attack freely, defender reacts. Jiyu Kumite = completely free sparring. Progressive steps to Shodan."
+    },
+    {
+      "id": "q6-1793612791821-2-8109",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Kata • Bassai Importance",
+      "q": "Why is Bassai Dai key for Ik-kyu grading?",
+      "options": [
+        "Easiest kata in list for beginners now today now",
+        "Only for kids grading and not for adults now now",
+        "No significance today for Shodan level now today",
+        "Storm fortress, explosive power, hip switching"
       ],
       "answer": 3,
-      "explanation": "Ik-kyu is first Sempai rank. Must lead by example, help juniors, clean dojo without being asked, embody Dojo Kun with humility."
+      "explanation": "Bassai Dai means to storm a fortress. Teaches explosive power change, hip switching, and breaking defense with spirit and kime."
+    },
+    {
+      "id": "q6-1793612791823-3-9298",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Kihon • Kime",
+      "q": "What is Chinkuchi or Kime at Ik-kyu level?",
+      "options": [
+        "Loose technique always without focus at all now",
+        "Keep muscle tight always without relaxing now now",
+        "Shout loud only without body focus now today now",
+        "Total focus at impact then relax immediately now"
+      ],
+      "answer": 3,
+      "explanation": "Instant total muscle contraction, breath, hip vibration and mental focus at impact for microsecond, then immediate relaxation for shock power and speed."
+    },
+    {
+      "id": "q6-1793612791825-4-3503",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "History • JKA",
+      "q": "What organization did Funakoshi students create in 1949?",
+      "options": [
+        "WKF organization for sport karate worldwide now",
+        "【entity-UFC¦canonical_name=UFC】 organization for MMA fighting now today now",
+        "Japan Karate Association JKA to spread Shotokan",
+        "ITKF only organization for traditional karate now"
+      ],
+      "answer": 2,
+      "explanation": "JKA formed in 1949 by Nakayama and seniors, formalizing Shotokan syllabus, Dan system, and spreading Shotokan worldwide from Japan."
+    },
+    {
+      "id": "q6-1793612791827-5-4948",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Tradition • Obi",
+      "q": "What is correct Obi knot for Ik-kyu Sempai?",
+      "options": [
+        "No meaning at all for obi knot now today today",
+        "Any knot works fine without balance now today now",
+        "Square knot, equal ends, balance of mind/body now",
+        "Left side longer always without balance now today"
+      ],
+      "answer": 2,
+      "explanation": "Square knot with equal length symbolizes balance of mind/body, spirit/technique, unity and readiness with humility. Sempai must show balance."
+    },
+    {
+      "id": "q6-1793612791829-6-3776",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Technique • Combination",
+      "q": "What is key for Renzoku Oi, Gyaku, Mae Geri combo?",
+      "options": [
+        "Just speed matters without form at all now today",
+        "Jump high for power without depth now today now",
+        "Close eyes for focus without seeing now today now",
+        "Keep depth, hip connection, kime each technique now"
+      ],
+      "answer": 3,
+      "explanation": "Combination must not rise in stance, hips must connect each technique, each needs independent kime and correct Maai. Ik-kyu tests connection."
+    },
+    {
+      "id": "q6-1793612791830-7-6147",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Philosophy • Shu Ha Ri",
+      "q": "What is Shu Ha Ri principle before Shodan?",
+      "options": [
+        "No relation to karate at all now today today now",
+        "Only Ri matters now without Shu and Ha now today",
+        "Means give up training and stop learning now today",
+        "Obey form, break form, leave form - Shu Ha Ri now"
+      ],
+      "answer": 3,
+      "explanation": "Shu=obey form, Ha=break form, Ri=leave form. Ik-kyu is late Shu moving to Ha - perfecting basics before creating own expression as Shodan."
+    },
+    {
+      "id": "q6-1793612791833-8-9103",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Kata • Shodan Required",
+      "q": "Which 3 katas are required for Shodan from Ik-kyu level?",
+      "options": [
+        "Heian 1-3 only needed for Shodan test now today",
+        "Unsu, Sochin, Meikyo advanced only now today now",
+        "Tekki Shodan, Bassai Dai, Kanku Dai core syllabus",
+        "Taikyoku only kata for grading now today today now"
+      ],
+      "answer": 2,
+      "explanation": "JKA standard: Tekki shows rooted power and close fight, Bassai shows breaking power, Kanku shows flow and stamina - comprehensive test for Shodan."
+    },
+    {
+      "id": "q6-1793612791835-9-1450",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Kihon • Exercise vs Application",
+      "q": "Kihon as exercise vs application at Ik-kyu level?",
+      "options": [
+        "Same exact thing without difference at all now now",
+        "Exercise is form, application is Bunkai meaning now",
+        "Kihon has no use at all for fighting now today now",
+        "Only for grading day without meaning now today now"
+      ],
+      "answer": 1,
+      "explanation": "Ik-kyu must transition from doing technique to understanding why. Every block has strike, every stance has meaning with target and distance. Bunkai is application."
+    },
+    {
+      "id": "q6-1793612791837-10-5991",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Kumite • Jiyu Ippon",
+      "q": "What is Jiyu Ippon Kumite for Ik-kyu test?",
+      "options": [
+        "Same as Gohon Kumite with five steps now today now",
+        "Semi-free, attacker anytime, react freely with Sen",
+        "No rules at all without control now today today now",
+        "Only punching allowed without kicks now today now"
+      ],
+      "answer": 1,
+      "explanation": "Semi-free one attack: attacker can attack anytime after warning distance, defender must react freely with block-counter. Teaches Sen and real timing, zanshin."
+    },
+    {
+      "id": "q6-1793612791840-11-8694",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Tradition • Sempai Duty",
+      "q": "As Ik-kyu Sempai, what is your main duty?",
+      "options": [
+        "Only show off brown belt to kohai now today now",
+        "Punish juniors always with power now today now",
+        "No duty at all now as Ik-kyu today today today",
+        "Guide Kohai, set example, service with humility now"
+      ],
+      "answer": 3,
+      "explanation": "Ik-kyu is first true Sempai rank. Must lead by example, help juniors, clean dojo without being asked, embody Dojo Kun with humility and Oss."
+    },
+    {
+      "id": "q6-1793612791842-12-1196",
+      "belt": 6,
+      "type": "mcq",
+      "topic": "Kihon • Enbusen & Kiai Points",
+      "q": "What is Enbusen and Kiai rule for Bassai Dai and Tekki?",
+      "options": [
+        "Random walk without start/end or kiai points now now",
+        "Precise lines, start/end same, kiai on power points",
+        "Only forward movement without turns at all now now",
+        "Jump only without kiai at all now today today now"
+      ],
+      "answer": 1,
+      "explanation": "Enbusen = performance line must be exact, start and end same point (except Tekki lateral). Bassai Dai kiai on 42 and final, Tekki on key kime points. Ik-kyu must know."
     }
   ],
   "extras": [
@@ -1948,6 +3106,657 @@
       "reading": "roh-koo joo",
       "category": "Counting",
       "definition": "6–10: Roku, Shichi (or Nana), Hachi, Kyu, Ju."
+    },
+    {
+      "id": "d1793606385176-0-3073",
+      "term": "Zanshin",
+      "reading": "zahn-sheen",
+      "category": "Concepts",
+      "definition": "The state of remaining awareness after technique, mind stays alert."
+    },
+    {
+      "id": "d1793606385177-1-2669",
+      "term": "Kime",
+      "reading": "kee-meh",
+      "category": "Technique",
+      "definition": "Focus of power - total concentration at impact."
+    },
+    {
+      "id": "d1793606385178-2-1822",
+      "term": "Dojo Kun",
+      "reading": "",
+      "category": "Philosophy",
+      "definition": "Five guiding principles of Shotokan dojo."
+    },
+    {
+      "id": "d1793606402668-0-9475",
+      "term": "Obi",
+      "reading": "oh-bee",
+      "category": "Equipment",
+      "definition": "The belt that holds the gi and shows rank. Its knot shows etiquette — tied over the spirit, not fashion."
+    },
+    {
+      "id": "d1793606402669-1-7509",
+      "term": "Dogi",
+      "reading": "doh-gee",
+      "category": "Equipment",
+      "definition": "The training uniform — correctly called Karate-Gi. White means beginner mind. Keep it clean, folded, respected."
+    },
+    {
+      "id": "d1793606402669-2-7147",
+      "term": "Kamiza",
+      "reading": "kah-mee-zah",
+      "category": "Etiquette",
+      "definition": "The top side of the dojo — where the shomen shrine or sensei's picture sits. Students sit facing kamiza during mokuso."
+    },
+    {
+      "id": "d1793606402670-3-6159",
+      "term": "Shomen",
+      "reading": "show-men",
+      "category": "Etiquette",
+      "definition": "The front of the dojo. Where respect is shown with ritsu-rei on entry and exit."
+    },
+    {
+      "id": "d1793606402671-4-2963",
+      "term": "Rei-gi",
+      "reading": "reh-gee",
+      "category": "Etiquette",
+      "definition": "Proper etiquette of bowing — when, how deep, how long. Reigi is the heart of dojo behavior."
+    },
+    {
+      "id": "d1793606402671-5-8904",
+      "term": "Saho",
+      "reading": "sah-hoh",
+      "category": "Etiquette",
+      "definition": "Proper manners and procedural etiquette inside the dojo — how to sit, bow, receive correction."
+    },
+    {
+      "id": "d1793606402673-6-1732",
+      "term": "Seiza",
+      "reading": "seh-zah",
+      "category": "Etiquette",
+      "definition": "Formal kneeling posture — knees folded, back straight. Used for zarei and mokuso."
+    },
+    {
+      "id": "d1793606402674-7-8327",
+      "term": "Anza",
+      "reading": "ahn-zah",
+      "category": "Etiquette",
+      "definition": "Cross-legged sitting allowed when seiza is painful. Still keeps back straight and respectful."
+    },
+    {
+      "id": "d1793606402675-8-9837",
+      "term": "Shugo",
+      "reading": "shoo-goh",
+      "category": "Commands",
+      "definition": "Line-up command — students form ranks facing kamiza for start or end of class."
+    },
+    {
+      "id": "d1793606402676-9-856",
+      "term": "Mawatte",
+      "reading": "mah-wat-teh",
+      "category": "Commands",
+      "definition": "Turn command — about-face, usually followed by yoi."
+    },
+    {
+      "id": "d1793606402676-10-4861",
+      "term": "Tai Sabaki",
+      "reading": "tie sah-bah-kee",
+      "category": "Concepts",
+      "definition": "Body shifting — moving the body off the attack line to create angle. Footwork is defence."
+    },
+    {
+      "id": "d1793606402677-11-7808",
+      "term": "Irimi",
+      "reading": "ee-ree-mee",
+      "category": "Concepts",
+      "definition": "Entering directly into the opponent's space — the boldest form of tai sabaki."
+    },
+    {
+      "id": "d1793606402678-12-5766",
+      "term": "Tenshin",
+      "reading": "ten-shin",
+      "category": "Concepts",
+      "definition": "Body shifting by stepping back and rotating — yielding to create counter-attack."
+    },
+    {
+      "id": "d1793606402679-13-5386",
+      "term": "Enzan No Metsuke",
+      "reading": "en-zan no meh-tskeh",
+      "category": "Concepts",
+      "definition": "Viewing the distant mountain — seeing the opponent whole, not staring at one part. Peripheral, calm vision."
+    },
+    {
+      "id": "d1793606402680-14-7310",
+      "term": "Sen",
+      "reading": "sen",
+      "category": "Concepts",
+      "definition": "Initiative — the timing of attack. Go no Sen, Sen no Sen, Sen Sen no Sen."
+    },
+    {
+      "id": "d1793606402681-15-5767",
+      "term": "Go No Sen",
+      "reading": "go no sen",
+      "category": "Concepts",
+      "definition": "Late initiative — defending after the opponent attacks, then countering. The beginner's timing."
+    },
+    {
+      "id": "d1793606402682-16-7485",
+      "term": "Sen No Sen",
+      "reading": "sen no sen",
+      "category": "Concepts",
+      "definition": "Simultaneous initiative — attacking at the instant opponent decides to attack. Stealing the moment."
+    },
+    {
+      "id": "d1793606402683-17-271",
+      "term": "Sen Sen No Sen",
+      "reading": "sen-sen no sen",
+      "category": "Concepts",
+      "definition": "Pre-emptive initiative — sensing intent before movement and acting first. Highest timing."
+    },
+    {
+      "id": "d1793606402683-18-2971",
+      "term": "Deai",
+      "reading": "deh-ai",
+      "category": "Concepts",
+      "definition": "Meeting at the start — intercepting the attack at its inception. Deai is sen no sen in motion."
+    },
+    {
+      "id": "d1793606402684-19-796",
+      "term": "Sun Dome",
+      "reading": "soon doh-meh",
+      "category": "Concepts",
+      "definition": "Stopping just short — control that halts one inch from target. Proof of mastery, not weakness."
+    },
+    {
+      "id": "d1793606402685-20-1349",
+      "term": "Awasete",
+      "reading": "ah-wah-seh-teh",
+      "category": "Commands",
+      "definition": "Combined or added points — referee call when two techniques score together."
+    },
+    {
+      "id": "d1793606402686-21-9998",
+      "term": "Hantei",
+      "reading": "hahn-teh",
+      "category": "Commands",
+      "definition": "Decision — judges call for a decision in a tied match."
+    },
+    {
+      "id": "d1793606402686-22-8029",
+      "term": "Hikiwake",
+      "reading": "hee-kee-wah-keh",
+      "category": "Concepts",
+      "definition": "A draw — no winner decided. Common in enbu or team kata when scores equal."
+    },
+    {
+      "id": "d1793606402687-23-217",
+      "term": "Waza-Ari",
+      "reading": "wah-zah-ah-ree",
+      "category": "Levels",
+      "definition": "Half-point in competition — a technique almost perfect, one point short of ippon."
+    },
+    {
+      "id": "d1793606402688-24-5889",
+      "term": "Ippon",
+      "reading": "eep-pohn",
+      "category": "Levels",
+      "definition": "Full point — a decisive technique with good form, timing, distance, and zanshin."
+    },
+    {
+      "id": "d1793606402689-25-2139",
+      "term": "Atoshi Baraku",
+      "reading": "ah-toh-shee bah-rah-koo",
+      "category": "Commands",
+      "definition": "15 seconds left — timekeeper's warning that the bout is ending. Final chance to score."
+    },
+    {
+      "id": "d1793606402690-26-1017",
+      "term": "Fudodachi",
+      "reading": "foo-doh dah-chee",
+      "category": "Stances",
+      "definition": "Immovable stance — like zenkutsu but feet in line, rooted and unshakeable. Stance of Sochin."
+    },
+    {
+      "id": "d1793606402691-27-8786",
+      "term": "Heisoku Dachi",
+      "reading": "heh-soh-koo dah-chee",
+      "category": "Stances",
+      "definition": "Closed feet stance — feet together, knees together. Formal attention stance."
+    },
+    {
+      "id": "d1793606402692-28-2975",
+      "term": "Hachiji Dachi",
+      "reading": "hah-chee-jee dah-chee",
+      "category": "Stances",
+      "definition": "Natural open-leg stance — feet shoulder-width, toes slightly out. Ready stance before yoi."
+    },
+    {
+      "id": "d1793606402692-29-7333",
+      "term": "Neko Ashi Dachi",
+      "reading": "neh-ko ah-shee dah-chee",
+      "category": "Stances",
+      "definition": "Cat stance — 90% weight on rear leg, front foot light like a cat's paw. For quick kicks and sweeps."
+    },
+    {
+      "id": "d1793606402693-30-3265",
+      "term": "Sanchin Dachi",
+      "reading": "sahn-chin dah-chee",
+      "category": "Stances",
+      "definition": "Hourglass stance — toes in, knees in, rooted. Breathing stance of Goju and Uechi."
+    },
+    {
+      "id": "d1793606402694-31-8094",
+      "term": "Hangetsu Dachi",
+      "reading": "hahn-geh-tsoo dah-chee",
+      "category": "Stances",
+      "definition": "Half-moon stance — like sanchin but wider, knees bent outward. Stance of Hangetsu kata."
+    },
+    {
+      "id": "d1793606402695-32-3395",
+      "term": "Kosa Dachi",
+      "reading": "koh-sah dah-chee",
+      "category": "Stances",
+      "definition": "Crossed-leg stance — rear knee behind front, weight low. Often a transition in kata."
+    },
+    {
+      "id": "d1793606402696-33-7853",
+      "term": "Renoji Dachi",
+      "reading": "reh-noh-jee dah-chee",
+      "category": "Stances",
+      "definition": "L-shaped stance — feet form the Japanese character for L. Narrow, deceptive distance."
+    },
+    {
+      "id": "d1793606402697-34-6906",
+      "term": "Ura Zuki",
+      "reading": "oo-rah zoo-kee",
+      "category": "Techniques",
+      "definition": "Inverted punch — palm up, short uppercut aimed at chin or solar plexus in close range."
+    },
+    {
+      "id": "d1793606402698-35-4915",
+      "term": "Tate Zuki",
+      "reading": "tah-teh zoo-kee",
+      "category": "Techniques",
+      "definition": "Vertical punch — fist vertical, like holding a hammer. Used in close quarters."
+    },
+    {
+      "id": "d1793606402699-36-4654",
+      "term": "Kizami Zuki",
+      "reading": "kee-zah-mee zoo-kee",
+      "category": "Techniques",
+      "definition": "Jab punch — lead hand snap with no hip switch. Fast, probing."
+    },
+    {
+      "id": "d1793606402700-37-3117",
+      "term": "Morote Zuki",
+      "reading": "moh-roh-teh zoo-kee",
+      "category": "Techniques",
+      "definition": "Double punch — both fists punch together. Strength of two hands in one line."
+    },
+    {
+      "id": "d1793606402701-38-5948",
+      "term": "Yama Zuki",
+      "reading": "yah-mah zoo-kee",
+      "category": "Techniques",
+      "definition": "Mountain punch — one arm jodan, one chudan simultaneously. U-shape of a mountain."
+    },
+    {
+      "id": "d1793606402702-39-2572",
+      "term": "Awase Zuki",
+      "reading": "ah-wah-seh zoo-kee",
+      "category": "Techniques",
+      "definition": "Combined punch — both fists to same level, usually chudan double."
+    },
+    {
+      "id": "d1793606402703-40-57",
+      "term": "Nukite",
+      "reading": "noo-kee-teh",
+      "category": "Techniques",
+      "definition": "Spear hand — fingertips thrusting as a blade. Requires conditioned fingers."
+    },
+    {
+      "id": "d1793606402704-41-5079",
+      "term": "Shuto Uchi",
+      "reading": "shoo-toh oo-chee",
+      "category": "Techniques",
+      "definition": "Knife-hand strike — outer edge of hand slashing to neck or temple. Not a block."
+    },
+    {
+      "id": "d1793606402706-42-9191",
+      "term": "Haito",
+      "reading": "hi-toh",
+      "category": "Techniques",
+      "definition": "Ridge-hand — thumb side of hand striking, opposite of shuto."
+    },
+    {
+      "id": "d1793606402707-43-2891",
+      "term": "Shotei",
+      "reading": "show-teh",
+      "category": "Techniques",
+      "definition": "Palm-heel strike — heel of palm driving upward to chin or chest."
+    },
+    {
+      "id": "d1793606402708-44-8220",
+      "term": "Uraken",
+      "reading": "oo-rah-ken",
+      "category": "Techniques",
+      "definition": "Back-fist strike — snapping back of fist to temple or nose."
+    },
+    {
+      "id": "d1793606402709-45-1086",
+      "term": "Tettsui",
+      "reading": "teh-tsui",
+      "category": "Techniques",
+      "definition": "Hammer fist — bottom of fist swinging down like a hammer."
+    },
+    {
+      "id": "d1793606402710-46-1778",
+      "term": "Kakuto",
+      "reading": "kah-koo-toh",
+      "category": "Techniques",
+      "definition": "Bent-wrist strike — striking with bent wrist, pushing down."
+    },
+    {
+      "id": "d1793606402711-47-1385",
+      "term": "Mikazuki Geri",
+      "reading": "mee-kah-zoo-kee geh-ree",
+      "category": "Techniques",
+      "definition": "Crescent kick — foot arcs inside or outside, sole slaps away opponent's hand."
+    },
+    {
+      "id": "d1793606402712-48-5411",
+      "term": "Ushiro Geri",
+      "reading": "oo-shee-roh geh-ree",
+      "category": "Techniques",
+      "definition": "Back kick — thrusting heel backward, looking over shoulder. Strongest kick."
+    },
+    {
+      "id": "d1793606402713-49-6468",
+      "term": "Ushiro Mawashi Geri",
+      "reading": "oo-shee-roh mah-wah-shee geh-ree",
+      "category": "Techniques",
+      "definition": "Spinning back roundhouse — full turn with heel. High-risk, high-reward."
+    },
+    {
+      "id": "d1793606402714-50-208",
+      "term": "Mae Tobi Geri",
+      "reading": "mah-eh toh-bee geh-ree",
+      "category": "Techniques",
+      "definition": "Jumping front kick — both knees lift, then front kick in air."
+    },
+    {
+      "id": "d1793606402715-51-2162",
+      "term": "Nidan Geri",
+      "reading": "nee-dahn geh-ree",
+      "category": "Techniques",
+      "definition": "Double jumping kick — one foot then other in same jump. Footwork of Kanku-Dai."
+    },
+    {
+      "id": "d1793606402716-52-5471",
+      "term": "Kakato Geri",
+      "reading": "kah-kah-toh geh-ree",
+      "category": "Techniques",
+      "definition": "Heel drop — stomping heel down onto thigh, foot, or face."
+    },
+    {
+      "id": "d1793606402717-53-8692",
+      "term": "Hiza Geri",
+      "reading": "hee-zah geh-ree",
+      "category": "Techniques",
+      "definition": "Knee strike — rising knee to body or face in close range."
+    },
+    {
+      "id": "d1793606402718-54-4235",
+      "term": "Juji Uke",
+      "reading": "joo-jee oo-keh",
+      "category": "Techniques",
+      "definition": "X-block — forearms crossed to block jodan or gedan. Juji means cross."
+    },
+    {
+      "id": "d1793606402719-55-8389",
+      "term": "Morote Uke",
+      "reading": "moh-roh-teh oo-keh",
+      "category": "Techniques",
+      "definition": "Augmented block — one forearm supports the other. Double strength."
+    },
+    {
+      "id": "d1793606402720-56-7477",
+      "term": "Sukui Uke",
+      "reading": "soo-koo-ee oo-keh",
+      "category": "Techniques",
+      "definition": "Scooping block — palm scoops under opponent's kick to lift and unbalance."
+    },
+    {
+      "id": "d1793606402721-57-8931",
+      "term": "Nagashi Uke",
+      "reading": "nah-gah-shee oo-keh",
+      "category": "Techniques",
+      "definition": "Flowing block — palm sweeping aside attack like water."
+    },
+    {
+      "id": "d1793606402723-58-2604",
+      "term": "Kake Uke",
+      "reading": "kah-keh oo-keh",
+      "category": "Techniques",
+      "definition": "Hooking block — wrist hooking and pulling opponent's arm."
+    },
+    {
+      "id": "d1793606402724-59-1180",
+      "term": "Haishu Uke",
+      "reading": "hi-shoo oo-keh",
+      "category": "Techniques",
+      "definition": "Back-hand block — using back of hand to deflect."
+    },
+    {
+      "id": "d1793606402725-60-7442",
+      "term": "Teisho Uke",
+      "reading": "teh-show oo-keh",
+      "category": "Techniques",
+      "definition": "Palm-heel block — palm heel pressing outward to stop punch."
+    },
+    {
+      "id": "d1793606402726-61-7493",
+      "term": "Otoshi Uke",
+      "reading": "oh-toh-shee oo-keh",
+      "category": "Techniques",
+      "definition": "Dropping block — forearm dropping down to block low kick or leg."
+    },
+    {
+      "id": "d1793606402727-62-1238",
+      "term": "Ashi Barai",
+      "reading": "ah-shee bah-rye",
+      "category": "Techniques",
+      "definition": "Foot sweep — sweeping opponent's foot to break balance. Tai sabaki's partner."
+    },
+    {
+      "id": "d1793606402728-63-5703",
+      "term": "Ren Geri",
+      "reading": "ren geh-ree",
+      "category": "Techniques",
+      "definition": "Consecutive kicks — same leg kicking twice before landing."
+    },
+    {
+      "id": "d1793606402729-64-2925",
+      "term": "Dan Geri",
+      "reading": "dahn geh-ree",
+      "category": "Techniques",
+      "definition": "Consecutive kicks in sequence — often mae-geri then mawashi-geri without setting foot down."
+    },
+    {
+      "id": "d1793606402730-65-8951",
+      "term": "Tensho",
+      "reading": "ten-show",
+      "category": "Concepts",
+      "definition": "Rotating palms kata — breathing and soft circular hands. Goju's other half to Sanchin."
+    },
+    {
+      "id": "d1793606402731-66-945",
+      "term": "Sanchin",
+      "reading": "sahn-chin",
+      "category": "Concepts",
+      "definition": "Three battles — mind, body, spirit. Kata and breathing exercise teaching rooted tension."
+    },
+    {
+      "id": "d1793606402732-67-2637",
+      "term": "Ibuki",
+      "reading": "ee-boo-kee",
+      "category": "Concepts",
+      "definition": "Hard breathing — powerful, audible exhale with tension. Sanchin's breath."
+    },
+    {
+      "id": "d1793606402733-68-8633",
+      "term": "Nogare",
+      "reading": "noh-gah-reh",
+      "category": "Concepts",
+      "definition": "Soft breathing — silent, hidden exhale for recovery and calm. Breath of Hangetsu."
+    },
+    {
+      "id": "d1793606402734-69-7855",
+      "term": "Chinkuchi",
+      "reading": "chin-koo-chee",
+      "category": "Concepts",
+      "definition": "Okinawan term for total body connection — wrist snap that ties floor to fist in one instant."
+    },
+    {
+      "id": "d1793606402735-70-8227",
+      "term": "Muchimi",
+      "reading": "moo-chee-mee",
+      "category": "Concepts",
+      "definition": "Sticky, heavy hands — weighted feeling in arms from correct breathing and relaxation."
+    },
+    {
+      "id": "d1793606402737-71-9547",
+      "term": "Gamaku",
+      "reading": "gah-mah-koo",
+      "category": "Concepts",
+      "definition": "Core power — the hip and lower abdomen's linked twist that powers every technique."
+    },
+    {
+      "id": "d1793606402738-72-7140",
+      "term": "Tanden",
+      "reading": "tahn-den",
+      "category": "Concepts",
+      "definition": "Lower abdomen center — the body's power center, two inches below navel. Where breath gathers."
+    },
+    {
+      "id": "d1793606402739-73-9186",
+      "term": "Hara",
+      "reading": "hah-rah",
+      "category": "Concepts",
+      "definition": "Belly or gut — seat of courage and spirit. Strong hara means unshakable."
+    },
+    {
+      "id": "d1793606402740-74-6194",
+      "term": "Seichusen",
+      "reading": "seh-choo-sen",
+      "category": "Concepts",
+      "definition": "Center line — imaginary line down your middle and opponent's. Control it, you control the fight."
+    },
+    {
+      "id": "d1793606402741-75-9060",
+      "term": "Irimi Sen",
+      "reading": "ee-ree-mee sen",
+      "category": "Concepts",
+      "definition": "Entering line — stepping into opponent's attack to cut it short."
+    },
+    {
+      "id": "d1793606402742-76-3822",
+      "term": "Atama",
+      "reading": "ah-tah-mah",
+      "category": "Anatomy",
+      "definition": "Head — including atama-uchi, head strike, rarely used."
+    },
+    {
+      "id": "d1793606402743-77-5982",
+      "term": "Nodo",
+      "reading": "noh-doh",
+      "category": "Anatomy",
+      "definition": "Throat — vital point. Shuto or nukite to nodo is decisive."
+    },
+    {
+      "id": "d1793606402745-78-9275",
+      "term": "Kinteki",
+      "reading": "kin-teh-kee",
+      "category": "Anatomy",
+      "definition": "Groin — kinteki-geri is prohibited in dojo kumite but studied for self-defense."
+    },
+    {
+      "id": "d1793606402746-79-6272",
+      "term": "Kansetsu",
+      "reading": "kahn-seh-tsoo",
+      "category": "Anatomy",
+      "definition": "Joint — kansetsu-geri attacks knee joint. Banned in sport, real in bunkai."
+    },
+    {
+      "id": "d1793606402747-80-9677",
+      "term": "Sokuto",
+      "reading": "soh-koo-toh",
+      "category": "Anatomy",
+      "definition": "Foot blade — outer edge of foot used in yoko-geri kekomi."
+    },
+    {
+      "id": "d1793606402748-81-312",
+      "term": "Koshi",
+      "reading": "koh-shee",
+      "category": "Anatomy",
+      "definition": "Ball of foot — striking surface for mae-geri and mawashi-geri."
+    },
+    {
+      "id": "d1793606402749-82-8227",
+      "term": "Kakato",
+      "reading": "kah-kah-toh",
+      "category": "Anatomy",
+      "definition": "Heel — striking surface for ushiro-geri and kakato-geri."
+    },
+    {
+      "id": "d1793606402751-83-4874",
+      "term": "Tekubi",
+      "reading": "teh-koo-bee",
+      "category": "Anatomy",
+      "definition": "Wrist — where kime locks. Strong tekubi means strong punch."
+    },
+    {
+      "id": "d1793606402752-84-9315",
+      "term": "Ude",
+      "reading": "oo-deh",
+      "category": "Anatomy",
+      "definition": "Forearm — ude-uke means forearm block. Forearms conditioned in kote-kitae."
+    },
+    {
+      "id": "d1793606402753-85-749",
+      "term": "Kata Guruma",
+      "reading": "kah-tah goo-roo-mah",
+      "category": "Techniques",
+      "definition": "Shoulder wheel — lifting throw where opponent rides your shoulders, hidden in kata bunkai."
+    },
+    {
+      "id": "d1793606402755-86-2329",
+      "term": "Tomoe Nage",
+      "reading": "toh-moh-eh nah-geh",
+      "category": "Techniques",
+      "definition": "Circle throw — foot on opponent's stomach, rolling back to throw. Seen in Enpi bunkai."
+    },
+    {
+      "id": "d1793606402756-87-1570",
+      "term": "Seiryoku Zenyo",
+      "reading": "seh-ryoh-koo zen-yoh",
+      "category": "Philosophy",
+      "definition": "Maximum efficiency, minimum effort — Jigoro Kano's principle that karate also follows."
+    },
+    {
+      "id": "d1793606402757-88-7254",
+      "term": "Jita Kyoei",
+      "reading": "jee-tah kyoh-eh",
+      "category": "Philosophy",
+      "definition": "Mutual welfare and benefit — growing together with partner, not defeating partner."
+    },
+    {
+      "id": "d1793606402759-89-245",
+      "term": "Tatami",
+      "reading": "tah-tah-mee",
+      "category": "Equipment",
+      "definition": "Straw mat flooring — in modern dojo replaced by mats, but bow still honors the space."
     }
   ],
   "library": [
@@ -2067,6 +3876,663 @@
       "category": "Teaching",
       "description": "This dojo's living syllabus of oral grading questions — maintained by senior senseis in the Admin Console.",
       "url": ""
+    },
+    {
+      "id": "l1793606824671-0-8303",
+      "title": "Dynamic Karate",
+      "author": "Masatoshi Nakayama",
+      "type": "book",
+      "category": "Technique",
+      "description": "The technical bible of Shotokan — stances, punches, kicks, body dynamics explained with physics. Must-read before Nidan.",
+      "url": "https://www.amazon.com/Dynamic-Karate-Masatoshi-Nakayama/dp/1568364132"
+    },
+    {
+      "id": "l1793606824673-1-844",
+      "title": "Karate-Do: My Way of Life - Official Summary",
+      "author": "Gichin Funakoshi",
+      "type": "article",
+      "category": "Philosophy",
+      "description": "Funakoshi's autobiography distilled — how karate moved from Okinawa to mainland Japan and his vision of Do.",
+      "url": "https://en.wikipedia.org/wiki/Karate-Do%3A_My_Way_of_Life"
+    },
+    {
+      "id": "l1793606824674-2-1283",
+      "title": "Shotokan's Secret - Expanded Edition",
+      "author": "Bruce Clayton",
+      "type": "book",
+      "category": "Bunkai",
+      "description": "Hidden bunkai in Heian katas — grappling, throws, joint locks. Changes how you see Heian Shodan.",
+      "url": "https://www.amazon.com/Shotokans-Secret-Expanded-Fighting-Original/dp/0897501888"
+    },
+    {
+      "id": "l1793606824676-3-9677",
+      "title": "The Heian Kata - Tekki to Bassai",
+      "author": "John Burke",
+      "type": "book",
+      "category": "Kata",
+      "description": "Complete breakdown of all 5 Heian, Tekki Shodan, Bassai-Dai — embusen, bunkai options, common errors.",
+      "url": "https://www.amazon.com/Heian-Kata-John-Burke/dp/1491042282"
+    },
+    {
+      "id": "l1793606824677-4-3219",
+      "title": "Karate Science - Dynamic Movement",
+      "author": "J.D. Swanson",
+      "type": "book",
+      "category": "Science",
+      "description": "Biomechanics of karate — how hip rotation, ground reaction, and breathing create power. Great for thesis.",
+      "url": "https://www.amazon.com/Karate-Science-Dynamic-Movement-Martial/dp/1594394598"
+    },
+    {
+      "id": "l1793606824678-5-8584",
+      "title": "WKF Official Kata Rules 2024",
+      "author": "【entity-World Karate Federation¦canonical_name=World Karate Federation】",
+      "type": "book",
+      "category": "Refereeing",
+      "description": "Latest scoring criteria for kata — technical vs athletic, how judges use tablets. Print this for students.",
+      "url": "https://www.wkf.net/structure-statutes-rules"
+    },
+    {
+      "id": "l1793606824679-6-5107",
+      "title": "WKF Kumite Competition Rules - Full PDF",
+      "author": "【entity-World Karate Federation¦canonical_name=World Karate Federation】",
+      "type": "book",
+      "category": "Refereeing",
+      "description": "Full kumite rules — senshu, atoshi baraku, categories, penalties, video review. Official 2024 version.",
+      "url": "https://www.wkf.net/pdf/wkf-competition-rules.pdf"
+    },
+    {
+      "id": "l1793606824680-7-2584",
+      "title": "JKA Shotokan Karate Magazine - Kata List",
+      "author": "JKA HQ",
+      "type": "book",
+      "category": "Kata",
+      "description": "Official JKA syllabus of 26 Shotokan katas from Taikyoku to Kanku-Sho — with kanji and meaning.",
+      "url": "https://www.jka.or.jp/en/about-jka/shotokan-karate-kata/"
+    },
+    {
+      "id": "l1793606824682-8-540",
+      "title": "The Essence of Okinawan Karate-Do",
+      "author": "Shoshin Nagamine",
+      "type": "book",
+      "category": "History",
+      "description": "Founder of Matsubayashi-ryu explains Okinawan karate history, spirit, and kata meaning — not Japanese Shotokan view.",
+      "url": "https://www.amazon.com/Essence-Okinawan-Karate-Do-Shoshin-Nagamine/dp/0804821100"
+    },
+    {
+      "id": "l1793606824683-9-4235",
+      "title": "Classical Kata of Okinawan Karate",
+      "author": "Pat McCarthy",
+      "type": "book",
+      "category": "History",
+      "description": "Oldest karate manual translated — Tegumi, Ti, original meanings of Pinan/Heian before Japanization.",
+      "url": "https://www.amazon.com/Classical-Okinawan-Karate-Patrick-McCarthy/dp/0897501136"
+    },
+    {
+      "id": "l1793606824684-10-7304",
+      "title": "Unante - The Secrets of Karate",
+      "author": "John Sells",
+      "type": "book",
+      "category": "History",
+      "description": "Deep history of karate masters in Okinawa — Itosu, Azato, Matsumura — with family lineages.",
+      "url": "https://www.amazon.com/Unante-Secrets-Karate-John-Sells/dp/0910706040"
+    },
+    {
+      "id": "l1793606824685-11-8797",
+      "title": "Karate Jutsu - The Original Teachings of Gichin Funakoshi",
+      "author": "Gichin Funakoshi & Tsutomu Ohshima",
+      "type": "book",
+      "category": "Bunkai",
+      "description": "Early Funakoshi before sport — includes grabs, throws, kyusho. Photos of original lethal applications.",
+      "url": "https://www.amazon.[STRIPPED 66 bytes]"
+    },
+    {
+      "id": "l1793606824687-12-512",
+      "title": "Mind Over Muscle - Writings of the Founder of Judo",
+      "author": "Jigoro Kano",
+      "type": "book",
+      "category": "Philosophy",
+      "description": "Seiryoku zenyo and jita kyoei — the judo principles that karate borrowed for dojo kun and character building.",
+      "url": "https://fullpdfword.com/look-up/mLC236/605992/5058753-mind-over-muscle-writings-from-the-founder-of-judo"
+    },
+    {
+      "id": "l1793606824688-13-4928",
+      "title": "The Book of Five Rings",
+      "author": "Miyamoto Musashi",
+      "type": "book",
+      "category": "Philosophy",
+      "description": "Samurai strategy that underpins karate's sen timing — Go no sen, sen no sen. Written 1645, still relevant.",
+      "url": "https://en.wikipedia.org/wiki/The_Book_of_Five_Rings"
+    },
+    {
+      "id": "l1793606824689-14-8521",
+      "title": "Hagakure - The Book of the Samurai",
+      "author": "Yamamoto Tsunetomo",
+      "type": "book",
+      "category": "Philosophy",
+      "description": "Bushido code — loyalty, death awareness, daily conduct. Source of dojo kun spirit.",
+      "url": "https://en.wikipedia.org/wiki/Hagakure"
+    },
+    {
+      "id": "l1793606824691-15-5227",
+      "title": "Fist of the Blue Lotus - Chinese Roots of Karate",
+      "author": "George Mattson",
+      "type": "book",
+      "category": "History",
+      "description": "How Fujian White Crane kung fu became Naha-te. Connects Sanchin, Tensho to Chinese origins.",
+      "url": "https://www.amazon.com/Shore-Karate-Goju-Ryu-Mattson/dp/1933901426"
+    },
+    {
+      "id": "l1793606824693-16-2807",
+      "title": "The Way of Kata - A Comprehensive Guide",
+      "author": "Lawrence Kane & Kris Wilder",
+      "type": "book",
+      "category": "Bunkai",
+      "description": "Practical bunkai decoding method — how to find locks, throws, and chokes in any kata movement.",
+      "url": "https://www.amazon.com/Way-Kata-Comprehensive-Decoding-Martial/dp/1594390584"
+    },
+    {
+      "id": "l1793606824694-17-9470",
+      "title": "Meditations on Violence",
+      "author": "Rory Miller",
+      "type": "book",
+      "category": "Self-Defense",
+      "description": "What real violence looks like vs dojo training — essential for instructors teaching self-defense bunkai.",
+      "url": "https://www.amazon.com/Meditations-Violence-Comparison-Martial-Training/dp/1594391188"
+    },
+    {
+      "id": "l1793606824695-18-9798",
+      "title": "Facing Violence",
+      "author": "Rory Miller",
+      "type": "book",
+      "category": "Self-Defense",
+      "description": "The 7 types of violence — how to teach students legal, ethical self-defense, not just sport kumite.",
+      "url": "https://www.amazon.com/Facing-Violence-Preparing-Unknown-Rory/dp/1594392137"
+    },
+    {
+      "id": "l1793606824696-19-8502",
+      "title": "Karate Stupid - Training Myths",
+      "author": "Scott Langley",
+      "type": "book",
+      "category": "Teaching",
+      "description": "JKA instructor debunks McDojo myths — long low stances, hikite worship, why Heian matters.",
+      "url": "https://www.amazon.com/Karate-Stupid-Scott-Langley/dp/1915503019"
+    },
+    {
+      "id": "l1793606824698-20-9038",
+      "title": "Complete Shotokan Karate - History and Practice",
+      "author": "Robin L. Rielly",
+      "type": "book",
+      "category": "History",
+      "description": "Shotokan from 1922 to now — lineage charts, kata evolution, political splits (JKA, SKIF, JKS).",
+      "url": "https://www.amazon.com/Complete-Shotokan-Karate-Robin-Rielly/dp/0804831480"
+    },
+    {
+      "id": "l1793606824699-21-459",
+      "title": "Kanku-Dai Bunkai Analysis - Video Series",
+      "author": "Elmar Schmeisser",
+      "type": "video",
+      "category": "Bunkai",
+      "description": "Full 60-min breakdown of Kanku-Dai hidden throws and joint locks — YouTube masterclass.",
+      "url": "https://www.youtube.com/watch?v=Z8LrTQJ7v4M"
+    },
+    {
+      "id": "l1793606824701-22-9376",
+      "title": "Heian Shodan to Godan - JKA Official Performances",
+      "author": "JKA",
+      "type": "video",
+      "category": "Kata",
+      "description": "JKA instructors perform all Heian katas slowly for grading — front and back view, official standard.",
+      "url": "https://www.youtube.com/watch?v=4pK3uE8sK1A"
+    },
+    {
+      "id": "l1793606824702-23-938",
+      "title": "Enbusen Explained - All Shotokan Kata Floor Patterns",
+      "author": "Andre Bertel",
+      "type": "article",
+      "category": "Kata",
+      "description": "Visual guide to every Shotokan kata's embusen — where you should finish vs start.",
+      "url": "https://www.shotokan-karate.org/enbusen.html"
+    },
+    {
+      "id": "l1793606824703-24-9858",
+      "title": "The 26 Shotokan Kata - Names and Meanings",
+      "author": "Wikipedia",
+      "type": "book",
+      "category": "Kata",
+      "description": "Quick reference — what Bassai, Kanku, Enpi, Jion actually mean in Japanese. Good for oral grading Q&A.",
+      "url": "https://en.wikipedia.org/wiki/List_of_Shotokan_kata"
+    },
+    {
+      "id": "l1793606824705-25-3177",
+      "title": "Anatomy of Breathing for Karate",
+      "author": "Blandine Calais-Germain",
+      "type": "book",
+      "category": "Science",
+      "description": "How ibuki and nogare use diaphragm — why sanchin breathing builds power and health.",
+      "url": "https://www.amazon.com/Anatomy-Breathing-Blandine-Calais-Germain/dp/0939616006"
+    },
+    {
+      "id": "l1793606824707-26-9426",
+      "title": "Strength Training for Karate - Functional Method",
+      "author": "Eberhard Schneider",
+      "type": "book",
+      "category": "Fitness",
+      "description": "Dojo-specific S&C — not bodybuilding. Legs for kiba-dachi, core for kime, wrist conditioning.",
+      "url": "https://www.amazon.com/Shotokan-Karate-Training-Eberhard-Schneider/dp/1841262985"
+    },
+    {
+      "id": "l1793606824708-27-1550",
+      "title": "Karate Injuries and Prevention Guide",
+      "author": "British Journal of Sports Medicine",
+      "type": "article",
+      "category": "Science",
+      "description": "Research on common karate injuries — knee, ankle, wrist — and how to warm up correctly.",
+      "url": "https://bjsm.bmj.com/content/karate-injury-prevention"
+    },
+    {
+      "id": "l1793606824717-28-7771",
+      "title": "The Art of Hojo Undo - Power Training",
+      "author": "【entity-Michael Clarke¦canonical_name=Michael Clarke】",
+      "type": "book",
+      "category": "Equipment",
+      "description": "Traditional Okinawan strength tools — makiwara, chi-ishi, nigiri-game. How to make them cheap in your dojo.",
+      "url": "https://www.amazon.com/Art-Hojo-Undo-Power-Training/dp/1594391364"
+    },
+    {
+      "id": "l1793606824719-29-3557",
+      "title": "Makiwara Training - Complete Guide",
+      "author": "Hidan Magazine",
+      "type": "article",
+      "category": "Equipment",
+      "description": "How to build and use makiwara — distance, wrapping, daily reps, why 100 punches a day matters.",
+      "url": "https://www.karatebyjesse.com/makiwara-guide/"
+    },
+    {
+      "id": "l1793606824721-30-1749",
+      "title": "Jesse Enkamp - Karate Nerd - Bunkai Blog",
+      "author": "Jesse Enkamp",
+      "type": "article",
+      "category": "Bunkai",
+      "description": "Modern bunkai articles — why karate blocks are actually strikes and throws. Very readable for students.",
+      "url": "https://www.karatebyjesse.com/category/karate-bunkai/"
+    },
+    {
+      "id": "l1793606824722-31-4645",
+      "title": "The Kihon Checklist for White to Black Belt",
+      "author": "Sensei Andy Allen",
+      "type": "tool",
+      "category": "Teaching",
+      "description": "Free PDF checklist of every kihon needed per belt — oizuki to ushiro-geri. Print for grading.",
+      "url": "https://www.shotokan.com.au/kihon-checklist.pdf"
+    },
+    {
+      "id": "l1793606824724-32-7646",
+      "title": "JKA Grading Syllabus - Kyu to Dan",
+      "author": "JKA",
+      "type": "book",
+      "category": "Teaching",
+      "description": "Official JKA exam requirements — what kihon, kata, kumite is required for each kyu and dan.",
+      "url": "https://www.jka.or.jp/en/grading/"
+    },
+    {
+      "id": "l1793606824725-33-4295",
+      "title": "SKIF Grading Syllabus",
+      "author": "SKIF Kanazawa",
+      "type": "book",
+      "category": "Teaching",
+      "description": "Kanazawa's Shotokan syllabus — alternative to JKA, includes more kata like Wankan and Jiin.",
+      "url": "https://www.skifworld.com/grading-syllabus"
+    },
+    {
+      "id": "l1793606824726-34-1055",
+      "title": "Karate Dojo Kun - Kanji Calligraphy",
+      "author": "Gichin Funakoshi Original",
+      "type": "article",
+      "category": "Etiquette",
+      "description": "Original kanji of Dojo Kun with stroke order — perfect for dojo wall poster.",
+      "url": "https://www.jka.or.jp/en/dojo-kun/"
+    },
+    {
+      "id": "l1793606824728-35-2292",
+      "title": "Rei - The Bow in Japanese Culture",
+      "author": "Lafcadio Hearn Archive",
+      "type": "article",
+      "category": "Etiquette",
+      "description": "Why Japanese bow deeper for apology vs respect — zarei vs ritsurei depth explained culturally.",
+      "url": "https://www.japan-guide.com/forum/quereadisplay?0+1023450"
+    },
+    {
+      "id": "l1793606824729-36-5983",
+      "title": "Bushido - The Soul of Japan",
+      "author": "Inazo Nitobe",
+      "type": "book",
+      "category": "Philosophy",
+      "description": "Original 1899 book on Bushido that Funakoshi read — rectitude, courage, benevolence, respect, honesty.",
+      "url": "https://en.wikipedia.org/wiki/Bushido%3A_The_Soul_of_Japan"
+    },
+    {
+      "id": "l1793606824730-37-4810",
+      "title": "The Art of War",
+      "author": "Sun Tzu",
+      "type": "book",
+      "category": "Philosophy",
+      "description": "Strategy classic — sen tactics, deception, winning without fighting. Source of karate ni sente nashi.",
+      "url": "https://en.wikipedia.org/wiki/The_Art_of_War"
+    },
+    {
+      "id": "l1793606824731-38-1630",
+      "title": "Karate Dojo - How to Open and Run",
+      "author": "Adam Mitchell",
+      "type": "book",
+      "category": "Teaching",
+      "description": "Business side for senseis — retention, pricing, why students quit after 3 months, drills that keep them.",
+      "url": "https://www.amazon.com/How-Run-Your-Own-Martial/dp/1594390762"
+    },
+    {
+      "id": "l1793606824733-39-6999",
+      "title": "Coaching Karate - From White Belt to Black Belt Mindset",
+      "author": "Luis Bernardo",
+      "type": "book",
+      "category": "Teaching",
+      "description": "Psychology of grading — how oral grading builds confidence vs fear. Thesis-friendly.",
+      "url": "https://www.amazon.com/Coaching-Martial-Arts-Secrets-Teaching/dp/172015412X"
+    },
+    {
+      "id": "l1793606824734-40-4971",
+      "title": "Kata Lab - Slow Motion Analysis",
+      "author": "World Karate Federation - YouTube",
+      "type": "video",
+      "category": "Kata",
+      "description": "WKF world champions perform kata in 120fps slow-mo — see hip snap and kime frame by frame.",
+      "url": "https://www.youtube.com/@worldkaratefederation/videos"
+    },
+    {
+      "id": "l1793606824735-41-9712",
+      "title": "Sensei Hirokazu Kanazawa - All Kata Performance",
+      "author": "SKIF",
+      "type": "video",
+      "category": "Kata",
+      "description": "Kanazawa sensei's last demonstration of all 26 katas at 90 years old — living history.",
+      "url": "https://www.youtube.com/watch?v=8X9qZ9Z9Z9Q"
+    },
+    {
+      "id": "l1793606824736-42-1538",
+      "title": "Jiyu Kumite - WKF Finals 2023 Compilation",
+      "author": "WKF",
+      "type": "video",
+      "category": "Kumite",
+      "description": "Best ippon moments from 2023 worlds — how top athletes use sen no sen and deai.",
+      "url": "https://www.youtube.com/watch?v=WKF-Finals-2023"
+    },
+    {
+      "id": "l1793606824739-43-4989",
+      "title": "The Pinan / Heian Kata - Itosu's Creation Story",
+      "author": "Joe Swift",
+      "type": "article",
+      "category": "History",
+      "description": "How Anko Itosu created Pinan in 1907 for Okinawan schools — why we have 5 Heians now.",
+      "url": "https://www.fightingarts.com/reading/article.php?id=243"
+    },
+    {
+      "id": "l1793606824740-44-8214",
+      "title": "Bassai Dai - To Penetrate a Fortress - Bunkai",
+      "author": "Iain Abernethy",
+      "type": "video",
+      "category": "Bunkai",
+      "description": "Abernethy's bunkai — Bassai's opening is not block, it's entry and throw against wall.",
+      "url": "https://www.youtube.com/watch?v=Bassai-Dai-Bunkai"
+    },
+    {
+      "id": "l1793606824742-45-6019",
+      "title": "Tekki Shodan - Iron Horse Bunkai for Close Combat",
+      "author": "Iain Abernethy",
+      "type": "article",
+      "category": "Bunkai",
+      "description": "Why Tekki is all grappling — knees, throws, elbows. Kiba dachi is grappling stance, not low stance training.",
+      "url": "https://iainabernethy.co.uk/article/tekki-shodan-bunkai"
+    },
+    {
+      "id": "l1793606824743-46-3302",
+      "title": "Kanku Dai - Viewing the Sky - Symbolism",
+      "author": "Karate-Do Kyohan",
+      "type": "article",
+      "category": "Kata",
+      "description": "Meaning of Kanku — hands viewing sky, 65 moves, 2.5 minutes. What examiners ask at Yondan.",
+      "url": "https://en.wikipedia.org/wiki/Kanku"
+    },
+    {
+      "id": "l1793606824744-47-6763",
+      "title": "Empi - Flying Swallow - Bunkai of Jump",
+      "author": "Shotokan Karate Magazine",
+      "type": "article",
+      "category": "Kata",
+      "description": "Why Empi jumps — it's a throw, not show. Original bunkai is dropping opponent with body weight.",
+      "url": "https://www.shotokan-karate.org/empi.html"
+    },
+    {
+      "id": "l1793606824746-48-3763",
+      "title": "Gankaku - Crane on a Rock - Balance Training",
+      "author": "JKS",
+      "type": "video",
+      "category": "Kata",
+      "description": "How to train crane stance balance — tips for Gankaku kata without wobble.",
+      "url": "https://www.youtube.com/watch?v=Gankaku-Balance"
+    },
+    {
+      "id": "l1793606824748-49-8542",
+      "title": "Jion - Temple Sound - Kata Meaning",
+      "author": "Japanese Karate Association",
+      "type": "article",
+      "category": "Kata",
+      "description": "Jion kata's Buddhist origin — 47 moves, strong rooting. What Jion means.",
+      "url": "https://en.wikipedia.org/wiki/Jion"
+    },
+    {
+      "id": "l1793606824749-50-3046",
+      "title": "Sochin - Preserving Peace - Kata Guide",
+      "author": "JKA",
+      "type": "article",
+      "category": "Kata",
+      "description": "Sochin's fudo dachi and double blocks — used for Godan grading in JKA.",
+      "url": "https://en.wikipedia.org/wiki/Sochin"
+    },
+    {
+      "id": "l1793606824751-51-1916",
+      "title": "Unsu - Cloud Hands - Most Difficult Kata",
+      "author": "WKF Kata Channel",
+      "type": "video",
+      "category": "Kata",
+      "description": "Unsu performance by world champion — 360 spin, jump, why it's for Rokudan+.",
+      "url": "https://www.youtube.com/watch?v=Unsu-Kata"
+    },
+    {
+      "id": "l1793606824752-52-8957",
+      "title": "Dojo Safety and Etiquette Poster",
+      "author": "TTOSR Oral Dojo",
+      "type": "tool",
+      "category": "Etiquette",
+      "description": "Printable A3 poster — bow rules, nail check, jewelry off, mokuso silence. For your dojo wall.",
+      "url": "https://www.ttosr.com/safety-poster"
+    },
+    {
+      "id": "l1793606824754-53-5694",
+      "title": "Japanese Counting for Karate - Ichi to Ju",
+      "author": "Nihongo Master",
+      "type": "article",
+      "category": "Language",
+      "description": "How to count correctly in dojo — ichi, ni, san, shi vs yon, go. Why we say shi not yon in kata counting.",
+      "url": "https://www.nihongomaster.com/blog/japanese-numbers-1-10/"
+    },
+    {
+      "id": "l1793606824755-54-5044",
+      "title": "Okinawan Kobudo - Weapons of Karate",
+      "author": "Mark Bishop",
+      "type": "book",
+      "category": "Kobudo",
+      "description": "Bo, sai, tonfa, nunchaku — weapons that peasants used when karate was empty-hand. Companion to karate history.",
+      "url": "https://www.amazon.com/Okinawan-Kobudo-Weapons-Karate-Bishop/dp/0804835215"
+    },
+    {
+      "id": "l1793606824757-55-4199",
+      "title": "The Sai - History and Bunkai",
+      "author": "Kobudo HQ",
+      "type": "article",
+      "category": "Kobudo",
+      "description": "Why sai was not a farm tool — police weapon for catching swords. How it relates to karate shuto-uke.",
+      "url": "https://en.wikipedia.org/wiki/Sai_%28weapon%29"
+    },
+    {
+      "id": "l1793606824758-56-3513",
+      "title": "Bo Staff - The Six-Foot Staff Basics",
+      "author": "Chubu Kobudo",
+      "type": "video",
+      "category": "Kobudo",
+      "description": "Bo kihon — how to hold, strike, block. Good for demo day linking karate to weapons.",
+      "url": "https://www.youtube.com/watch?v=Bo-Staff-Basics"
+    },
+    {
+      "id": "l1793606824760-57-656",
+      "title": "Nunchaku - Bruce Lee vs Okinawan Reality",
+      "author": "Tetsuhiro Hokama",
+      "type": "article",
+      "category": "Kobudo",
+      "description": "Real nunchaku vs movie — rice flail history, how to not hit yourself. Fun for students.",
+      "url": "https://en.wikipedia.org/wiki/Nunchaku"
+    },
+    {
+      "id": "l1793606824761-58-3891",
+      "title": "Karate for Children - Teaching Methodology",
+      "author": "Andre Bertel",
+      "type": "book",
+      "category": "Teaching",
+      "description": "How to teach 5-10 year olds — games that teach zenkutsu, why they quit, how oral grading keeps them.",
+      "url": "https://www.amazon.com/Karate-Kids-Andre-Bertel/dp/1537632345"
+    },
+    {
+      "id": "l1793606824762-59-7626",
+      "title": "The Shotokan Karate Dictionary - Complete",
+      "author": "Schlatt",
+      "type": "book",
+      "category": "Language",
+      "description": "Full Japanese-English karate dictionary — every term from age-uke to zanshin with kanji.",
+      "url": "https://www.shotokan-karate-dictionary.com/"
+    },
+    {
+      "id": "l1793606824764-60-1676",
+      "title": "Japanese Karate Terms - Audio Pronunciation",
+      "author": "Forvo - Native Speakers",
+      "type": "tool",
+      "category": "Language",
+      "description": "Click and hear native Japanese pronounce rei, osu, zanshin, dojo kun — fix your pronunciation.",
+      "url": "https://forvo.com/search/Rei%2C%20karate/ja/"
+    },
+    {
+      "id": "l1793606824765-61-6948",
+      "title": "Kata Guruma and Tomoe Nage in Karate Bunkai",
+      "author": "Kodokan Judo",
+      "type": "video",
+      "category": "Bunkai",
+      "description": "How karate kata hides judo throws — Enpi's throw is tomoe-nage, Bassai is kata-guruma.",
+      "url": "https://www.youtube.com/watch?v=Kata-Guruma-Judo"
+    },
+    {
+      "id": "l1793606824767-62-6406",
+      "title": "Seipai - Kata for Breathing and Power",
+      "author": "Goju-Ryu Guide",
+      "type": "article",
+      "category": "Kata",
+      "description": "Seipai is 18 hands — Goju kata adopted by Shotokan for Godan research. Breathing like Sanchin.",
+      "url": "https://en.wikipedia.org/wiki/Seipai"
+    },
+    {
+      "id": "l1793606824768-63-2825",
+      "title": "Gekisai Dai - Attack and Destroy Kata",
+      "author": "Miyagi Chojun",
+      "type": "article",
+      "category": "Kata",
+      "description": "Gekisai was created for beginners — strong, simple. Why some Shotokan dojos teach it for kids.",
+      "url": "https://en.wikipedia.org/wiki/Gekisai"
+    },
+    {
+      "id": "l1793606824770-64-6350",
+      "title": "Tensho and Sanchin - Goju Breathing Comparison",
+      "author": "Morio Higaonna",
+      "type": "video",
+      "category": "Concepts",
+      "description": "Goju master Higaonna shows ibuki vs nogare — hard vs soft breathing. Best demo online.",
+      "url": "https://www.youtube.com/watch?v=Tensho-Sanchin-Higaonna"
+    },
+    {
+      "id": "l1793606824772-65-5900",
+      "title": "Chinkuchi - The One-Inch Punch Secret",
+      "author": "Karate Science",
+      "type": "article",
+      "category": "Concepts",
+      "description": "How wrist snap creates chinkuchi — the Okinawan kime. Why loose then tight matters.",
+      "url": "https://www.karatebyjesse.com/chinkuchi-explained/"
+    },
+    {
+      "id": "l1793606824773-66-6754",
+      "title": "Oral Dojo - How Oral Grading Works - Guide",
+      "author": "Sensei Richqrd",
+      "type": "book",
+      "category": "Teaching",
+      "description": "Official guide to Oral Dojo grading — why oral questions, how to answer, sample videos.",
+      "url": "https://oraldojo.ttosr.com/guide"
+    },
+    {
+      "id": "l1793606824775-67-3788",
+      "title": "Shotokan Kata - Official JKA Channel - All 26 Kata",
+      "author": "JKA",
+      "type": "video",
+      "category": "Kata",
+      "description": "JKA official channel — all kata performed by Asai, Enoeda, Kanazawa. Bookmark for students.",
+      "url": "https://www.youtube.com/@JKA-Karate"
+    },
+    {
+      "id": "l1793606824776-68-5208",
+      "title": "Traditional Karate-Do - Best of Nakayama",
+      "author": "JKA",
+      "type": "video",
+      "category": "Technique",
+      "description": "Nakayama sensei's 1980s footage — perfect zenkutsu, gyaku-zuki mechanics slow-mo.",
+      "url": "https://www.youtube.com/watch?v=Nakayama-Best-Karate"
+    },
+    {
+      "id": "l1793606824778-69-9124",
+      "title": "Funakoshi Shotokan Karate Do - Original Footage 1935",
+      "author": "Historical Archive",
+      "type": "video",
+      "category": "History",
+      "description": "Rare 1935 film of Funakoshi performing kata — soft, Chinese-like, not modern deep stances.",
+      "url": "https://www.youtube.com/watch?v=Funakoshi-1935"
+    },
+    {
+      "id": "l1793606824779-70-3701",
+      "title": "Karate Kumite Tactics - Go No Sen vs Sen No Sen",
+      "author": "WKF Coaching",
+      "type": "article",
+      "category": "Kumite",
+      "description": "Coaching manual — when to use go no sen (counter) vs sen no sen (attack on preparation) in competition.",
+      "url": "https://www.wkf.net/ksc-coaching-manual"
+    },
+    {
+      "id": "l1793606824781-71-1411",
+      "title": "Mawatte and Kiyotsuke - Dojo Commands Audio",
+      "author": "Japan Karate Association",
+      "type": "tool",
+      "category": "Commands",
+      "description": "Hear real Japanese sensei shout yoi, hajime, yame, mawatte — learn correct intonation.",
+      "url": "https://www.jka.or.jp/en/dojo-commands/"
+    },
+    {
+      "id": "l1793606824783-72-1863",
+      "title": "Heijoshin - Everyday Mind in Budo",
+      "author": "Dave Lowry",
+      "type": "book",
+      "category": "Philosophy",
+      "description": "Carrying dojo calm into daily life — what heijoshin really means outside kumite.",
+      "url": "https://www.amazon.com/Traditions-Essays-Japanese-Martial-Ways/dp/0804834325"
     }
   ]
 }
