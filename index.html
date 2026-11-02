@@ -25,10 +25,8 @@
 <meta name="format-detection" content="telephone=no">
 
 <!-- Icons / Favicon -->
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
 <link rel="mask-icon" href="/icons/icon-512.png" color="#14B8A6">
 
 <!-- Manifest -->
@@ -402,7 +400,7 @@ function renderApp(){
         </div>
         <div class="relative flex-1 flex flex-col max-w-[1200px] w-full mx-auto px-5 sm:px-8 lg:px-12">
           <div class="flex items-center justify-between pt-4 sm:pt-5">
-            <span class="bg-white rounded-full pl-2 pr-4 py-1.5 shadow-sm flex items-center"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-7 w-auto max-w-[110px] object-contain"></span>
+            <span class=" rounded-full pl-2 pr-4 py-1.5 shadow-sm flex items-center"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-7 w-auto max-w-[110px] object-contain"></span>
             <div class="flex items-center gap-2 text-[12px] font-semibold">
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.flame} ${state.streak} day streak</span>
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.gem} ${state.gems}</span>
@@ -589,7 +587,7 @@ function renderApp(){
     <div class="min-h-screen">
       <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06] backdrop-blur-xl">
         <div class="max-w-[980px] mx-auto px-4 h-[64px] flex items-center justify-between">
-          <div class="flex items-center gap-3"><img src="assets/logo/oldo-logo.png" alt="CD Logo" class="h-8 w-auto max-w-[110px] object-contain"><div class="hidden sm:block"><div class="text-[11px] font-semibold text-black/50 tracking-wide">DEMO EDITION</div></div><button id="toWelcome" class="ml-2 sm:ml-4 w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</button></div>
+          <div class="flex items-center gap-3"><img src="assets/logo/od-logo.png" alt="OralDojo" class="h-8 w-auto max-w-[110px] object-contain"><div class="hidden sm:block"><div class="text-[11px] font-semibold text-black/50 tracking-wide">DEMO EDITION</div></div><button id="toWelcome" class="ml-2 sm:ml-4 w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</button></div>
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-1.5 bg-white border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.flame}<span class="text-[13px] font-bold">${state.streak}</span></div>
             <div class="flex items-center gap-1.5 bg-white border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.heart}<span class="text-[13px] font-bold">∞</span></div>
