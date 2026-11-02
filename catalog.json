@@ -1,10 +1,11 @@
 {
-  "version": 621,
-  "updatedAt": "2026-11-02T09:46:31.842Z",
+  "version": 622,
+  "updatedAt": "2026-11-02T13:28:33.668Z",
   "settings": {
     "senseiWhatsApp": "2348074001613",
     "senseiEmail": "oraldojo@ttosr.com",
-    "adminPin": "1234"
+    "adminPin": "1234",
+    "sheetdbUrl": "https://sheetdb.io/api/v1/k3ejac5qmwszn"
   },
   "belts": [
     {

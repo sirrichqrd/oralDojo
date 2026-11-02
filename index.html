@@ -130,6 +130,8 @@ h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
 .lb-good{background:#E8FFF3;border-top:2px solid rgba(46,204,113,0.45);animation:lbUp .32s cubic-bezier(.2,.9,.3,1.04)}
 .lb-bad{background:#FFF1F1;border-top:2px solid rgba(255,75,75,0.4);animation:lbUp .32s cubic-bezier(.2,.9,.3,1.04)}
 @keyframes lbUp{from{transform:translateY(103%)}to{transform:translateY(0)}}
+.mtile{transition:background .18s ease,border-color .18s ease,transform .12s ease}
+.mtile:active{transform:scale(.97)}
 @media (prefers-reduced-motion:reduce){.lb-good,.lb-bad{animation:none}}
 </style>
 </head>
@@ -153,6 +155,8 @@ function refreshData(){
   SENSEI_EMAIL=settings.senseiEmail||'oraldojo@ttosr.com';
 }
 refreshData();
+// Defer the outbox flush so the sheetdbUrl const is initialized before it runs
+setTimeout(flushOutbox, 0);
 
 // Self-healing render: if a corrupt catalog/draft ever breaks a view,
 // discard the bad draft, reload the data and fall back to the welcome screen.
@@ -206,12 +210,219 @@ sparkles:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><
 menu:'<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>',
 check:'<path d="M20 6 9 17l-5-5"/>',
 x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+link:'<path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><path d="M8 12h8"/>',
 };
 const FILLED={heart:1};
 const ic=k=>'<svg viewBox="0 0 24 24" width="1em" height="1em" fill="'+(FILLED[k]?'currentColor':'none')+'" stroke="currentColor" stroke-width="'+(FILLED[k]?1.5:2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ic">'+ICONS[k]+'</svg>';
 const I={};for(const k in ICONS)I[k]=ic(k);
 const TINT={heart:'#FF4B4B',heartCrack:'#FF4B4B',star:'#F5A623',sparkles:'#0A7A42',target:'#FF8C42'};
 for(const k in TINT)I[k]='<span style="color:'+TINT[k]+'">'+I[k]+'</span>';
+// --- STUDENT REGISTER (SheetDB → Google Sheets) — data capture only, no login ---
+const PROFILE_KEY='oralDojo_profile';
+const OUTBOX_KEY='oralDojo_regOutbox';
+const PROGRESS_KEY='oralDojo_progress';
+/* ════════════════════════════════════════════════════════════════════════════
+   ★ PASTE YOUR SHEETDB API URL ON THE NEXT LINE ★   ←  ←  ←  ←  ←  ←  ←
+   1. Go to https://sheetdb.io  →  Connect your Google Sheet  →  Copy the URL
+   2. Paste it between the quotes below (keep the quotes)
+   3. Your Google Sheet needs these column headers in row 1:  Name | Rank | Email | Avatar
+   Example:  const DEFAULT_SHEETDB_URL='https://sheetdb.io/api/v1/abcd1234efgh';
+   ════════════════════════════════════════════════════════════════════════════ */
+const DEFAULT_SHEETDB_URL='https://sheetdb.io/api/v1/k3ejac5qmwszn';
+// Avatar options shown after the register form (optional step before entering the dojo)
+const AVATARS=['🥋','🥷','🐉','🦅','🐯','⚡','🔥','💪','🥇','⭐','🧘','🗡️'];
+const getProfile=()=>{ try{ return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null'); }catch(e){ return null; } };
+const sheetdbUrl=()=>String((settings&&settings.sheetdbUrl)||DEFAULT_SHEETDB_URL||'').trim();
+async function postToSheetdb(p){
+  const url=sheetdbUrl();
+  if(!url) return {ok:false, reason:'no-endpoint'};
+  const payload={Name:p.name, Rank:p.rank, Email:p.email};
+  if(p.avatar) payload.Avatar=p.avatar;
+  try{
+    // Check if a user with this email already exists — prevents duplicate rows in the sheet
+    let exists=false;
+    try{
+      const sr=await fetch(url+'/search?Email='+encodeURIComponent(p.email),{headers:{'Accept':'application/json'}});
+      if(sr.ok){ const arr=await sr.json(); exists=Array.isArray(arr)&&arr.length>0; }
+    }catch(_){}
+    let res;
+    if(exists){
+      // Update the existing record by Email (no duplicate row)
+      res=await fetch(url+'/Email/'+encodeURIComponent(p.email),{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({data:[payload]})});
+    }else{
+      // Create a new record
+      res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({data:[payload]})});
+    }
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return {ok:true, action:exists?'updated':'created'};
+  }catch(e){
+    try{ const box=JSON.parse(localStorage.getItem(OUTBOX_KEY)||'[]'); box.push(p); localStorage.setItem(OUTBOX_KEY,JSON.stringify(box)); }catch(_){ }
+    return {ok:false, reason:'network'};
+  }
+}
+async function flushOutbox(){
+  const url=sheetdbUrl(); if(!url) return;
+  let box=[]; try{ box=JSON.parse(localStorage.getItem(OUTBOX_KEY)||'[]'); }catch(e){}
+  if(!box.length) return;
+  const remain=[];
+  for(const p of box){
+    try{
+      const payload={Name:p.name,Rank:p.rank,Email:p.email};
+      if(p.avatar) payload.Avatar=p.avatar;
+      let exists=false;
+      try{ const sr=await fetch(url+'/search?Email='+encodeURIComponent(p.email),{headers:{'Accept':'application/json'}}); if(sr.ok){ const arr=await sr.json(); exists=Array.isArray(arr)&&arr.length>0; } }catch(_){}
+      let res;
+      if(exists){ res=await fetch(url+'/Email/'+encodeURIComponent(p.email),{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({data:[payload]})}); }
+      else { res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({data:[payload]})}); }
+      if(!res.ok) remain.push(p);
+    }catch(e){ remain.push(p); }
+  }
+  try{ localStorage.setItem(OUTBOX_KEY,JSON.stringify(remain)); }catch(e){}
+}
+// --- Progress persistence: resume from wherever you stopped on this device ---
+function saveProgress(){ try{ localStorage.setItem(PROGRESS_KEY,JSON.stringify({belt:state.belt,unlocked:state.unlocked,completed:state.completed,lastCompleted:state.lastCompleted,xp:state.xp,gems:state.gems,streak:state.streak})); }catch(e){} }
+function loadProgress(){ try{ const p=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'null'); if(p){ if(typeof p.belt==='number') state.belt=p.belt; if(Array.isArray(p.unlocked)) state.unlocked=p.unlocked; if(Array.isArray(p.completed)) state.completed=p.completed; if(p.lastCompleted!==undefined) state.lastCompleted=p.lastCompleted; if(typeof p.xp==='number') state.xp=p.xp; if(typeof p.gems==='number') state.gems=p.gems; if(typeof p.streak==='number') state.streak=p.streak; } }catch(e){} }
+// Invite message used on the profile page + score card share — always carries the site URL
+const INVITE_MSG='OSS! 🥋 I am training in Oral Dojo — the Karate oral grading, by Sensei Richqrd. History, technique, philosophy & tradition, a karate knowledge test platform. Come train with me → https://oraldojo.ttosr.com';
+function copyText(t){ try{ if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(t); } else { const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } }catch(e){} }
+function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }
+// --- SCORE CARD (canvas → PNG) + share with invite ---
+function buildScoreMsg(pct,beltObj){
+  const p=getProfile();
+  return 'OSS! 🥋 I scored '+pct+'% on my '+beltObj.from+' → '+beltObj.to+' oral grading in Oral Dojo'+(p&&p.rank?(' as '+p.rank):'')+'. Can you beat my score? Try it → https://oraldojo.ttosr.com';
+}
+function drawRR(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function hexLum(hex){ const h=String(hex||'#14B8A6').replace('#',''); const v=h.length===3?h.split('').map(c=>c+c).join(''):h; const r=parseInt(v.substr(0,2),16)||0, gg=parseInt(v.substr(2,2),16)||0, b=parseInt(v.substr(4,2),16)||0; return (0.299*r+0.587*gg+0.114*b)/255; }
+async function makeScoreBlob(pct,beltObj,correct,total){
+  try{ await document.fonts.load('700 80px Fredoka'); await document.fonts.load('800 40px "Plus Jakarta Sans"'); await document.fonts.ready; }catch(e){}
+  const W=1080,H=1350; const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  const beltCol=beltObj.color||'#14B8A6'; const dark=1-hexLum(beltCol);
+  g.fillStyle='#FAF8F5'; g.fillRect(0,0,W,H);
+  g.fillStyle='#14B8A6'; g.beginPath(); g.moveTo(0,0); g.lineTo(W,0); g.lineTo(W,452); g.lineTo(96,452); g.quadraticCurveTo(0,452,0,356); g.closePath(); g.fill();
+  g.fillStyle='rgba(255,255,255,0.10)'; g.font='900 300px Fredoka, "Plus Jakarta Sans", sans-serif'; g.textAlign='right'; g.textBaseline='alphabetic'; g.fillText('道',W-24,352);
+  g.textAlign='left'; g.fillStyle='#FFFFFF'; g.font='700 52px Fredoka, sans-serif'; g.fillText('ORAL DOJO',64,116);
+  g.font='800 21px "Plus Jakarta Sans", sans-serif'; g.fillStyle='rgba(255,255,255,0.8)'; g.fillText('KARATE ORAL GRADING • BY SENSEI RICHQRD',64,158);
+  const chipTxt=beltObj.from+'  →  '+beltObj.to; g.font='700 40px Fredoka, sans-serif'; const tw=g.measureText(chipTxt).width;
+  drawRR(g,64,208,Math.min(W-128,tw+72),84,42); g.fillStyle=beltCol; g.fill();
+  g.fillStyle=dark>0.5?'#FFFFFF':'#1A1A1A'; g.fillText(chipTxt,100,262);
+  g.font='800 20px "Plus Jakarta Sans", sans-serif'; g.fillStyle='rgba(255,255,255,0.85)'; g.fillText('ORAL GRADING PASSED • OSS!',64,332);
+  drawRR(g,64,512,W-128,606,36); g.fillStyle='#FFFFFF'; g.fill(); g.lineWidth=2; g.strokeStyle='rgba(0,0,0,0.08)'; g.stroke();
+  g.textAlign='center';
+  g.font='800 24px "Plus Jakarta Sans", sans-serif'; g.fillStyle='#8A8A86'; g.fillText('MY SCORE',W/2,586);
+  g.font='700 190px Fredoka, sans-serif'; g.fillStyle='#1A1A1A'; g.fillText(pct+'%',W/2,762);
+  g.font='800 26px "Plus Jakarta Sans", sans-serif'; g.fillStyle='#0F766E'; g.fillText((correct||0)+' of '+(total||0)+' correct • oral grading questions',W/2,822);
+  const pr=getProfile();
+  g.font='700 44px Fredoka, sans-serif'; g.fillStyle='#1A1A1A'; g.fillText(pr&&pr.name?pr.name:'A karateka',W/2,906);
+  if(pr&&pr.rank){ drawRR(g,W/2-170,936,340,54,27); g.fillStyle='#E6F7F4'; g.fill(); g.font='800 22px "Plus Jakarta Sans", sans-serif'; g.fillStyle='#0F766E'; g.fillText(pr.rank,W/2,972); }
+  const d=new Date(); g.font='700 22px "Plus Jakarta Sans", sans-serif'; g.fillStyle='#8A8A86'; g.fillText(d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),W/2,1062);
+  g.font='700 34px Fredoka, sans-serif'; g.fillStyle='#1A1A1A'; g.fillText('Think you can beat me?',W/2,1186);
+  g.font='800 30px "Plus Jakarta Sans", sans-serif'; g.fillStyle='#14B8A6'; g.fillText('oraldojo.ttosr.com',W/2,1236);
+  const cols=['#FFD93D','#2ECC71','#3498DB','#FF8C42','#8E44AD'];
+  for(let i=0;i<26;i++){ const cx=40+Math.random()*(W-80), cy=430+Math.random()*180; g.save(); g.translate(cx,cy); g.rotate(Math.random()*Math.PI); g.fillStyle=cols[i%cols.length]; g.globalAlpha=.75; g.fillRect(-9,-4,18,8); g.restore(); }
+  return await new Promise(res=>c.toBlob(b=>res(b),'image/png'));
+}
+async function shareResultScore(pct,beltObj,correct,total){
+  const text=buildScoreMsg(pct,beltObj);
+  let blob=null; try{ blob=await makeScoreBlob(pct,beltObj,correct,total); }catch(e){}
+  if(!blob){ try{ if(navigator.share){ await navigator.share({text}); showToast('Shared — OSS!'); return; } }catch(e){ if(e&&e.name==='AbortError') return; } copyText(text); showToast('Invite text copied — paste it anywhere!'); return; }
+  try{
+    const file=new File([blob],'oral-dojo-score.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],text,title:'Oral Dojo'}); showToast('Score shared — OSS!'); return; }
+    if(navigator.share){ await navigator.share({text}); downloadBlob(blob,'oral-dojo-score.png'); showToast('Shared! Score card downloaded too'); return; }
+  }catch(e){ if(e&&e.name==='AbortError') return; }
+  downloadBlob(blob,'oral-dojo-score.png'); copyText(text); showToast('Score card saved + invite text copied — OSS!');
+}
+// --- MATCH QUESTION ENGINE (word→meaning, image→name) ---
+const MTINT=['#E8F0FF','#FFF8D6','#F5F0FF','#FFE8F0','#E8FFF3','#FFF1E0','#E0F2FF','#FDE8F5'];
+function initMatch(q){
+  if(state.match&&state.match.qid===String(q.id)) return;
+  const sh=a=>{ const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=r[i]; r[i]=r[j]; r[j]=t; } return r; };
+  const pairs=(q.pairs||[]).map((p,i)=>({k:'p'+i, text:p.left||'', img:p.leftImg||''}));
+  state.match={ qid:String(q.id), lefts:sh(pairs), rights:sh((q.pairs||[]).map((p,i)=>({k:'p'+i, text:p.right||''}))), links:{}, solved:{}, sel:null, mistakes:0, flash:{} };
+}
+function matchReady(){ const m=state.match; return !!m&&m.lefts.every(it=>m.solved[it.k]||m.links[it.k]!==undefined); }
+function tapMatchLeft(k){
+  const m=state.match; if(!m||state.answered||m.solved[k]) return;
+  if(m.links[k]!==undefined){ delete m.links[k]; if(m.sel===k) m.sel=null; render(); return; }
+  m.sel=(m.sel===k)?null:k;
+  render();
+}
+function tapMatchRight(k){
+  const m=state.match; if(!m||state.answered) return;
+  if(m.sel===null){ showToast('Tap a word or image first, then its match'); return; }
+  const usedBy=Object.keys(m.links).find(lk=>lk!==m.sel&&m.links[lk]===k&&!m.solved[lk]);
+  if(usedBy!==undefined) delete m.links[usedBy];
+  m.links[m.sel]=k; m.sel=null;
+  render();
+}
+function submitMatch(){
+  const m=state.match; if(!m) return;
+  let wrong=0;
+  Object.keys(m.links).forEach(lk=>{
+    if(m.solved[lk]) return;
+    if(lk===m.links[lk]) m.solved[lk]=true;
+    else { m.flash[lk]=true; wrong++; }
+  });
+  m.mistakes+=wrong;
+  if(wrong>0){
+    render();
+    setTimeout(()=>{
+      const m2=state.match; if(!m2||state.answered) return;
+      Object.keys(m2.flash).forEach(k=>delete m2.flash[k]);
+      Object.keys(m2.links).forEach(lk=>{ if(!m2.solved[lk]&&lk!==m2.links[lk]) delete m2.links[lk]; });
+      render();
+    },780);
+    return;
+  }
+  state.answered=true;
+  state.correct=(m.mistakes===0);
+  if(state.correct){ state.xpEarned+=15; state.correctCount=(state.correctCount||0)+1; }
+  else {
+    state.hearts--; state.wobble=true;
+    setTimeout(()=>{state.wobble=false; render();},400);
+    if(state.hearts<=0){ setTimeout(()=>{state.outOfHearts=true; render();},600); }
+  }
+  render();
+}
+function matchHtml(q){
+  const m=state.match;
+  const rIdx={}; m.rights.forEach((r,i)=>{ rIdx[r.k]=i; });
+  const leftTile=it=>{
+    const solved=!!m.solved[it.k], linked=!solved&&m.links[it.k]!==undefined, sel=it.k===m.sel&&!solved, bad=!!m.flash[it.k];
+    let cls='mtile w-full rounded-2xl border-2 min-h-[68px] p-2.5 sm:p-3 flex items-center justify-center gap-2 press ';
+    let style='';
+    if(solved) cls+='bg-[#E8FFF3] border-[#2ECC71]';
+    else if(bad) cls+='bg-[#FFE8E8] border-[#FF4B4B] wobble';
+    else if(linked){ cls+='border-black/15 shadow-sm'; style='background:'+MTINT[rIdx[m.links[it.k]]%MTINT.length]; }
+    else if(sel) cls+='bg-black border-black text-white';
+    else cls+='bg-white border-black/10 hover:border-black/25';
+    return `<button data-ml="${it.k}" class="${cls}" style="${style}">${it.img?`<img src="${it.img}" alt="match tile" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border ${sel?'border-white/40':'border-black/10'} bg-white">`:`<span class="font-bold text-[13px] sm:text-[15px] leading-tight text-center px-1">${esc(it.text)}</span>`}${solved?'<span class="text-[#0A7A42] shrink-0 text-[15px]">'+I.check+'</span>':''}</button>`;
+  };
+  const rightTile=it=>{
+    const usedBy=Object.keys(m.links).find(lk=>m.links[lk]===it.k);
+    const solved=usedBy!==undefined&&!!m.solved[usedBy];
+    const linked=!solved&&usedBy!==undefined;
+    let cls='mtile w-full rounded-2xl border-2 min-h-[68px] p-2.5 sm:p-3 flex items-center justify-center press ';
+    let style='';
+    if(solved) cls+='bg-[#E8FFF3] border-[#2ECC71]';
+    else if(linked){ cls+='border-black/15 shadow-sm'; style='background:'+MTINT[rIdx[it.k]%MTINT.length]; }
+    else cls+='bg-white border-black/10 hover:border-black/25';
+    return `<button data-mr="${it.k}" class="${cls}" style="${style}"><span class="font-semibold text-[12px] sm:text-[13.5px] leading-snug text-center px-1">${esc(it.text)}</span>${solved?'<span class="text-[#0A7A42] shrink-0 text-[15px]">'+I.check+'</span>':''}</button>`;
+  };
+  const done=m.lefts.filter(it=>m.solved[it.k]).length;
+  return `<div class="mt-5">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-[#FFD93D] text-black">MATCH GAME</span>
+      <span class="text-[11px] font-bold text-black/40">${done}/${m.lefts.length} PAIRED</span>
+      ${m.mistakes>0?`<span class="text-[11px] font-bold text-[#9A1A1A]">${m.mistakes} MISTAKE${m.mistakes===1?'':'S'}</span>`:''}
+    </div>
+    <p class="text-[12px] font-semibold text-black/50 mt-2">${state.answered?'Review your matches below.':'Tap a word or image, then tap its match. Pair them all, then check.'}</p>
+    <div class="mt-4 grid grid-cols-2 gap-2.5 sm:gap-3">
+      <div class="space-y-2.5 sm:space-y-3">${m.lefts.map(leftTile).join('')}</div>
+      <div class="space-y-2.5 sm:space-y-3">${m.rights.map(rightTile).join('')}</div>
+    </div>
+  </div>`;
+}
 // --- THESIS SUBMISSION (live) — batch queue + WhatsApp/Email share ---
 const T_KEY='oralDojo_theses';
 const tGet=()=>JSON.parse(localStorage.getItem(T_KEY)||'[]');
@@ -305,12 +516,15 @@ let state={
  answered:false,
  correct:null,
  xpEarned:0,
+ correctCount:0,
+ match:null,
  menu:false,
  wobble:false,
  outOfHearts:false,
  thesisModal:null,
  lockedBelt:false,
  fbFromContribute:false,
+ profileEdit:false,
 };
 
 const app=document.getElementById('app');
@@ -325,6 +539,12 @@ function playPageIn(){
 
 function transition(to){
   if(to==='contribute') state.contribStep='gate';
+  // Gate the belt path (and its lesson/result) behind registration.
+  // Any back button that calls transition('path') without a profile
+  // is redirected to the register page instead of landing on the path.
+  if((to==='path'||to==='lesson'||to==='result') && !getProfile()){
+    to='register';
+  }
   state.view=to;
   render();
   playPageIn();
@@ -351,6 +571,7 @@ function renderApp(){
   document.onkeydown=null;
   if(state.view!=='feedback') state.fbFromContribute=false;
   if(state.view!=='path') state.lockedBelt=false;
+  if(state.view!=='profile') state.profileEdit=false;
   const belt = belts.find(b=>b.id===state.belt) || belts[0];
   const lesson = getLesson();
   const q = lesson[state.qIndex];
@@ -400,7 +621,7 @@ function renderApp(){
         </div>
         <div class="relative flex-1 flex flex-col max-w-[1200px] w-full mx-auto px-5 sm:px-8 lg:px-12">
           <div class="flex items-center justify-between pt-4 sm:pt-5">
-            <span class=" rounded-full pl-2 pr-4 py-1.5 shadow-sm flex items-center"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-6 w-auto max-w-[110px] object-contain"></span>
+            <span class=" rounded-full pl-2 pr-4 py-1.5 shadow-sm flex items-center"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-7 w-auto max-w-[110px] object-contain"></span>
             <div class="flex items-center gap-2 text-[12px] font-semibold">
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.flame} ${state.streak} day streak</span>
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.gem} ${state.gems}</span>
@@ -519,7 +740,7 @@ function renderApp(){
           </button>
         </div>
         <div class="px-4 pb-[max(12px,env(safe-area-inset-bottom))] text-center">
-          <p class="text-[9px] sm:text-[10px] tracking-widest font-bold text-black/30">DEMO EDITION • NO EMAIL NEEDED • INSTANT DOJO • OSS!</p>
+          <p class="text-[9px] sm:text-[10px] tracking-widest font-bold text-black/30">ENTER THE DOJO • ORAL GRADING • INSTANT DOJO • OSS!</p>
           <p class="text-[9px] sm:text-[10px] tracking-widest font-bold text-black/30 mt-1 hidden sm:block">ORAL GRADING • HISTORY • TECHNIQUES • PHILOSOPHY • TRADITION • RESEARCH</p>
         </div>
       </footer>
@@ -567,7 +788,7 @@ function renderApp(){
     document.getElementById('wDots').addEventListener('click',e=>{ const d=e.target.closest('[data-dot]'); if(d) wGo(parseInt(d.dataset.dot,10),true); });
     stageEl.addEventListener('click',e=>{
       const go=e.target.closest('[data-go]');
-      if(go){ wStop(); transition(go.dataset.go); return; }
+      if(go){ wStop(); if(go.dataset.go==='path'&&!getProfile()){ transition('register'); } else { transition(go.dataset.go); } return; }
       if(e.target.closest('[data-next]')) wGo(cur+1,true);
     });
     let touchX=null;
@@ -580,20 +801,218 @@ function renderApp(){
       if(e.key==='ArrowRight') wGo(cur+1,true);
       else if(e.key==='ArrowLeft') wGo(cur-1,true);
     };
-    document.getElementById('startBtn').onclick=()=>transition('path');
+    document.getElementById('startBtn').onclick=()=>transition(getProfile()?'path':'register');
     document.getElementById('wContributeMain')?.addEventListener('click',()=>transition('contribute'));
+  } else if(state.view==='register'){
+    const p=getProfile()||{};
+    const rankOpts=belts.map(b=>`<option value="${esc(b.from+' → '+b.to)}" ${p.rank===(b.from+' → '+b.to)?'selected':''}>${esc(b.from)} → ${esc(b.to)}</option>`).join('');
+    app.innerHTML=`
+    <div class="min-h-[100dvh] flex flex-col">
+      <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
+        <div class="max-w-[620px] mx-auto px-4 h-[64px] flex items-center justify-between">
+          <button id="regBack" class="flex items-center gap-2 font-bold"><div class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</div><span class="fredoka">Welcome</span></button>
+          <span class="text-[11px] font-black tracking-widest bg-black text-[#FFD93D] px-3 py-1.5 rounded-full">DOJO REGISTER</span>
+        </div>
+      </header>
+      <div class="flex-1 w-full max-w-[620px] mx-auto px-4 py-6 sm:py-8">
+        <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
+          <div class="absolute -right-2 -top-8 fredoka text-[170px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
+          <div class="relative">
+            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.handshake} NEW KARATEKA</div>
+            <h1 class="fredoka text-[38px] sm:text-[52px] leading-[0.98] font-bold tracking-tight mt-4">Welcome.</h1>
+            <div class="flex items-center gap-2.5 flex-wrap mt-4">
+              <span class="fredoka text-[19px] sm:text-[23px] font-bold">Enter the Dojo as</span>
+              <select id="regRank" class="max-w-[260px] h-11 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[13px] sm:text-[14px] px-4 outline-none border-2 border-white/60 shadow-sm">${rankOpts}</select>
+            </div>
+            <p class="text-[13px] sm:text-[14px] text-white/80 font-medium mt-4 leading-relaxed max-w-[440px]">Tell the register who's stepping on the mat — no password, no login. Your details go straight to Sensei's dojo sheet.</p>
+          </div>
+        </div>
+        <form id="regForm" class="mt-4 bg-white rounded-[28px] belt-shadow border border-black/5 p-6 sm:p-7 space-y-4">
+          <div>
+            <label class="text-[11px] font-black tracking-widest text-black/50">FULL NAME *</label>
+            <input id="regName" required value="${esc(p.name||'')}" placeholder="e.g. Ada Obi" autocomplete="name" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] font-black tracking-widest text-black/50">EMAIL *</label>
+            <input id="regEmail" required type="email" value="${esc(p.email||'')}" placeholder="you@example.com" autocomplete="email" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
+          </div>
+          <button id="regEnterBtn" type="submit" class="w-full h-[54px] rounded-full bg-black text-white font-bold fredoka text-[16px] press flex items-center justify-center gap-2">Enter the Dojo →</button>
+          <p class="text-[11px] font-medium text-black/40 text-center leading-relaxed">Only your name, rank and email are stored — in Sensei's Google Sheet via SheetDB. No account needed.</p>
+        </form>
+      </div>
+    </div>`;
+    document.getElementById('regBack').onclick=()=>transition('welcome');
+    document.getElementById('regForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const name=document.getElementById('regName').value.trim();
+      const email=document.getElementById('regEmail').value.trim();
+      const rank=document.getElementById('regRank').value;
+      if(name.length<2){ showToast('Please enter your full name'); return; }
+      if(!/^\S+@\S+\.\S+$/.test(email)){ showToast('Please enter a valid email'); return; }
+      const existing=getProfile()||{};
+      const profile={name,rank,email,avatar:existing.avatar||'',at:new Date().toISOString()};
+      try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); }catch(_){ }
+      // Sync to the sheet happens after the optional avatar step — no duplicate risk
+      transition('avatar');
+    });
+  } else if(state.view==='avatar'){
+    const p=getProfile()||{};
+    const sel=p.avatar||'';
+    app.innerHTML=`
+    <div class="min-h-[100dvh] flex flex-col">
+      <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
+        <div class="max-w-[620px] mx-auto px-4 h-[64px] flex items-center justify-between">
+          <button id="avBack" class="flex items-center gap-2 font-bold"><div class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</div><span class="fredoka">Register</span></button>
+          <span class="text-[11px] font-black tracking-widest bg-black text-[#FFD93D] px-3 py-1.5 rounded-full">CHOOSE AVATAR • OPTIONAL</span>
+        </div>
+      </header>
+      <div class="flex-1 w-full max-w-[620px] mx-auto px-4 py-6 sm:py-8">
+        <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
+          <div class="absolute -right-2 -top-8 fredoka text-[170px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
+          <div class="relative">
+            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/10 rounded-full px-3 py-1 text-[11px] font-bold tracking-widest">${I.sparkles} STEP ONTO THE MAT</div>
+            <h1 class="fredoka text-[34px] sm:text-[44px] leading-[0.98] font-bold tracking-tight mt-4">Pick your spirit.</h1>
+            <p class="text-[13px] sm:text-[14px] text-white/80 font-medium mt-4 leading-relaxed max-w-[440px]">Choose an avatar — it appears on your profile and score cards. You can skip this and pick one later from your profile.</p>
+          </div>
+        </div>
+        <div class="mt-4 bg-white rounded-[28px] belt-shadow border border-black/5 p-6 sm:p-7">
+          <div class="grid grid-cols-4 gap-3" id="avGrid">
+            ${AVATARS.map(a=>`<button data-av="${a}" class="avPick aspect-square rounded-2xl border-2 ${sel===a?'border-black bg-[#FAF8F5]':'border-black/10 bg-white'} flex items-center justify-center text-[34px] press transition">${a}</button>`).join('')}
+          </div>
+          <div class="mt-5 grid grid-cols-2 gap-2">
+            <button id="avSkip" class="h-[52px] rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Skip for now</button>
+            <button id="avGo" class="h-[52px] rounded-full bg-black text-white font-bold fredoka text-[14px] press flex items-center justify-center gap-2">Enter the Dojo →</button>
+          </div>
+          <p class="text-[11px] font-medium text-black/40 text-center mt-3">You can change your avatar any time from your Profile.</p>
+        </div>
+      </div>
+    </div>`;
+    let picked=sel;
+    document.getElementById('avBack').onclick=()=>transition('register');
+    document.querySelectorAll('.avPick').forEach(b=>b.addEventListener('click',()=>{
+      picked=b.dataset.av;
+      document.querySelectorAll('.avPick').forEach(x=>{ x.className='avPick aspect-square rounded-2xl border-2 border-black/10 bg-white flex items-center justify-center text-[34px] press transition'; });
+      b.className='avPick aspect-square rounded-2xl border-2 border-black bg-[#FAF8F5] flex items-center justify-center text-[34px] press transition';
+    }));
+    const saveAndGo=async ()=>{
+      const cur=getProfile()||{};
+      const updated={...cur, avatar:picked};
+      try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
+      const r=await postToSheetdb(updated);
+      if(r.ok) showToast('Welcome to the Dojo, '+(cur.name||'karateka').split(' ')[0]+' — OSS!');
+      else if(r.reason==='no-endpoint') showToast('Saved on this device — Sensei will connect the register');
+      else showToast('Saved on this device — will sync when online');
+      transition('path');
+    };
+    document.getElementById('avSkip').onclick=()=>{ picked=''; saveAndGo(); };
+    document.getElementById('avGo').onclick=saveAndGo;
+  } else if(state.view==='profile'){
+    const p=getProfile()||{};
+    const av=p.avatar||'🥋';
+    const completedBelts=belts.filter(b=>state.completed.includes(b.id));
+    const editing=state.profileEdit===true;
+    const rankOpts=belts.map(b=>`<option value="${esc(b.from+' → '+b.to)}" ${p.rank===(b.from+' → '+b.to)?'selected':''}>${esc(b.from)} → ${esc(b.to)}</option>`).join('');
+    app.innerHTML=`
+    <div class="min-h-screen">
+      <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
+        <div class="max-w-[620px] mx-auto px-4 h-[64px] flex items-center justify-between">
+          <button id="profBack" class="flex items-center gap-2 font-bold"><div class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</div><span class="fredoka">Profile</span></button>
+          <span class="text-[11px] font-black tracking-widest bg-black text-[#FFD93D] px-3 py-1.5 rounded-full">MY DOJO PROFILE</span>
+        </div>
+      </header>
+      <div class="max-w-[620px] mx-auto px-4 py-6 space-y-4">
+        <div class="bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] p-6 sm:p-8 relative overflow-hidden belt-shadow">
+          <div class="absolute -right-2 -top-8 fredoka text-[170px] leading-none font-black text-white/10 select-none pointer-events-none">道</div>
+          <div class="relative flex items-center gap-4">
+            <div class="w-20 h-20 rounded-2xl bg-white/15 border border-white/30 flex items-center justify-center text-[44px] shrink-0">${av}</div>
+            <div class="min-w-0"><div class="text-[11px] font-black tracking-widest text-white/70">KARATEKA</div><div class="fredoka text-[24px] sm:text-[28px] font-bold leading-tight truncate">${esc(p.name||'Unknown')}</div><div class="text-[13px] text-white/80 font-semibold mt-0.5">${esc(p.rank||'White → 9th Kyu')}</div></div>
+          </div>
+        </div>
+        ${editing?`
+        <form id="profEditForm" class="bg-white rounded-[28px] belt-shadow border-2 border-[#14B8A6]/30 p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between"><h2 class="fredoka text-[20px] font-bold">Edit my details</h2><span class="text-[10px] font-black tracking-widest bg-[#FAF8F5] border px-2.5 py-1 rounded-full">EDIT MODE</span></div>
+          <div><label class="text-[11px] font-black tracking-widest text-black/50">AVATAR</label><div class="mt-2 grid grid-cols-6 gap-2">${AVATARS.map(a=>`<button type="button" data-avpick="${a}" class="profAvPick aspect-square rounded-xl border-2 ${av===a?'border-black bg-[#FAF8F5]':'border-black/10'} flex items-center justify-center text-[24px] press">${a}</button>`).join('')}</div></div>
+          <div><label class="text-[11px] font-black tracking-widest text-black/50">FULL NAME *</label><input id="profName" required value="${esc(p.name||'')}" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none"></div>
+          <div><label class="text-[11px] font-black tracking-widest text-black/50">EMAIL *</label><input id="profEmail" required type="email" value="${esc(p.email||'')}" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none"></div>
+          <div><label class="text-[11px] font-black tracking-widest text-black/50">RANK</label><select id="profRank" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[14px] focus:border-black outline-none">${rankOpts}</select></div>
+          <div class="grid grid-cols-2 gap-2"><button type="submit" class="h-[50px] rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Changes →</button><button type="button" id="profCancel" class="h-[50px] rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button></div>
+          <p class="text-[11px] font-medium text-black/40 text-center">Your updates sync to Sensei's dojo sheet — no duplicate row, your record is updated by email.</p>
+        </form>`:`
+        <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-5 sm:p-6 space-y-3">
+          <div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[16px]">My Details</h3><button id="profEdit" class="h-9 px-4 rounded-full bg-black text-white font-bold text-[12px] fredoka press">✎ Edit my details</button></div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="bg-[#FAF8F5] rounded-2xl p-3.5 border border-black/5"><div class="text-[10px] font-black tracking-widest text-black/40">NAME</div><div class="font-bold text-[14px] mt-0.5">${esc(p.name||'—')}</div></div>
+            <div class="bg-[#FAF8F5] rounded-2xl p-3.5 border border-black/5"><div class="text-[10px] font-black tracking-widest text-black/40">RANK</div><div class="font-bold text-[14px] mt-0.5">${esc(p.rank||'—')}</div></div>
+            <div class="bg-[#FAF8F5] rounded-2xl p-3.5 border border-black/5 sm:col-span-2"><div class="text-[10px] font-black tracking-widest text-black/40">EMAIL</div><div class="font-bold text-[14px] mt-0.5 break-all">${esc(p.email||'—')}</div></div>
+          </div>
+        </div>`}
+        <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-5 sm:p-6">
+          <div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[16px]">My Progress</h3><span class="text-[11px] font-bold tracking-widest text-black/40">${state.completed.length}/${belts.length} BELTS</span></div>
+          <div class="grid grid-cols-3 gap-3 mt-4">
+            <div class="bg-[#FFF8D6] rounded-2xl p-3 border border-[#FFD93D]/30"><div class="flex items-center gap-1 text-[11px] font-bold text-[#8A6D00]">${I.flame} STREAK</div><div class="fredoka text-[20px] font-bold mt-1">${state.streak} days</div></div>
+            <div class="bg-[#E8FFF3] rounded-2xl p-3 border border-[#2ECC71]/20"><div class="flex items-center gap-1 text-[11px] font-bold text-[#0A7A42]">${I.bolt} XP</div><div class="fredoka text-[20px] font-bold mt-1">${state.xp}</div></div>
+            <div class="bg-[#F5F0FF] rounded-2xl p-3 border border-[#8E44AD]/20"><div class="flex items-center gap-1 text-[11px] font-bold text-[#6C3483]">${I.gem} GEMS</div><div class="fredoka text-[20px] font-bold mt-1">${state.gems}</div></div>
+          </div>
+          <div class="mt-4"><div class="flex justify-between text-[11px] font-bold mb-2"><span class="text-black/50">PATH PROGRESS</span><span>${Math.round(state.completed.length/belts.length*100)}%</span></div><div class="h-2.5 bg-[#FAF8F5] rounded-full overflow-hidden border border-black/5"><div class="h-full bg-[#14B8A6] rounded-full progress-stripe transition-all" style="width:${state.completed.length/belts.length*100}%"></div></div></div>
+          ${completedBelts.length?`<div class="mt-4"><div class="text-[10px] font-black tracking-widest text-black/40 mb-2">BELTS PASSED</div><div class="flex flex-wrap gap-2">${completedBelts.map(b=>`<span class="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border" style="background:${b.color||'#fff'};border-color:rgba(0,0,0,.1)"><span class="text-[12px] font-black ${b.id>=9?'text-white':'text-black/80'}">${b.kanji||'初'}</span><span class="text-[11px] font-bold ${b.id>=9?'text-white':'text-black/70'}">${esc(b.short||'')}</span><span class="text-[#2ECC71]">${I.check}</span></span>`).join('')}</div></div>`:`<div class="mt-4 text-[12px] font-medium text-black/40 text-center py-3">No belts passed yet — tap a belt on the path to begin your first oral grading.</div>`}
+        </div>
+        <div class="bg-black text-white rounded-[28px] belt-shadow border border-white/10 p-5 sm:p-6 relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 w-36 h-36 bg-[#FFD93D] rounded-full blur-[36px] opacity-20"></div>
+          <div class="relative"><h3 class="fredoka font-bold text-[16px] flex items-center gap-2">${I.handshake} Invite others to the Dojo</h3><p class="text-[13px] text-white/70 font-medium mt-2 leading-relaxed">Challenge a friend to beat your score, or just invite them to start the path. The invite message + site URL are pre-filled.</p>
+            <div class="mt-3 bg-white/10 rounded-2xl p-3 border border-white/10 text-[12px] text-white/80 font-medium leading-relaxed">${esc(INVITE_MSG)}</div>
+            <div class="mt-3 grid grid-cols-2 gap-2"><button id="profShareWa" class="h-11 rounded-full bg-[#25D366] text-white font-bold fredoka text-[13px] press flex items-center justify-center gap-1.5">WhatsApp →</button><button id="profShareCopy" class="h-11 rounded-full bg-white text-black font-bold fredoka text-[13px] press">Copy invite text</button></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-5">
+          <div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[14px]">Dojo data on this device</h3></div>
+          <p class="text-[12px] font-medium text-black/50 mt-1">Your profile and progress are saved on this device so you can resume where you stopped. Clearing them signs you out and you would need to register again.</p>
+          <button id="profClear" class="mt-3 h-11 px-4 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] font-bold text-[12px] press">Clear my data on this device</button>
+        </div>
+        <div class="text-center text-[11px] font-medium text-black/30 py-2">Oral Grading • History • Techniques • Philosophy • Tradition • Research</div>
+      </div>
+    </div>`;
+    document.getElementById('profBack').onclick=()=>{ state.profileEdit=false; transition('path'); };
+    document.getElementById('profEdit')?.addEventListener('click',()=>{ state.profileEdit=true; render(); });
+    if(editing){
+      let editAv=av;
+      document.querySelectorAll('.profAvPick').forEach(b=>b.addEventListener('click',()=>{
+        editAv=b.dataset.avpick;
+        document.querySelectorAll('.profAvPick').forEach(x=>x.className='profAvPick aspect-square rounded-xl border-2 border-black/10 flex items-center justify-center text-[24px] press');
+        b.className='profAvPick aspect-square rounded-xl border-2 border-black bg-[#FAF8F5] flex items-center justify-center text-[24px] press';
+      }));
+      document.getElementById('profCancel').onclick=()=>{ state.profileEdit=false; render(); };
+      document.getElementById('profEditForm').addEventListener('submit',async e=>{
+        e.preventDefault();
+        const name=document.getElementById('profName').value.trim();
+        const email=document.getElementById('profEmail').value.trim();
+        const rank=document.getElementById('profRank').value;
+        if(name.length<2){ showToast('Please enter your full name'); return; }
+        if(!/^\S+@\S+\.\S+$/.test(email)){ showToast('Please enter a valid email'); return; }
+        const updated={...p, name, email, rank, avatar:editAv, at:new Date().toISOString()};
+        try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
+        showToast('Saving…');
+        await postToSheetdb(updated);
+        state.profileEdit=false;
+        render();
+        showToast('Details updated — OSS!');
+      });
+    }
+    document.getElementById('profShareWa')?.addEventListener('click',()=>{ window.open('https://wa.me/?text='+encodeURIComponent(INVITE_MSG),'_blank'); showToast('Opening WhatsApp…'); });
+    document.getElementById('profShareCopy')?.addEventListener('click',()=>{ copyText(INVITE_MSG); showToast('Invite text copied — paste it anywhere!'); });
+    document.getElementById('profClear')?.addEventListener('click',()=>{ try{ localStorage.removeItem(PROFILE_KEY); localStorage.removeItem(PROGRESS_KEY); }catch(_){ } state.profileEdit=false; showToast('Your data has been cleared'); setTimeout(()=>transition('welcome'),600); });
   } else if(state.view==='path'){
     app.innerHTML=`
     <div class="min-h-screen">
       <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06] backdrop-blur-xl">
         <div class="max-w-[980px] mx-auto px-4 h-[64px] flex items-center justify-between">
-          <div class="flex items-center gap-3"><img src="assets/logo/od-logo.png" alt="OralDojo" class="h-6 w-auto max-w-[110px] object-contain"><div class="hidden sm:block"><div class="text-[11px] font-semibold text-black/50 tracking-wide">DEMO EDITION</div></div><button id="toWelcome" class="ml-2 sm:ml-4 w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</button></div>
+          <div class="flex items-center gap-3"><img src="assets/logo/od-logo.png" alt="OralDojo" class="h-8 w-auto max-w-[110px] object-contain"><div class="hidden sm:block"><div class="text-[11px] font-semibold text-black/50 tracking-wide">DEMO EDITION</div></div><button id="toWelcome" class="ml-2 sm:ml-4 w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">←</button></div>
           <div class="flex items-center gap-2">
             <div class="flex items-center gap-1.5 bg-white border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.flame}<span class="text-[13px] font-bold">${state.streak}</span></div>
             <div class="flex items-center gap-1.5 bg-white border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.heart}<span class="text-[13px] font-bold">∞</span></div>
             <div class="hidden sm:flex items-center gap-1.5 bg-[#FFD93D] border border-black/10 rounded-full px-3 py-1.5 shadow-sm">${I.gem}<span class="text-[13px] font-bold">${state.gems}</span></div>
             <div class="hidden sm:flex items-center gap-1.5 bg-black text-white rounded-full px-3 py-1.5 shadow-sm">${I.bolt}<span class="text-[13px] font-bold">${state.xp} XP</span></div>
             <button id="toDictionary" class="hidden sm:flex w-8 h-8 rounded-full bg-white border items-center justify-center">${I.alphabet}</button><button id="toLibrary" class="hidden sm:flex w-8 h-8 rounded-full bg-white border items-center justify-center">${I.archive}</button><button id="toResearch" class="hidden sm:flex w-8 h-8 rounded-full bg-white border items-center justify-center">${I.books}</button>
+            <button id="toProfile" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center text-[15px]" title="My Profile">${(getProfile()&&getProfile().avatar)||I.users}</button>
             <button id="openMenu" class="w-8 h-8 rounded-full bg-white border flex items-center justify-center">${I.menu}</button>
           </div>
         </div>
@@ -686,7 +1105,7 @@ function renderApp(){
         </div>
       </div>
     </div>
-    ${state.menu?`<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex items-end sm:items-center justify-center"><div class="bg-white rounded-[28px] w-full max-w-[380px] p-5 belt-shadow"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold text-[18px]">Dojo Menu</h3><button id="closeMenu" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">✕</button></div><div class="space-y-2"><button data-go="path" class="menuGo w-full h-12 rounded-2xl bg-black text-white font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.belt} Belt Path</span>→</button><button data-go="dictionary" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.alphabet} Dictionary</span>→</button><button data-go="library" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.archive} Library</span>→</button><button data-go="research" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.books} Research Hub</span>→</button><button data-go="contribute" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.handshake} Contribution</span>→</button><button data-go="feedback" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.chat} Feedback</span>→</button><button data-go="welcome" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.users} Welcome</span>→</button></div></div></div>`:''}
+    ${state.menu?`<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex items-end sm:items-center justify-center"><div class="bg-white rounded-[28px] w-full max-w-[380px] p-5 belt-shadow"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold text-[18px]">Dojo Menu</h3><button id="closeMenu" class="w-8 h-8 rounded-full bg-[#FAF8F5] border flex items-center justify-center">✕</button></div><div class="space-y-2"><button data-go="profile" class="menuGo w-full h-12 rounded-2xl bg-black text-white font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${(getProfile()&&getProfile().avatar)||I.users} My Profile</span>→</button><button data-go="path" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.belt} Belt Path</span>→</button><button data-go="dictionary" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.alphabet} Dictionary</span>→</button><button data-go="library" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.archive} Library</span>→</button><button data-go="research" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.books} Research Hub</span>→</button><button data-go="contribute" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.handshake} Contribution</span>→</button><button data-go="feedback" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.chat} Feedback</span>→</button><button data-go="welcome" class="menuGo w-full h-12 rounded-2xl bg-[#FAF8F5] border font-bold flex items-center justify-between px-4"><span class="flex items-center gap-2">${I.users} Welcome</span>→</button></div></div></div>`:''}
       ${state.lockedBelt?`<div id="lockBackdrop" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm p-4 flex items-end sm:items-center justify-center"><div class="relative bg-[#14B8A6] text-white rounded-[28px] rounded-bl-[64px] w-full max-w-[400px] p-7 overflow-hidden belt-shadow"><div class="absolute -right-3 -top-8 fredoka text-[150px] leading-none font-black text-white/10 select-none pointer-events-none">道</div><div class="relative"><span class="inline-flex items-center bg-[#FFD93D] text-black text-[10px] font-black px-2.5 py-1 rounded-full tracking-[0.18em]">FULL EDITION</span><h3 class="fredoka text-[26px] font-bold leading-[1.05] mt-3">Coming in the<br>Full Edition.</h3><p class="text-[13px] font-medium text-white/80 mt-2.5 leading-relaxed">Yondan and Godan oral gradings — live Sensei sessions, thesis defence and the senior curriculum — are part of the Oral Dojo Full Edition, coming soon.</p><div class="mt-5 space-y-2"><button id="lockClose" class="w-full h-12 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[14px] press">OSS! Got it</button><button id="lockWelcome" class="w-full h-11 rounded-full border border-white/30 text-white fredoka font-bold text-[13px] press">Back to Welcome</button></div></div></div></div>`:''}
     `;
     // events
@@ -696,6 +1115,7 @@ function renderApp(){
     document.getElementById('toResearch')?.addEventListener('click',()=>transition('research'));
     document.getElementById('researchBtn')?.addEventListener('click',()=>transition('research'));
     document.getElementById('openResearch2')?.addEventListener('click',()=>transition('research'));
+    document.getElementById('toProfile')?.addEventListener('click',()=>transition('profile'));
     document.getElementById('openMenu')?.addEventListener('click',()=>{state.menu=true; render();});
     document.getElementById('closeMenu')?.addEventListener('click',()=>{state.menu=false; render();});
     document.querySelectorAll('.menuGo').forEach(b=>b.addEventListener('click',e=>{state.menu=false; transition(e.currentTarget.dataset.go)}));
@@ -707,10 +1127,11 @@ function renderApp(){
     document.querySelectorAll('.beltBtn').forEach(b=>b.addEventListener('click',e=>{
       const id=parseInt(e.currentTarget.dataset.belt);
       if(id>=11){ state.lockedBelt=true; render(); return; }
-      state.belt=id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.hearts=3; state.lastCompleted=id;
+      state.belt=id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; state.lastCompleted=id;
       transition('lesson');
     }));
   } else if(state.view==='lesson' && q){
+    if(q.type==='match'&&q.pairs&&q.pairs.length>1) initMatch(q);
     app.innerHTML=`
     <div class="min-h-screen bg-[#FAF8F5] flex flex-col ${state.wobble?'wobble':''}">
       <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-black/5">
@@ -724,9 +1145,10 @@ function renderApp(){
         <div class="flex items-center gap-2 mb-4"><span class="text-[11px] font-black tracking-widest px-3 py-1 rounded-full bg-black text-white">${belt.short} • ${belt.from} → ${belt.to}</span><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-white border border-black/10">${q.topic}</span><span class="ml-auto text-[11px] font-bold text-black/40">${state.qIndex+1}/${lesson.length}</span></div>
         <div class="bg-white rounded-[28px] belt-shadow border-2 ${state.answered?(state.correct?'border-[#2ECC71]':'border-[#FF4B4B]'):'border-black/5'} p-6 sm:p-8 transition-colors">
           <div class="flex gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-[#FAF8F5] border border-black/5 flex items-center justify-center text-[22px] shrink-0">${q.type==='scenario'?I.film:q.type==='image'?I.image:q.topic.includes('History')||q.topic.includes('Origin')?I.scroll:q.topic.includes('Tradition')?I.torii:q.topic.includes('Dojo Management')?I.castle:I.belt}</div>
+            <div class="w-12 h-12 rounded-2xl bg-[#FAF8F5] border border-black/5 flex items-center justify-center text-[22px] shrink-0">${q.type==='scenario'?I.film:q.type==='image'?I.image:q.type==='match'?I.link:q.topic.includes('History')||q.topic.includes('Origin')?I.scroll:q.topic.includes('Tradition')?I.torii:q.topic.includes('Dojo Management')?I.castle:I.belt}</div>
             <div><h2 class="fredoka text-[20px] sm:text-[24px] font-bold leading-[1.2]">${q.q}</h2>${q.type==='scenario'?'<p class="text-[13px] text-black/60 font-medium mt-2 leading-relaxed">Choose the most respectful and technically correct response - like in a real oral grading.</p>':''}</div>
           </div>
+          ${q.type==='match'&&q.pairs&&q.pairs.length>1?matchHtml(q):`
           <div class="mt-7 space-y-3">
             ${q.options.map((opt,i)=>{
               const sel = state.selected===i;
@@ -744,7 +1166,7 @@ function renderApp(){
                 ${state.answered && sel && !isAns?'<span class="text-[#9A1A1A]">'+I.x+'</span>':''}
               </button>`;
             }).join('')}
-          </div>
+          </div>`}
         </div>
         <div class="mt-6 text-center"><span class="text-[11px] font-bold tracking-widest text-black/30"> • KARATE ORAL GRADING • ${q.type.toUpperCase()}</span></div>
       </div>
@@ -762,7 +1184,7 @@ function renderApp(){
         </div>`:`
         <div class="max-w-[900px] mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-3">
           <div class="flex-1 hidden sm:block text-[11px] font-bold tracking-widest text-black/30">LISTEN • SPEAK • GRADE</div>
-          <button id="actionBtn" ${state.selected===null?'disabled':''} class="w-full sm:w-auto sm:min-w-[280px] h-[50px] rounded-2xl font-bold fredoka text-[16px] tracking-wide press transition flex items-center justify-center gap-2 ${state.selected===null?'bg-[#EFEDE8] text-black/30 cursor-not-allowed':'bg-[#14B8A6] hover:bg-[#0F766E] text-white shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]'}">Check Answer →</button>
+          <button id="actionBtn" ${(q.type==='match'&&q.pairs&&q.pairs.length>1?matchReady():state.selected!==null)?'':'disabled'} class="w-full sm:w-auto sm:min-w-[280px] h-[50px] rounded-2xl font-bold fredoka text-[16px] tracking-wide press transition flex items-center justify-center gap-2 ${(q.type==='match'&&q.pairs&&q.pairs.length>1?matchReady():state.selected!==null)?'bg-[#14B8A6] hover:bg-[#0F766E] text-white shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]':'bg-[#EFEDE8] text-black/30 cursor-not-allowed'}">${q.type==='match'&&q.pairs&&q.pairs.length>1?'Check Matches →':'Check Answer →'}</button>
         </div>`}
       </div>
       ${state.outOfHearts?`<div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"><div class="bg-white rounded-[28px] w-full max-w-[380px] p-6 belt-shadow text-center"><div class="w-16 h-16 mx-auto rounded-full bg-[#FFE8E8] border-2 border-[#FF4B4B]/20 flex items-center justify-center text-[28px]">${I.heartCrack}</div><h3 class="fredoka text-[22px] font-bold mt-4">Out of spirit!</h3><p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">In real grading, composure matters. Take a breath, review, and try again. Hearts refill.</p><div class="mt-5 grid grid-cols-2 gap-2"><button id="backDojo" class="h-12 rounded-full bg-[#FAF8F5] border font-bold">Back to Dojo</button><button id="retry" class="h-12 rounded-full bg-black text-white font-bold">Refill & Retry</button></div></div></div>`:''}
@@ -773,41 +1195,54 @@ function renderApp(){
       state.selected=parseInt(e.currentTarget.dataset.opt);
       render();
     }));
+    if(q.type==='match'&&q.pairs&&q.pairs.length>1){
+      document.querySelectorAll('[data-ml]').forEach(b=>b.addEventListener('click',()=>{ tapMatchLeft(b.dataset.ml); }));
+      document.querySelectorAll('[data-mr]').forEach(b=>b.addEventListener('click',()=>{ tapMatchRight(b.dataset.mr); }));
+    }
+    const advanceLesson=()=>{
+      if(state.qIndex+1 < lesson.length){
+        if(state.hearts<=0) return;
+        state.qIndex++; state.selected=null; state.answered=false; state.correct=null; state.match=null;
+        render();
+      } else {
+        state.xp += state.xpEarned+25; state.gems+=20; state.streak+=1;
+        if(!state.completed.includes(state.belt)) state.completed.push(state.belt);
+        state.lastCompleted=state.belt;
+        const nextId=state.belt+1;
+        if(nextId < belts.length && !state.unlocked.includes(nextId)) state.unlocked.push(nextId);
+        saveProgress();
+        transition('result');
+      }
+    };
     const actionBtn=document.getElementById('actionBtn');
     if(actionBtn){
       actionBtn.onclick=()=>{
+        const isMatchQ=q.type==='match'&&q.pairs&&q.pairs.length>1;
+        if(isMatchQ){
+          if(!state.answered){ if(matchReady()) submitMatch(); return; }
+          advanceLesson(); return;
+        }
         if(state.selected===null) return;
         if(!state.answered){
           const correct = state.selected===q.answer;
           state.correct=correct; state.answered=true;
-          if(correct) state.xpEarned+=15;
+          if(correct){ state.xpEarned+=15; state.correctCount=(state.correctCount||0)+1; }
           else {
             state.hearts--; state.wobble=true;
             setTimeout(()=>{state.wobble=false; render();},400);
             if(state.hearts<=0){ setTimeout(()=>{state.outOfHearts=true; render();},600); }
           }
           render();
-        } else {
-          if(state.qIndex+1 < lesson.length){
-            if(state.hearts<=0) return;
-            state.qIndex++; state.selected=null; state.answered=false; state.correct=null;
-            render();
-          } else {
-            state.xp += state.xpEarned+25; state.gems+=20; state.streak+=1;
-            if(!state.completed.includes(state.belt)) state.completed.push(state.belt);
-            state.lastCompleted=state.belt;
-            const nextId=state.belt+1;
-            if(nextId < belts.length && !state.unlocked.includes(nextId)) state.unlocked.push(nextId);
-            transition('result');
-          }
-        }
+        } else advanceLesson();
       };
     }
     document.getElementById('backDojo')?.addEventListener('click',()=>{state.outOfHearts=false; transition('path');});
-    document.getElementById('retry')?.addEventListener('click',()=>{state.hearts=3; state.outOfHearts=false; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; render();});
+    document.getElementById('retry')?.addEventListener('click',()=>{state.hearts=3; state.outOfHearts=false; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.match=null; state.correctCount=0; render();});
   } else if(state.view==='result'){
     const nextBelt=belts[state.belt+1];
     const nextPlayable=!!nextBelt; // false only on the last belt of the path
+    const totalQ=lesson.length||1;
+    const scorePct=Math.max(0,Math.min(100,Math.round((state.correctCount||0)/totalQ*100)));
     app.innerHTML=`
     <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-[#FAF8F5] overflow-hidden relative">
       <div class="pointer-events-none fixed inset-0">
@@ -819,7 +1254,7 @@ function renderApp(){
         <p class="text-[13px] font-semibold text-black/50 mt-2">${belt.from} → ${belt.to} • Oral grading passed</p>
         <div class="grid grid-cols-3 gap-3 mt-6">
           <div class="bg-[#FFF8D6] rounded-2xl p-3 border border-[#FFD93D]/30"><div class="text-[11px] font-black tracking-widest text-[#8A6D00]">XP EARNED</div><div class="fredoka text-[20px] font-bold">+${state.xpEarned+25}</div></div>
-          <div class="bg-[#E8FFF3] rounded-2xl p-3 border border-[#2ECC71]/30"><div class="text-[11px] font-black tracking-widest text-[#0A7A42]">ACCURACY</div><div class="fredoka text-[20px] font-bold">Great</div></div>
+          <div class="bg-[#E8FFF3] rounded-2xl p-3 border border-[#2ECC71]/30"><div class="text-[11px] font-black tracking-widest text-[#0A7A42]">SCORE</div><div class="fredoka text-[20px] font-bold">${scorePct}%</div></div>
           <div class="bg-[#F5F0FF] rounded-2xl p-3 border border-[#8E44AD]/30"><div class="text-[11px] font-black tracking-widest text-[#6C3483]">BELT</div><div class="fredoka text-[20px] font-bold">+1</div></div>
         </div>
         <div class="mt-6 bg-[#FAF8F5] rounded-2xl p-4 border border-black/5 text-left flex items-center gap-3">
@@ -828,6 +1263,14 @@ function renderApp(){
         </div>
         <button id="continuePath" class="mt-6 w-full h-[52px] rounded-full bg-[#14B8A6] hover:bg-[#0F766E] text-white fredoka font-bold text-[16px] flex items-center justify-center gap-2 press shadow-[0_8px_20px_-6px_rgba(20,184,166,0.5)]">${nextPlayable?'Continue to Next Belt':'Back to Belt Path'} →</button>
         <button id="practiceAgain" class="mt-3 w-full h-[48px] rounded-full bg-[#FAF8F5] border font-bold text-[14px]">Practice Again</button>
+        <div class="mt-5 pt-4 border-t border-black/5">
+          <div class="text-[11px] font-black tracking-widest text-black/40 text-center">INVITE OTHERS • CHALLENGE THE DOJO</div>
+          <button id="shareScoreBtn" class="mt-3 w-full h-[52px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2 shadow-[0_8px_20px_-6px_rgba(37,211,102,0.5)]">Share My Score + Invite →</button>
+          <div class="mt-2 grid grid-cols-2 gap-2">
+            <button id="dlScoreBtn" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[13px] press">⬇ Download Score</button>
+            <button id="fbScoreBtn" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[13px] press">Give Feedback</button>
+          </div>
+        </div>
         <p class="text-[10px] font-bold tracking-widest text-black/30 mt-5">Oral Grading • History • Techniques • Philosophy • Tradition • Research</p>
       </div>
     </div>`;
@@ -837,13 +1280,16 @@ function renderApp(){
       } else if(nextPlayable){
         // Go straight into the next belt lesson - no need to re-select the belt
         state.lastCompleted=nextBelt.id;
-        state.belt=nextBelt.id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.hearts=3;
+        state.belt=nextBelt.id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3;
         transition('lesson');
       } else {
         transition('path');
       }
     };
-    document.getElementById('practiceAgain').onclick=()=>{state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.hearts=3; transition('lesson');};
+    document.getElementById('practiceAgain').onclick=()=>{state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; transition('lesson');};
+    document.getElementById('shareScoreBtn').onclick=()=>shareResultScore(scorePct,belt,state.correctCount||0,totalQ);
+    document.getElementById('dlScoreBtn').onclick=async()=>{ const blob=await makeScoreBlob(scorePct,belt,state.correctCount||0,totalQ); if(blob){ downloadBlob(blob,'oral-dojo-'+(belt.short||('belt'+belt.id))+'-score.png'); showToast('Score card downloaded — OSS!'); } else { showToast('Could not build the score card'); } };
+    document.getElementById('fbScoreBtn').onclick=()=>{ state.fbFromContribute=false; transition('feedback'); };
   } else if(state.view==='contribute'){
     const step=state.contribStep||'gate';
     const saved=JSON.parse(localStorage.getItem('oralDojo_contributions')||'[]');
@@ -1246,6 +1692,7 @@ function renderApp(){
   }
 }
 
+loadProgress();
 render();
 playPageIn();
 console.log("ORAL DOJO loaded. All " + belts.length + " belts unlocked. Data source: " + DojoData.getSource());
