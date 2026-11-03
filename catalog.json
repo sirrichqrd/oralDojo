@@ -1,6 +1,6 @@
 {
-  "version": 622,
-  "updatedAt": "2026-11-02T13:28:33.668Z",
+  "version": 625,
+  "updatedAt": "2026-11-03T08:19:39.411Z",
   "settings": {
     "senseiWhatsApp": "2348074001613",
     "senseiEmail": "oraldojo@ttosr.com",
@@ -2878,13 +2878,6 @@
       "definition": "The spirit shout — unites breath, body and intent. Not noise: commitment."
     },
     {
-      "id": "d26",
-      "term": "Waza",
-      "reading": "wah-zah",
-      "category": "Concepts",
-      "definition": "Technique. Waza-ari is 'half a point' — a technique almost good enough to score full."
-    },
-    {
       "id": "d27",
       "term": "Mushin",
       "reading": "moo-shin",
@@ -3294,8 +3287,8 @@
       "id": "d1793606402687-23-217",
       "term": "Waza-Ari",
       "reading": "wah-zah-ah-ree",
-      "category": "Levels",
-      "definition": "Half-point in competition — a technique almost perfect, one point short of ippon."
+      "category": "Scores",
+      "definition": "Two (2)-points in competition — a kick technique to the body, chudan area."
     },
     {
       "id": "d1793606402688-24-5889",
