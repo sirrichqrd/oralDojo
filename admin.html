@@ -30,6 +30,8 @@ h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
 <canvas id="three-canvas"></canvas>
 <div id="app" class="relative z-10"></div>
 <script src="dojo-data.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module" src="dojo-firebase.js"></script>
 <script type="module">
 await DojoData.init();
 let belts=[], questions={}, research=[], dictionary=[], library=[], settings={};
@@ -41,6 +43,15 @@ function refreshData(){
 }
 refreshData();
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const GICON='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.5 1.2-4 1.2-3.1 0-5.7-2.1-6.7-4.9H1.3v3.1C3.3 21.3 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.7.4-2.4V6.5H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.5l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.1C18 1.2 15.2 0 12 0 7.3 0 3.3 2.7 1.3 6.5l4 3.1c1-2.8 3.6-4.8 6.7-4.8z"/></svg>';
+function needGoogle(){ return !!(window.DojoFirebase&&DojoFirebase.isConfigured()&&DojoFirebase.needsAdminGoogle()); }
+function adminGoogleOk(){ return !needGoogle()||!!(typeof state!=='undefined'&&state.adminUser&&window.DojoFirebase&&DojoFirebase.isAdminUser()); }
+function tryUnlock(){
+  const pinOk=sessionStorage.getItem('oralDojo_admin_auth')==='1';
+  const was=state.authed;
+  state.authed=pinOk&&adminGoogleOk();
+  return state.authed&&!was;
+}
 let toastTimer=null;
 function showToast(msg){
   const oldT=document.getElementById('toast'); if(oldT) oldT.remove();
@@ -164,7 +175,12 @@ Likes: 24`,
   bulkResParsed:[],
   dictCatFilter:'all',
   libCatFilter:'all',
-  resTagFilter:'all'
+  resTagFilter:'all',
+  adminUser:null,
+  inbox:[],
+  inboxError:null,
+  inboxFilter:'all',
+  fbPublishing:false
 };
 
 function render(){ try{ renderApp(); }catch(e){ console.error(e); DojoData.discardDraft().then(()=>{ refreshData(); try{ renderApp(); }catch(e2){ document.getElementById('app').innerHTML='<div style="padding:48px;text-align:center;font-weight:700">Data error — reload.</div>'; } }); } }
@@ -178,30 +194,46 @@ function renderApp(){
       <div class="w-full max-w-[460px] bg-white rounded-[32px] belt-shadow border border-black/5 p-7 sm:p-8 text-center relative overflow-hidden">
         <div class="absolute -right-6 -top-6 fredoka text-[140px] leading-none font-black text-black/[0.03] select-none">道</div>
         <div class="relative"><div class="w-16 h-16 mx-auto rounded-full bg-[#FAF8F5] border flex items-center justify-center text-[30px]">⚙️</div>
-          <h2 class="fredoka text-[26px] font-bold mt-4">Admin Console v4</h2>
-          <p class="text-[13px] text-black/60 mt-2">Manage all — questions, research, dictionary, library. Bulk + Copy All in one click.</p>
+          <h2 class="fredoka text-[26px] font-bold mt-4">Admin Console v5</h2>
+          <p class="text-[13px] text-black/60 mt-2">Questions, research, dictionary, library + the live Inbox. Saves publish straight to every karateka.</p>
           <form id="pinForm" class="mt-6 space-y-3">
             <input id="pinInput" type="password" placeholder="Admin PIN" class="w-full h-12 rounded-2xl border-2 border-black/10 px-4 font-semibold text-[16px] text-center focus:border-black outline-none">
             <button type="submit" class="w-full h-[52px] rounded-full bg-black text-white font-bold fredoka text-[15px] press">Unlock →</button>
           </form>
-          <p class="text-[10px] font-black tracking-[0.18em] text-black/30 mt-4">PIN: 1234 default</p>
+          <div class="mt-4 rounded-2xl border-2 ${state.adminUser?'border-[#2ECC71]/40 bg-[#E8FFF3]':'border-black/10 bg-[#FAF8F5]'} p-4 text-left">
+            <div class="text-[10px] font-black tracking-[0.18em] ${state.adminUser?'text-[#0A7A42]':'text-black/40'}">${state.adminUser?('GOOGLE: '+esc(state.adminUser.email||'')):'STEP 2 — ADMIN GOOGLE SIGN-IN'}</div>
+            ${needGoogle()
+              ? (state.adminUser
+                  ? (window.DojoFirebase.isAdminUser()
+                      ? '<p class="text-[12px] font-bold text-[#0A7A42] mt-1.5">Allowlisted admin — you are set.</p>'
+                      : '<p class="text-[12px] font-bold text-[#9A1A1A] mt-1.5">This Google account is not on the ADMIN_EMAILS allowlist in firebase-config.js.</p><button id="aGoogleBtn" class="mt-2 h-11 px-4 rounded-full bg-white border font-bold text-[12px] press inline-flex items-center gap-2">'+GICON+' Switch account</button>')
+                  : '<p class="text-[12px] font-medium text-black/50 mt-1.5">Sign in with your admin Google account to unlock the live catalog and the Inbox.</p><button id="aGoogleBtn" class="mt-2 h-11 px-4 rounded-full bg-white border font-bold text-[12px] press inline-flex items-center gap-2">'+GICON+' Sign in with Google</button>')
+              : '<p class="text-[12px] font-medium text-black/50 mt-1.5">Firebase not configured — running in local mode. Paste your keys into firebase-config.js to go live.</p>'}
+          </div>
+          <p class="text-[10px] font-black tracking-[0.18em] text-black/30 mt-4">PIN: 1234 default • keep ADMIN_EMAILS identical in firebase-config.js and firestore.rules</p>
         </div>
       </div>
     </div>`;
   } else {
-    const tabDefs=[['questions','❓ Questions'],['research','📚 Research'],['dictionary','🔤 Dictionary'],['library','🗂️ Library'],['settings','⚙️ Settings']];
+    const newInbox=(state.inbox||[]).filter(s=>(s.status||'new')==='new').length;
+    const tabDefs=[['questions','❓ Questions'],['research','📚 Research'],['dictionary','🔤 Dictionary'],['library','🗂️ Library'],['inbox','Inbox'+(newInbox?' • '+newInbox:'')],['settings','⚙️ Settings']];
     const tabBar=`<div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">${tabDefs.map(t=>`<button data-atab="${t[0]}" class="aTab shrink-0 h-10 px-4 rounded-full text-[12px] font-bold border press ${state.tab===t[0]?'bg-black text-white border-black':'bg-white border-black/10'}">${t[1]}</button>`).join('')}</div>`;
     body=`<div class="mt-2">${tabBar}</div><div class="mt-5">${(panels[state.tab]||qPanel)()}</div>`;
   }
+  const fbChip = (window.DojoFirebase&&DojoFirebase.isConfigured())
+    ? (DojoData.isLive()
+        ? '<span class="hidden md:flex text-[10px] font-black bg-[#E8FFF3] border border-[#2ECC71]/40 text-[#0A7A42] px-3 py-1.5 rounded-full">FIREBASE LIVE</span>'
+        : '<span class="hidden md:flex text-[10px] font-black bg-[#FFF8D6] border border-[#FFD93D]/40 text-[#8A6D00] px-3 py-1.5 rounded-full">FIREBASE OFF</span>')
+    : '<span class="hidden md:flex text-[10px] font-black bg-[#FFF8D6] border border-[#FFD93D]/40 text-[#8A6D00] px-3 py-1.5 rounded-full">LOCAL MODE</span>';
   const headerAuthed = state.authed ? `
     <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06] backdrop-blur-xl">
       <div class="max-w-[1120px] mx-auto px-4 h-[64px] flex items-center justify-between gap-2">
         <div class="flex items-center gap-3">
           <img src="assets/logo/od-logo.png" alt="Logo" class="h-6 w-auto max-w-[110px] object-contain">
-          <div class="hidden sm:block"><div class="fredoka font-bold leading-none text-[13px]">ORAL DOJO — ADMIN v4</div><div class="text-[10px] font-bold tracking-[0.15em] text-black/40">BULK • COPY ALL • CATEGORY</div></div>
+          <div class="hidden sm:block"><div class="fredoka font-bold leading-none text-[13px]">ORAL DOJO — ADMIN v5</div><div class="text-[10px] font-bold tracking-[0.15em] text-black/40">BULK • COPY ALL • LIVE INBOX</div></div>
         </div>
         <div class="flex items-center gap-1.5">
-          <span class="hidden lg:flex text-[10px] font-black bg-[#FAF8F5] border px-3 py-1.5 rounded-full max-w-[200px] truncate">${esc(srcLabel)}</span>
+          ${fbChip}<span class="hidden lg:flex text-[10px] font-black bg-[#FAF8F5] border px-3 py-1.5 rounded-full max-w-[200px] truncate">${esc(srcLabel)}</span>
           <span class="text-[10px] font-black bg-[#FFF8D6] border border-[#FFD93D]/40 px-2.5 py-1.5 rounded-full">v${esc(cat.version)}</span>
           <button id="adExport" class="h-9 px-3 rounded-full bg-black text-[#FFD93D] text-[11px] font-black press">⬇ Export</button>
           <a href="index.html" class="h-9 px-3 rounded-full bg-white border text-[11px] font-bold press">Dojo ↗</a>
@@ -215,7 +247,8 @@ function renderApp(){
     document.getElementById('adExport')?.addEventListener('click',doExport);
     document.getElementById('adLock')?.addEventListener('click',()=>{ sessionStorage.removeItem('oralDojo_admin_auth'); state.authed=false; state.tab='questions'; state.form=null; render(); playPageIn(); showToast('Locked'); });
   } else {
-    document.getElementById('pinForm').onsubmit=e=>{ e.preventDefault(); const val=document.getElementById('pinInput').value.trim(); if(val===String(settings.adminPin||'1234')){ state.authed=true; sessionStorage.setItem('oralDojo_admin_auth','1'); render(); playPageIn(); showToast('Welcome'); } else { document.getElementById('pinForm').classList.add('wobble'); setTimeout(()=>document.getElementById('pinForm')?.classList.remove('wobble'),400); } };
+    document.getElementById('pinForm').onsubmit=e=>{ e.preventDefault(); const val=document.getElementById('pinInput').value.trim(); if(val===String(settings.adminPin||'1234')){ sessionStorage.setItem('oralDojo_admin_auth','1'); tryUnlock(); render(); playPageIn(); showToast(needGoogle()&&!state.adminUser?'PIN accepted — now sign in with your admin Google account':'Welcome, Sensei'); } else { document.getElementById('pinForm').classList.add('wobble'); setTimeout(()=>document.getElementById('pinForm')?.classList.remove('wobble'),400); } };
+    document.getElementById('aGoogleBtn')?.addEventListener('click',async()=>{ const r=await window.DojoFirebase.signInGoogle(); if(r&&!r.ok&&r.reason!=='cancelled') showToast(window.DojoFirebase.isConfigured()?'Google sign-in failed — please try again':'Connect Firebase first — see FIREBASE-SETUP.md'); });
   }
   if(state.authed){
     document.querySelectorAll('.aTab').forEach(b=>b.onclick=()=>{state.tab=b.dataset.atab; state.form=null; render(); playPageIn();});
@@ -223,6 +256,7 @@ function renderApp(){
     else if(state.tab==='research') bindR();
     else if(state.tab==='dictionary') bindD();
     else if(state.tab==='library') bindL();
+    else if(state.tab==='inbox') bindI();
     else bindS();
   }
 }
@@ -419,11 +453,94 @@ const sPanel=()=>{
       <div class="mt-4 grid grid-cols-2 gap-2"><button id="aCopyAllQuestions" class="h-11 rounded-full bg-[#FAF8F5] border font-bold text-[12px]">📋 All Q Bulk</button><button id="aCopyAllDict" class="h-11 rounded-full bg-[#FAF8F5] border font-bold text-[12px]">📋 All Dict Bulk</button><button id="aCopyAllLib" class="h-11 rounded-full bg-[#FAF8F5] border font-bold text-[12px]">📋 All Lib Bulk</button><button id="aCopyAllRes" class="h-11 rounded-full bg-[#FAF8F5] border font-bold text-[12px]">📋 All Res Bulk</button></div>
     </div>
     <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-6"><h3 class="fredoka font-bold text-[16px]">🤙 Dojo Contact</h3><div class="mt-4 space-y-3"><div><label class="text-[10px] font-black tracking-[0.15em] text-black/50">WHATSAPP</label><input id="aWa" value="${esc(settings.senseiWhatsApp||'')}" class="mt-1.5 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px]"></div><div><label class="text-[10px] font-black tracking-[0.15em] text-black/50">EMAIL</label><input id="aEmail" value="${esc(settings.senseiEmail||'')}" class="mt-1.5 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px]"></div><div><label class="text-[10px] font-black tracking-[0.15em] text-black/50">ADMIN PIN</label><input id="aPin" value="${esc(settings.adminPin||'')}" class="mt-1.5 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px]"></div><div><label class="text-[10px] font-black tracking-[0.15em] text-black/50">SHEETDB API URL — REGISTER → GOOGLE SHEET</label><input id="aSheetdb" value="${esc(settings.sheetdbUrl||'')}" placeholder="https://sheetdb.io/api/v1/your-id" class="mt-1.5 w-full h-11 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[13px]"></div><button id="aSaveSettings" class="w-full h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Settings</button></div></div>
-    <div class="bg-[#0F0F0F] text-white rounded-[28px] belt-shadow border border-[#FFD93D]/20 p-6 lg:col-span-2"><h3 class="fredoka font-bold text-[16px]">🚀 Publish Changes</h3><p class="text-[13px] text-white/60 mt-2">Export catalog.json and place in root next to index.html. Every device loads it.</p><div class="mt-4 grid sm:grid-cols-3 gap-2"><button id="aExport2" class="h-12 rounded-full bg-[#FFD93D] text-black font-black fredoka text-[13px] press">⬇ Export</button><label class="h-12 rounded-full bg-white/10 border border-white/10 font-bold fredoka text-[13px] press flex items-center justify-center cursor-pointer">⬆ Import<input type="file" id="aImportFile" accept=".json" class="hidden"></label>${srcLabel.indexOf('draft')>=0?'<button id="aDiscard" class="h-12 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/30 text-[#9A1A1A] font-bold fredoka text-[13px] press">↺ Discard draft</button>':''}</div></div>
+    <div class="bg-white rounded-[28px] belt-shadow border-2 border-[#14B8A6]/30 p-6 lg:col-span-2"><h3 class="fredoka font-bold text-[16px]">Firebase — live catalog</h3><p class="text-[13px] font-medium text-black/60 mt-2">${(window.DojoFirebase&&DojoFirebase.isConfigured())?(DojoData.isLive()?'Connected — every save in this console now goes LIVE to all karateka instantly (no catalog.json upload needed).':'Connected but the live catalog is not published yet — click Publish below once to seed Firestore.'):'Not connected. Paste your firebaseConfig into firebase-config.js, publish firestore.rules, then reload — see FIREBASE-SETUP.md.'}</p><div class="mt-4 flex flex-wrap gap-2"><button id="aFbPublish" class="h-12 px-5 rounded-full bg-[#14B8A6] text-white font-black fredoka text-[13px] press">Publish this catalog to Firebase →</button><button id="aFbReload" class="h-12 px-5 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[13px] press">Reload from Firebase</button></div><p class="text-[11px] font-bold tracking-widest text-black/30 mt-3">ADMIN EMAILS: ${esc((((window.DojoFirebase&&DojoFirebase.adminEmails)?DojoFirebase.adminEmails():[])||[]).join(', ')||'none — set ADMIN_EMAILS in firebase-config.js')}</p></div>
+    <div class="bg-[#0F0F0F] text-white rounded-[28px] belt-shadow border border-[#FFD93D]/20 p-6 lg:col-span-2"><h3 class="fredoka font-bold text-[16px]">🚀 Export / Backup</h3><p class="text-[13px] text-white/60 mt-2">With Firebase live, every save already reaches students instantly — export is only an offline backup of catalog.json.</p><div class="mt-4 grid sm:grid-cols-3 gap-2"><button id="aExport2" class="h-12 rounded-full bg-[#FFD93D] text-black font-black fredoka text-[13px] press">⬇ Export</button><label class="h-12 rounded-full bg-white/10 border border-white/10 font-bold fredoka text-[13px] press flex items-center justify-center cursor-pointer">⬆ Import<input type="file" id="aImportFile" accept=".json" class="hidden"></label>${srcLabel.indexOf('draft')>=0?'<button id="aDiscard" class="h-12 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/30 text-[#9A1A1A] font-bold fredoka text-[13px] press">↺ Discard draft</button>':''}</div></div>
   </div>`;
 };
 
-const panels={questions:qPanel,research:rPanel,dictionary:dPanel,library:lPanel,settings:sPanel};
+const iPanel=()=>{
+  const list=state.inbox||[];
+  const configured=window.DojoFirebase&&DojoFirebase.isConfigured();
+  const live=DojoData.isLive();
+  const f=state.inboxFilter||'all';
+  const isNew=s=>(s.status||'new')==='new';
+  const filtered=list.filter(s=>{
+    if(f==='all') return (s.status||'new')!=='archived';
+    if(f==='new') return isNew(s);
+    if(f==='archived') return s.status==='archived';
+    return s.kind===f && s.status!=='archived';
+  });
+  const kindBadge=k=>({thesis:'THESIS',question:'QUESTION',feedback:'FEEDBACK'}[k]||String(k||'').toUpperCase());
+  const stCls=s=>({new:'bg-[#FFD93D] text-black',reviewed:'bg-[#E8F0FF] text-[#1B4F91]',approved:'bg-[#E8FFF3] text-[#0A7A42]',archived:'bg-[#EFEDE8] text-black/50'}[s]||'bg-[#FAF8F5] border');
+  const when=s=>{ try{ const d=new Date(s.createdAtMs||Date.parse(s.createdAtISO||'')); return isNaN(d)?'—':d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' • '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return '—'; } };
+  const card=s=>{
+    const beltObj=belts.find(b=>b.id===parseInt(s.belt,10));
+    let body='';
+    if(s.kind==='question'){
+      const L=['A','B','C','D'];
+      body=`<div class="font-bold text-[13px] leading-snug mt-1.5">${esc(s.q||'')}</div>
+        <div class="mt-1.5 flex flex-wrap gap-1.5">${(s.options||[]).map((o,i)=>`<span class="text-[11px] font-bold px-2 py-1 rounded-full border ${i===parseInt(s.answer,10)?'bg-[#E8FFF3] border-[#2ECC71]/40 text-[#0A7A42]':'bg-white border-black/10'}">${L[i]||i}) ${esc(o)}</span>`).join('')}</div>
+        <div class="text-[12px] text-black/50 mt-1.5 leading-snug"><b class="text-black/70">Why:</b> ${esc(s.explanation||'')}</div>`;
+    } else if(s.kind==='thesis'){
+      body=`<div class="font-bold text-[13px] leading-snug mt-1.5">${esc(s.title||'')}</div>
+        ${s.problem?`<div class="text-[12px] text-black/50 mt-1 leading-snug"><b class="text-black/70">Problem:</b> ${esc(s.problem)}</div>`:''}
+        <div class="text-[12px] text-black/50 mt-1 leading-snug"><b class="text-black/70">Method:</b> ${esc(s.method||'')}</div>
+        <div class="text-[12px] text-black/50 mt-1 leading-snug"><b class="text-black/70">Contribution:</b> ${esc(s.contribution||'')}</div>
+        ${s.link?`<a href="${esc(s.link)}" target="_blank" rel="noopener" class="text-[11px] font-bold text-[#0F766E] mt-1 inline-block">Open link ↗</a>`:''}`;
+    } else {
+      body=`<div class="text-[13px] leading-relaxed mt-1.5 font-medium">${esc(s.text||'')}</div>`;
+    }
+    return `<div class="bg-white rounded-[22px] belt-shadow border border-black/5 p-4">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-black text-white">${kindBadge(s.kind)}</span>
+        <span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full ${stCls(s.status||'new')}">${String(s.status||'new').toUpperCase()}</span>
+        ${s.kind==='question'?`<span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-[#FAF8F5] border">${esc(beltObj?(beltObj.from+' → '+beltObj.to):('Belt '+s.belt))}</span>`:''}
+        ${s.grade?`<span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full bg-[#FAF8F5] border">${esc(s.grade)}</span>`:''}
+        <span class="ml-auto text-[10px] font-bold text-black/40">${when(s)}</span>
+      </div>
+      ${body}
+      <div class="text-[11px] font-semibold text-black/40 mt-2">From: ${esc(s.name||'Anonymous')}${s.email?' • '+esc(s.email):''}</div>
+      <div class="mt-3 flex flex-wrap gap-2">
+        ${s.kind==='question'&&s.status!=='approved'?`<button data-appr="${esc(s.id)}" class="h-9 px-4 rounded-full bg-black text-white font-bold text-[11px] press">Approve → live catalog</button>`:''}
+        ${s.kind!=='question'&&s.status==='new'?`<button data-rev="${esc(s.id)}" class="h-9 px-4 rounded-full bg-[#FAF8F5] border font-bold text-[11px] press">Mark reviewed</button>`:''}
+        ${s.status!=='archived'?`<button data-arch="${esc(s.id)}" class="h-9 px-4 rounded-full bg-[#FAF8F5] border font-bold text-[11px] press">Archive</button>`:''}
+        <button data-idel="${esc(s.id)}" class="h-9 px-4 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] font-bold text-[11px] press">Delete</button>
+      </div>
+    </div>`;
+  };
+  const chips=[['all','All'],['new','New'],['thesis','Theses'],['question','Questions'],['feedback','Feedback'],['archived','Archived']];
+  return `<div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-4">
+    <div class="flex flex-col lg:flex-row gap-2 lg:items-center justify-between">
+      <div class="flex items-center gap-2"><div class="w-10 h-10 rounded-xl bg-[#E8FFF3] border flex items-center justify-center">✉</div><div><div class="fredoka font-bold text-[14px]">Inbox • ${list.length} submission${list.length===1?'':'s'}</div><div class="text-[11px] font-bold tracking-widest text-black/40">${list.filter(isNew).length} NEW • ${filtered.length} IN FILTER</div></div></div>
+      <div class="flex flex-wrap gap-2">${chips.map(c=>`<button data-ifilter="${c[0]}" class="h-9 px-3.5 rounded-full text-[11px] font-bold border press ${f===c[0]?'bg-black text-white border-black':'bg-white border-black/10'}">${c[1]}</button>`).join('')}</div>
+    </div>
+  </div>
+  ${(!configured||!live)?`<div class="mt-4 bg-[#FFF8D6] rounded-[24px] border border-[#FFD93D]/40 p-5 text-[13px] font-semibold text-[#8A6D00]">Firebase is not connected yet. Paste your keys into <b>firebase-config.js</b>, publish <b>firestore.rules</b>, then sign in with an allowlisted admin Google account — feedback, theses and question contributions will land here live. ${state.inboxError?('('+esc(state.inboxError)+')'):''}</div>`:''}
+  <div class="mt-4 space-y-3">${filtered.map(card).join('')||`<div class="bg-white rounded-[28px] border-2 border-dashed border-black/10 p-8 text-center fredoka font-bold text-black/40">Nothing here yet.</div>`}</div>`;
+};
+async function inboxAction(id, action){
+  const s=(state.inbox||[]).find(x=>x.id===id);
+  if(!s) return;
+  if(action==='approve'){
+    const item={ id:'q'+(parseInt(s.belt,10)||0)+'-'+Date.now(), belt:parseInt(s.belt,10)||0, type:'mcq', topic:s.topic||'Community', q:s.q||'', options:Array.isArray(s.options)?s.options:[], answer:parseInt(s.answer,10)||0, explanation:s.explanation||'' };
+    if(!item.q||item.options.length<2){ showToast('Submission is incomplete — cannot approve'); return; }
+    await DojoData.upsertQuestion(item);
+    refreshData();
+    const r=await window.DojoFirebase.updateSubmission(id,{status:'approved'});
+    showToast(r&&r.ok?'Question approved — live for every karateka':'Added to catalog (status update failed)');
+    render();
+  } else if(action==='review'){ const r=await window.DojoFirebase.updateSubmission(id,{status:'reviewed'}); showToast(r&&r.ok?'Marked reviewed':'Update failed'); }
+  else if(action==='archive'){ const r=await window.DojoFirebase.updateSubmission(id,{status:'archived'}); showToast(r&&r.ok?'Archived':'Update failed'); }
+  else if(action==='delete'){ const r=await window.DojoFirebase.deleteSubmission(id); showToast(r&&r.ok?'Deleted':'Delete failed'); }
+}
+function bindI(){
+  document.querySelectorAll('[data-ifilter]').forEach(b=>b.onclick=()=>{ state.inboxFilter=b.dataset.ifilter; render(); });
+  document.querySelectorAll('[data-appr]').forEach(b=>b.onclick=()=>arm(b,()=>inboxAction(b.dataset.appr,'approve')));
+  document.querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>inboxAction(b.dataset.rev,'review'));
+  document.querySelectorAll('[data-arch]').forEach(b=>b.onclick=()=>inboxAction(b.dataset.arch,'archive'));
+  document.querySelectorAll('[data-idel]').forEach(b=>b.onclick=()=>arm(b,()=>inboxAction(b.dataset.idel,'delete')));
+}
+const panels={questions:qPanel,research:rPanel,dictionary:dPanel,library:lPanel,inbox:iPanel,settings:sPanel};
 
 function bindQ(){
   const wrap=document.getElementById('aQFOpts');
@@ -481,7 +598,7 @@ function bindQ(){
     const opts=[...wrap.querySelectorAll('input')].map(i=>i.value.trim());
     const item={ id:idVal, belt:beltVal, type:typeSel.value, topic:topicVal, q:qVal, options:opts, answer:parseInt(ansSel.value,10), explanation:exVal };
     if(!item.topic||!item.q||!item.explanation||opts.some(o=>!o)){ showToast('Fill all'); return; }
-    await DojoData.upsertQuestion(item); state.form=null; refreshData(); render(); showToast('Saved');
+    await DojoData.upsertQuestion(item); state.form=null; refreshData(); render(); showToast(DojoData.isLive()?'Saved — live via Firebase':'Saved as local draft');
   };
 }
 function bindR(){
@@ -500,7 +617,7 @@ function bindR(){
   }
   if(!document.getElementById('aRSave')) return;
   document.getElementById('aRCancel').onclick=()=>{state.form=null; render();};
-  document.getElementById('aRSave').onclick=async()=>{ const all=DojoData.getResearch(); const idStr=document.getElementById('aRId').value; const item={ id: idStr?parseInt(idStr,10):Math.max(0,...all.map(r=>+r.id||0))+1, title:document.getElementById('aRTitle').value.trim(), author:document.getElementById('aRAuthor').value.trim(), rank:document.getElementById('aRRank').value.trim(), tag:document.getElementById('aRTag').value.trim(), excerpt:document.getElementById('aRExcerpt').value.trim(), likes:parseInt(document.getElementById('aRLikes').value,10)||0 }; if(!item.title||!item.excerpt){ showToast('Title+excerpt required'); return; } await DojoData.upsertResearch(item); state.form=null; refreshData(); render(); showToast('Saved'); };
+  document.getElementById('aRSave').onclick=async()=>{ const all=DojoData.getResearch(); const idStr=document.getElementById('aRId').value; const item={ id: idStr?parseInt(idStr,10):Math.max(0,...all.map(r=>+r.id||0))+1, title:document.getElementById('aRTitle').value.trim(), author:document.getElementById('aRAuthor').value.trim(), rank:document.getElementById('aRRank').value.trim(), tag:document.getElementById('aRTag').value.trim(), excerpt:document.getElementById('aRExcerpt').value.trim(), likes:parseInt(document.getElementById('aRLikes').value,10)||0 }; if(!item.title||!item.excerpt){ showToast('Title+excerpt required'); return; } await DojoData.upsertResearch(item); state.form=null; refreshData(); render(); showToast(DojoData.isLive()?'Saved — live via Firebase':'Saved as local draft'); };
 }
 function bindD(){
   document.getElementById('aDAdd').onclick=()=>{state.form={kind:'dict', item:null}; state.bulkDictOpen=false; render();};
@@ -518,7 +635,7 @@ function bindD(){
   }
   if(!document.getElementById('aDSave')) return;
   document.getElementById('aDCancel').onclick=()=>{state.form=null; render();};
-  document.getElementById('aDSave').onclick=async()=>{ const item={ id:document.getElementById('aDId').value||('d'+Date.now()), term:document.getElementById('aDTerm').value.trim(), reading:document.getElementById('aDReading').value.trim(), category:document.getElementById('aDCat').value.trim()||'Concepts', definition:document.getElementById('aDDef').value.trim() }; if(!item.term||!item.definition){ showToast('Term+definition required'); return; } await DojoData.upsertDictionary(item); state.form=null; refreshData(); render(); showToast('Saved'); };
+  document.getElementById('aDSave').onclick=async()=>{ const item={ id:document.getElementById('aDId').value||('d'+Date.now()), term:document.getElementById('aDTerm').value.trim(), reading:document.getElementById('aDReading').value.trim(), category:document.getElementById('aDCat').value.trim()||'Concepts', definition:document.getElementById('aDDef').value.trim() }; if(!item.term||!item.definition){ showToast('Term+definition required'); return; } await DojoData.upsertDictionary(item); state.form=null; refreshData(); render(); showToast(DojoData.isLive()?'Saved — live via Firebase':'Saved as local draft'); };
 }
 function bindL(){
   document.getElementById('aLAdd').onclick=()=>{state.form={kind:'lib', item:null}; state.bulkLibOpen=false; render();};
@@ -536,10 +653,19 @@ function bindL(){
   }
   if(!document.getElementById('aLSave')) return;
   document.getElementById('aLCancel').onclick=()=>{state.form=null; render();};
-  document.getElementById('aLSave').onclick=async()=>{ const item={ id:document.getElementById('aLId').value||('l'+Date.now()), title:document.getElementById('aLTitle').value.trim(), author:document.getElementById('aLAuthor').value.trim(), type:document.getElementById('aLType').value, category:document.getElementById('aLCat').value.trim()||'General', description:document.getElementById('aLDesc').value.trim(), url:document.getElementById('aLUrl').value.trim() }; if(!item.title||!item.description){ showToast('Title+description required'); return; } await DojoData.upsertLibrary(item); state.form=null; refreshData(); render(); showToast('Saved'); };
+  document.getElementById('aLSave').onclick=async()=>{ const item={ id:document.getElementById('aLId').value||('l'+Date.now()), title:document.getElementById('aLTitle').value.trim(), author:document.getElementById('aLAuthor').value.trim(), type:document.getElementById('aLType').value, category:document.getElementById('aLCat').value.trim()||'General', description:document.getElementById('aLDesc').value.trim(), url:document.getElementById('aLUrl').value.trim() }; if(!item.title||!item.description){ showToast('Title+description required'); return; } await DojoData.upsertLibrary(item); state.form=null; refreshData(); render(); showToast(DojoData.isLive()?'Saved — live via Firebase':'Saved as local draft'); };
 }
 function bindS(){
   document.getElementById('aExport2').onclick=doExport;
+  document.getElementById('aFbPublish')?.addEventListener('click',async()=>{
+    const btn=document.getElementById('aFbPublish');
+    btn.disabled=true; btn.textContent='Publishing…';
+    const r=await DojoData.publishToFirebase();
+    btn.disabled=false; btn.textContent='Publish this catalog to Firebase →';
+    showToast(r&&r.ok?('Published — catalog is now LIVE ('+(r.questions!=null?(r.questions+' questions'):'v'+DojoData.getCatalog().version)+')'):('Publish failed: '+((r&&r.reason)||'Firebase not connected')));
+    refreshData(); render(); playPageIn();
+  });
+  document.getElementById('aFbReload')?.addEventListener('click',()=>{ refreshData(); render(); playPageIn(); showToast('Reloaded from the live source'); });
   document.getElementById('aCopyAllQuestions')?.addEventListener('click',()=>copyToClipboard(genQBulk(DojoData.getQuestions())));
   document.getElementById('aCopyAllDict')?.addEventListener('click',()=>copyToClipboard(genDictBulk(DojoData.getDictionary())));
   document.getElementById('aCopyAllLib')?.addEventListener('click',()=>copyToClipboard(genLibBulk(DojoData.getLibrary())));
@@ -549,8 +675,25 @@ function bindS(){
   document.getElementById('aSaveSettings').onclick=async()=>{ const wa=document.getElementById('aWa').value.trim().replace(/[^\d]/g,''); const em=document.getElementById('aEmail').value.trim(); const pin=document.getElementById('aPin').value.trim(); const sd=document.getElementById('aSheetdb').value.trim(); if(!wa||!em||!pin){ showToast('All fields required'); return; } await DojoData.updateSettings({senseiWhatsApp:wa,senseiEmail:em,adminPin:pin,sheetdbUrl:sd}); refreshData(); render(); playPageIn(); showToast('Settings saved'); };
 }
 
+// ─── Firebase wiring: admin Google gate + live Inbox ───
+tryUnlock();
+window.DojoFirebase.onAuth(u=>{
+  state.adminUser=u||null;
+  if(u&&!window.DojoFirebase.isAdminUser()) showToast('That Google account is not on the ADMIN_EMAILS allowlist');
+  if(u&&window.DojoFirebase.isAdminUser()){
+    window.DojoFirebase.watchSubmissions(list=>{
+      const prev=(state.inbox||[]).length;
+      state.inbox=list||[]; state.inboxError=null;
+      const busy=state.form||state.bulkOpen||state.bulkDictOpen||state.bulkLibOpen||state.bulkResOpen;
+      if(!busy&&(state.tab==='inbox'||state.inbox.length!==prev)) render();
+    }, err=>{ state.inboxError=String(err||'permission denied'); if(state.tab==='inbox') render(); });
+  } else { state.inbox=[]; }
+  tryUnlock();
+  const busy=state.form||state.bulkOpen||state.bulkDictOpen||state.bulkLibOpen||state.bulkResOpen;
+  if(!busy) render();
+});
 render(); playPageIn();
-console.log('ADMIN v4 - Bulk + Copy All loaded. Source:', DojoData.getSource(), 'v'+DojoData.getCatalog().version);
+console.log('ADMIN v5 (Firebase) — Source:', DojoData.getSource(), 'v'+DojoData.getCatalog().version, '| Live:', DojoData.isLive());
 </script>
 </body>
 </html>

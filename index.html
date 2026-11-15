@@ -140,6 +140,8 @@ h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
 <div id="app" class="relative z-10"></div>
 
 <script src="dojo-data.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module" src="dojo-firebase.js"></script>
 <script type="module">
 // --- DATA LAYER (dojo-data.js + catalog.json) — all content flows through DojoData ---
 await DojoData.init();
@@ -217,6 +219,7 @@ const ic=k=>'<svg viewBox="0 0 24 24" width="1em" height="1em" fill="'+(FILLED[k
 const I={};for(const k in ICONS)I[k]=ic(k);
 const TINT={heart:'#FF4B4B',heartCrack:'#FF4B4B',star:'#F5A623',sparkles:'#0A7A42',target:'#FF8C42'};
 for(const k in TINT)I[k]='<span style="color:'+TINT[k]+'">'+I[k]+'</span>';
+const GICON='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" class="ic"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.5 1.2-4 1.2-3.1 0-5.7-2.1-6.7-4.9H1.3v3.1C3.3 21.3 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.7.4-2.4V6.5H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.5l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8L20 3.1C18 1.2 15.2 0 12 0 7.3 0 3.3 2.7 1.3 6.5l4 3.1c1-2.8 3.6-4.8 6.7-4.8z"/></svg>';
 // --- STUDENT REGISTER (SheetDB → Google Sheets) — data capture only, no login ---
 const PROFILE_KEY='oralDojo_profile';
 const OUTBOX_KEY='oralDojo_regOutbox';
@@ -280,7 +283,12 @@ async function flushOutbox(){
   try{ localStorage.setItem(OUTBOX_KEY,JSON.stringify(remain)); }catch(e){}
 }
 // --- Progress persistence: resume from wherever you stopped on this device ---
-function saveProgress(){ try{ localStorage.setItem(PROGRESS_KEY,JSON.stringify({belt:state.belt,unlocked:state.unlocked,completed:state.completed,lastCompleted:state.lastCompleted,xp:state.xp,gems:state.gems,streak:state.streak})); }catch(e){} }
+function saveProgress(){
+  const prog={belt:state.belt,unlocked:state.unlocked,completed:state.completed,lastCompleted:state.lastCompleted,xp:state.xp,gems:state.gems,streak:state.streak};
+  try{ localStorage.setItem(PROGRESS_KEY,JSON.stringify(prog)); }catch(e){}
+  // Cloud sync: signed-in karateka get their progress on every device
+  if(state.user&&window.DojoFirebase&&DojoFirebase.isConnected()){ window.__lastProgPush=Date.now(); DojoFirebase.saveProgress(state.user.uid,prog).catch(()=>{}); }
+}
 function loadProgress(){ try{ const p=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'null'); if(p){ if(typeof p.belt==='number') state.belt=p.belt; if(Array.isArray(p.unlocked)) state.unlocked=p.unlocked; if(Array.isArray(p.completed)) state.completed=p.completed; if(p.lastCompleted!==undefined) state.lastCompleted=p.lastCompleted; if(typeof p.xp==='number') state.xp=p.xp; if(typeof p.gems==='number') state.gems=p.gems; if(typeof p.streak==='number') state.streak=p.streak; } }catch(e){} }
 // Invite message used on the profile page + score card share — always carries the site URL
 const INVITE_MSG='OSS! 🥋 I am training in Oral Dojo — the Karate oral grading, by Sensei Richqrd. History, technique, philosophy & tradition, a karate knowledge test platform. Come train with me → https://oraldojo.ttosr.com';
@@ -476,8 +484,9 @@ function thesisModalHtml(saved){
         </div>`).join(''):`<div class="rounded-2xl border-2 border-dashed border-black/10 p-6 text-center text-[13px] font-semibold text-black/50">Your batch is empty — add a thesis first.</div>`}
       </div>
       ${saved.length?`<div class="mt-5 space-y-2">
-        <button id="tShareWa2" class="w-full h-[52px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2 shadow-[0_8px_20px_-6px_rgba(37,211,102,0.5)]">Share ${saved.length} Thesis${saved.length===1?'':'es'} via WhatsApp →</button>
-        <button id="tShareMail2" class="w-full h-[52px] rounded-full bg-black text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2">Share via Email →</button>
+        <button id="tDirect2" class="w-full h-[52px] rounded-full bg-black text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2">Send ${saved.length} Thesis${saved.length===1?'':'es'} straight to Sensei →</button>
+        <button id="tShareWa2" class="w-full h-[52px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2 shadow-[0_8px_20px_-6px_rgba(37,211,102,0.5)]">Backup: share via WhatsApp →</button>
+        <button id="tShareMail2" class="w-full h-[52px] rounded-full bg-[#FAF8F5] border text-black font-bold fredoka text-[15px] press flex items-center justify-center gap-2">Backup: share via Email →</button>
       </div>`:''}
       <div class="mt-3 grid grid-cols-2 gap-2">
         <button id="tAdd2" class="h-11 rounded-full bg-[#FAF8F5] border font-bold text-[13px] press">+ Add Another</button>
@@ -490,7 +499,8 @@ function thesisModalHtml(saved){
       <h2 class="fredoka text-[24px] font-bold mt-4">Thesis saved — OSS!</h2>
       <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">Your batch now holds <span class="font-bold text-black">${saved.length} submission${saved.length===1?'':'s'}</span>. Keep adding more, or share them all with Sensei at once.</p>
       <div class="mt-5 space-y-2">
-        <button id="tShareWa" class="w-full h-12 rounded-full bg-[#25D366] text-white font-bold fredoka text-[14px] press">Share ${saved.length} Submission${saved.length===1?'':'s'} with Sensei →</button>
+        <button id="tDirect" class="w-full h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Send ${saved.length} Submission${saved.length===1?'':'s'} straight to Sensei →</button>
+        <button id="tShareWa" class="w-full h-12 rounded-full bg-[#25D366] text-white font-bold fredoka text-[14px] press">Backup: share via WhatsApp →</button>
         <div class="grid grid-cols-2 gap-2">
           <button id="tAnother" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Add Another</button>
           <button class="tCloseBtn h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Close</button>
@@ -518,6 +528,7 @@ let state={
  xpEarned:0,
  correctCount:0,
  match:null,
+ user:null,
  menu:false,
  wobble:false,
  outOfHearts:false,
@@ -623,6 +634,7 @@ function renderApp(){
           <div class="flex items-center justify-between pt-4 sm:pt-5">
             <span class=" rounded-full pl-2 pr-4 py-1.5 shadow-sm flex items-center"><img src="assets/logo/oldo-logo.png" alt="OralDojo" class="h-7 w-auto max-w-[110px] object-contain"></span>
             <div class="flex items-center gap-2 text-[12px] font-semibold">
+              ${state.user?`<button id="hdrUser" class="flex items-center gap-1.5 bg-black text-white px-3 py-1.5 rounded-full shadow-sm font-bold">${GICON} ${esc((state.user.name||state.user.email||'Dojo').split(' ')[0])}</button>`:`<button id="hdrSignIn" class="flex items-center gap-1.5 bg-black text-[#FFD93D] px-3 py-1.5 rounded-full shadow-sm font-bold">${GICON} Sign in</button>`}
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.flame} ${state.streak} day streak</span>
               <span class="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm">${I.gem} ${state.gems}</span>
             </div>
@@ -802,10 +814,15 @@ function renderApp(){
       else if(e.key==='ArrowLeft') wGo(cur-1,true);
     };
     document.getElementById('startBtn').onclick=()=>transition(getProfile()?'path':'register');
+    document.getElementById('hdrSignIn')?.addEventListener('click',async()=>{ const r=await window.DojoFirebase.signInGoogle(); if(r&&r.ok){ transition('register'); } else if(r&&!r.ok&&r.reason!=='cancelled'){ showToast(window.DojoFirebase.isConfigured()?'Google sign-in failed — please try again':'Connect Firebase first — see FIREBASE-SETUP.md'); } });
+    document.getElementById('hdrUser')?.addEventListener('click',()=>transition('profile'));
     document.getElementById('wContributeMain')?.addEventListener('click',()=>transition('contribute'));
   } else if(state.view==='register'){
     const p=getProfile()||{};
-    const rankOpts=belts.map(b=>`<option value="${esc(b.from+' → '+b.to)}" ${p.rank===(b.from+' → '+b.to)?'selected':''}>${esc(b.from)} → ${esc(b.to)}</option>`).join('');
+    const gu=state.user||null;
+    const preName=p.name||(gu&&gu.name)||'';
+    const preEmail=p.email||(gu&&gu.email)||'';
+    const rankOpts=`<option value="" disabled ${p.rank?'':'selected'}>Select your rank…</option>`+belts.map(b=>`<option value="${esc(b.from+' → '+b.to)}" ${p.rank===(b.from+' → '+b.to)?'selected':''}>${esc(b.from)} → ${esc(b.to)}</option>`).join('');
     app.innerHTML=`
     <div class="min-h-[100dvh] flex flex-col">
       <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
@@ -822,22 +839,25 @@ function renderApp(){
             <h1 class="fredoka text-[38px] sm:text-[52px] leading-[0.98] font-bold tracking-tight mt-4">Welcome.</h1>
             <div class="flex items-center gap-2.5 flex-wrap mt-4">
               <span class="fredoka text-[19px] sm:text-[23px] font-bold">Enter the Dojo as</span>
-              <select id="regRank" class="max-w-[260px] h-11 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[13px] sm:text-[14px] px-4 outline-none border-2 border-white/60 shadow-sm">${rankOpts}</select>
+              <select id="regRank" required class="max-w-[260px] h-11 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[13px] sm:text-[14px] px-4 outline-none border-2 ${p.rank?'border-white/60':'border-[#FFD93D]'} shadow-sm">${rankOpts}</select>
             </div>
-            <p class="text-[13px] sm:text-[14px] text-white/80 font-medium mt-4 leading-relaxed max-w-[440px]">Tell the register who's stepping on the mat — no password, no login. Your details go straight to Sensei's dojo sheet.</p>
+            <p class="text-[11px] font-black tracking-widest text-[#FFD93D] mt-3">SELECT YOUR RANK YOURSELF — THE DOOR STAYS LOCKED UNTIL YOU DO.</p>
+            <p class="text-[13px] sm:text-[14px] text-white/80 font-medium mt-3 leading-relaxed max-w-[440px]">Tell the register who's stepping on the mat. Sign in with Google and your progress follows you to every device — or continue with just your name and email.</p>
           </div>
         </div>
         <form id="regForm" class="mt-4 bg-white rounded-[28px] belt-shadow border border-black/5 p-6 sm:p-7 space-y-4">
           <div>
             <label class="text-[11px] font-black tracking-widest text-black/50">FULL NAME *</label>
-            <input id="regName" required value="${esc(p.name||'')}" placeholder="e.g. Ada Obi" autocomplete="name" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
+            <input id="regName" required value="${esc(preName)}" placeholder="e.g. Ada Obi" autocomplete="name" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
           </div>
           <div>
             <label class="text-[11px] font-black tracking-widest text-black/50">EMAIL *</label>
-            <input id="regEmail" required type="email" value="${esc(p.email||'')}" placeholder="you@example.com" autocomplete="email" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
+            <input id="regEmail" required type="email" value="${esc(preEmail)}" placeholder="you@example.com" autocomplete="email" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
           </div>
-          <button id="regEnterBtn" type="submit" class="w-full h-[54px] rounded-full bg-black text-white font-bold fredoka text-[16px] press flex items-center justify-center gap-2">Enter the Dojo →</button>
-          <p class="text-[11px] font-medium text-black/40 text-center leading-relaxed">Only your name, rank and email are stored — in Sensei's Google Sheet via SheetDB. No account needed.</p>
+          <button type="button" id="regGoogle" class="w-full h-[52px] rounded-full bg-white border-2 border-black/10 text-black font-bold fredoka text-[15px] press flex items-center justify-center gap-2">${GICON} ${gu?'Google connected — progress will sync':'Continue with Google'}</button>
+          <div class="flex items-center gap-3 text-[10px] font-black tracking-widest text-black/30"><span class="flex-1 h-px bg-black/10"></span>OR REGISTER WITH EMAIL<span class="flex-1 h-px bg-black/10"></span></div>
+          <button id="regEnterBtn" type="submit" disabled class="w-full h-[54px] rounded-full bg-[#EFEDE8] text-black/30 font-bold fredoka text-[16px] flex items-center justify-center gap-2 cursor-not-allowed">Select your rank to enter →</button>
+          <p class="text-[11px] font-medium text-black/40 text-center leading-relaxed">${gu?"Your name, rank and email go to Sensei's register, and your progress syncs to every device you sign in on.":"Only your name, rank and email are stored — in Sensei's Google Sheet via SheetDB. Add Google sign-in to sync progress everywhere."}</p>
         </form>
       </div>
     </div>`;
@@ -847,13 +867,36 @@ function renderApp(){
       const name=document.getElementById('regName').value.trim();
       const email=document.getElementById('regEmail').value.trim();
       const rank=document.getElementById('regRank').value;
+      if(!rank){ showToast('Please select your rank first'); return; }
       if(name.length<2){ showToast('Please enter your full name'); return; }
       if(!/^\S+@\S+\.\S+$/.test(email)){ showToast('Please enter a valid email'); return; }
       const existing=getProfile()||{};
-      const profile={name,rank,email,avatar:existing.avatar||'',at:new Date().toISOString()};
+      const profile={name,rank,email,avatar:existing.avatar||'',uid:(state.user&&state.user.uid)||existing.uid||null,at:new Date().toISOString()};
       try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); }catch(_){ }
       // Sync to the sheet happens after the optional avatar step — no duplicate risk
       transition('avatar');
+    });
+    // "Enter the Dojo" stays locked until the user picks a rank themselves
+    const regRankSel=document.getElementById('regRank');
+    const regEnterBtn=document.getElementById('regEnterBtn');
+    const syncRegBtn=()=>{
+      const on=!!regRankSel.value;
+      regEnterBtn.disabled=!on;
+      regEnterBtn.className=on
+        ?'w-full h-[54px] rounded-full bg-black text-white font-bold fredoka text-[16px] press flex items-center justify-center gap-2'
+        :'w-full h-[54px] rounded-full bg-[#EFEDE8] text-black/30 font-bold fredoka text-[16px] flex items-center justify-center gap-2 cursor-not-allowed';
+      regEnterBtn.innerHTML=on?'Enter the Dojo →':'Select your rank to enter →';
+    };
+    regRankSel.addEventListener('change',syncRegBtn); syncRegBtn();
+    document.getElementById('regGoogle')?.addEventListener('click',async()=>{
+      if(state.user){ showToast('Google already connected'); return; }
+      const r=await window.DojoFirebase.signInGoogle();
+      if(r&&r.ok){
+        const u=window.DojoFirebase.currentUser();
+        if(u){ const n=document.getElementById('regName'); const m=document.getElementById('regEmail'); if(n&&!n.value) n.value=u.name||''; if(m&&!m.value) m.value=u.email||''; }
+        const gb=document.getElementById('regGoogle'); if(gb) gb.innerHTML=GICON+' Google connected — progress will sync';
+        showToast('Google connected — your progress will follow you');
+      } else if(r&&r.reason!=='cancelled'){ showToast(window.DojoFirebase.isConfigured()?'Google sign-in failed — please try again':'Connect Firebase first — see FIREBASE-SETUP.md'); }
     });
   } else if(state.view==='avatar'){
     const p=getProfile()||{};
@@ -899,6 +942,7 @@ function renderApp(){
       const updated={...cur, avatar:picked};
       try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
       const r=await postToSheetdb(updated);
+      if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); }catch(e){} }
       if(r.ok) showToast('Welcome to the Dojo, '+(cur.name||'karateka').split(' ')[0]+' — OSS!');
       else if(r.reason==='no-endpoint') showToast('Saved on this device — Sensei will connect the register');
       else showToast('Saved on this device — will sync when online');
@@ -911,7 +955,7 @@ function renderApp(){
     const av=p.avatar||'🥋';
     const completedBelts=belts.filter(b=>state.completed.includes(b.id));
     const editing=state.profileEdit===true;
-    const rankOpts=belts.map(b=>`<option value="${esc(b.from+' → '+b.to)}" ${p.rank===(b.from+' → '+b.to)?'selected':''}>${esc(b.from)} → ${esc(b.to)}</option>`).join('');
+    const rankOpts=`<option value="" ${p.rank?'':'selected'}>Select your rank…</option>`+belts.map(b=>`<option value="${esc(b.from+' → '+b.to)}" ${p.rank===(b.from+' → '+b.to)?'selected':''}>${esc(b.from)} → ${esc(b.to)}</option>`).join('');
     app.innerHTML=`
     <div class="min-h-screen">
       <header class="sticky top-0 z-30 glass-dark border-b border-black/[0.06]">
@@ -934,7 +978,7 @@ function renderApp(){
           <div><label class="text-[11px] font-black tracking-widest text-black/50">AVATAR</label><div class="mt-2 grid grid-cols-6 gap-2">${AVATARS.map(a=>`<button type="button" data-avpick="${a}" class="profAvPick aspect-square rounded-xl border-2 ${av===a?'border-black bg-[#FAF8F5]':'border-black/10'} flex items-center justify-center text-[24px] press">${a}</button>`).join('')}</div></div>
           <div><label class="text-[11px] font-black tracking-widest text-black/50">FULL NAME *</label><input id="profName" required value="${esc(p.name||'')}" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none"></div>
           <div><label class="text-[11px] font-black tracking-widest text-black/50">EMAIL *</label><input id="profEmail" required type="email" value="${esc(p.email||'')}" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none"></div>
-          <div><label class="text-[11px] font-black tracking-widest text-black/50">RANK</label><select id="profRank" class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[14px] focus:border-black outline-none">${rankOpts}</select></div>
+          <div><label class="text-[11px] font-black tracking-widest text-black/50">RANK</label><select id="profRank" required class="mt-1 w-full h-12 rounded-2xl border-2 border-black/10 bg-[#FAF8F5] px-3 font-semibold text-[14px] focus:border-black outline-none">${rankOpts}</select></div>
           <div class="grid grid-cols-2 gap-2"><button type="submit" class="h-[50px] rounded-full bg-black text-white font-bold fredoka text-[14px] press">Save Changes →</button><button type="button" id="profCancel" class="h-[50px] rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Cancel</button></div>
           <p class="text-[11px] font-medium text-black/40 text-center">Your updates sync to Sensei's dojo sheet — no duplicate row, your record is updated by email.</p>
         </form>`:`
@@ -946,6 +990,10 @@ function renderApp(){
             <div class="bg-[#FAF8F5] rounded-2xl p-3.5 border border-black/5 sm:col-span-2"><div class="text-[10px] font-black tracking-widest text-black/40">EMAIL</div><div class="font-bold text-[14px] mt-0.5 break-all">${esc(p.email||'—')}</div></div>
           </div>
         </div>`}
+        <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-5 sm:p-6">
+          <div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[16px]">Account &amp; sync</h3><span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full ${state.user?'bg-[#E8FFF3] border border-[#2ECC71]/30 text-[#0A7A42]':'bg-[#FAF8F5] border text-black/40'}">${state.user?'GOOGLE CONNECTED':'LOCAL ONLY'}</span></div>
+          ${state.user?`<p class="text-[12px] font-medium text-black/50 mt-1 leading-relaxed">Signed in as <b class="text-black/70">${esc(state.user.email||'Google account')}</b>. Your XP, belts and streak sync to every device you sign in on.</p><button id="profSignOut" class="mt-3 h-11 px-4 rounded-full bg-[#FAF8F5] border font-bold text-[12px] press">Sign out on this device</button>`:`<p class="text-[12px] font-medium text-black/50 mt-1 leading-relaxed">Sign in with Google and your progress follows you to any device — phone, tablet, the dojo laptop. Your current data on this device is merged the first time you sign in.</p><button id="profSignIn" class="mt-3 h-11 px-4 rounded-full bg-black text-white font-bold text-[12px] fredoka press flex items-center justify-center gap-2">${GICON} Sign in with Google</button>`}
+        </div>
         <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-5 sm:p-6">
           <div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[16px]">My Progress</h3><span class="text-[11px] font-bold tracking-widest text-black/40">${state.completed.length}/${belts.length} BELTS</span></div>
           <div class="grid grid-cols-3 gap-3 mt-4">
@@ -990,6 +1038,7 @@ function renderApp(){
         if(!/^\S+@\S+\.\S+$/.test(email)){ showToast('Please enter a valid email'); return; }
         const updated={...p, name, email, rank, avatar:editAv, at:new Date().toISOString()};
         try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
+        if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); }catch(e){} }
         showToast('Saving…');
         await postToSheetdb(updated);
         state.profileEdit=false;
@@ -997,6 +1046,8 @@ function renderApp(){
         showToast('Details updated — OSS!');
       });
     }
+    document.getElementById('profSignIn')?.addEventListener('click',async()=>{ const r=await window.DojoFirebase.signInGoogle(); if(r&&!r.ok&&r.reason!=='cancelled') showToast(window.DojoFirebase.isConfigured()?'Google sign-in failed — please try again':'Connect Firebase first — see FIREBASE-SETUP.md'); });
+    document.getElementById('profSignOut')?.addEventListener('click',async()=>{ try{ await window.DojoFirebase.signOutUser(); }catch(e){} showToast('Signed out — your progress also stays on this device'); });
     document.getElementById('profShareWa')?.addEventListener('click',()=>{ window.open('https://wa.me/?text='+encodeURIComponent(INVITE_MSG),'_blank'); showToast('Opening WhatsApp…'); });
     document.getElementById('profShareCopy')?.addEventListener('click',()=>{ copyText(INVITE_MSG); showToast('Invite text copied — paste it anywhere!'); });
     document.getElementById('profClear')?.addEventListener('click',()=>{ try{ localStorage.removeItem(PROFILE_KEY); localStorage.removeItem(PROGRESS_KEY); }catch(_){ } state.profileEdit=false; showToast('Your data has been cleared'); setTimeout(()=>transition('welcome'),600); });
@@ -1128,6 +1179,7 @@ function renderApp(){
       const id=parseInt(e.currentTarget.dataset.belt);
       if(id>=11){ state.lockedBelt=true; render(); return; }
       state.belt=id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; state.lastCompleted=id;
+      saveProgress();
       transition('lesson');
     }));
   } else if(state.view==='lesson' && q){
@@ -1307,7 +1359,7 @@ function renderApp(){
         <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-7 text-center">
           <div class="w-16 h-16 mx-auto rounded-full bg-[#F5F0FF] border border-[#8E44AD]/20 flex items-center justify-center text-[30px]" style="color:#6C3483">${I.belt}</div>
           <h2 class="fredoka text-[24px] font-bold mt-4">Senior Sensei Check</h2>
-          <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">Contributing grading questions is reserved for senior senseis who keep dojo tradition alive. Build a batch of questions, then share them all to Sensei Richqrd at once — via WhatsApp or email.</p>
+          <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">Contributing grading questions is reserved for senior senseis who keep dojo tradition alive. Build a batch of questions, then submit them all straight to Sensei Richqrd's admin console at once.</p>
           <p class="fredoka font-bold text-[16px] mt-5">Are you a senior sensei?</p>
           <div class="mt-4 grid grid-cols-2 gap-2">
             <button id="senseiYes" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Yes, continue</button>
@@ -1373,7 +1425,8 @@ function renderApp(){
           </div>
           ${saved.length?`
           <div class="mt-5 space-y-2">
-            <button id="shareWa" class="w-full h-[52px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2 shadow-[0_8px_20px_-6px_rgba(37,211,102,0.5)]">Share ${saved.length} Question${saved.length===1?'':'s'} via WhatsApp →</button>
+            <button id="shareDirect" class="w-full h-[52px] rounded-full bg-black text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2">Submit ${saved.length} Question${saved.length===1?'':'s'} straight to Sensei →</button>
+            <button id="shareWa" class="w-full h-[52px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2 shadow-[0_8px_20px_-6px_rgba(37,211,102,0.5)]">Backup: send via WhatsApp →</button>
             <button id="shareMail" class="w-full h-[52px] rounded-full bg-black text-white font-bold fredoka text-[15px] press flex items-center justify-center gap-2">Share via Email →</button>
             <p class="text-[11px] font-bold tracking-widest text-black/30 text-center">SENSEI RICHQRD • 0807 400 1613 • ${SENSEI_EMAIL}</p>
           </div>`:''}
@@ -1399,7 +1452,7 @@ function renderApp(){
         <div class="bg-white rounded-[28px] belt-shadow border-2 border-[#2ECC71]/40 p-7 text-center">
           <div class="w-16 h-16 mx-auto rounded-full bg-[#E8FFF3] border border-[#2ECC71]/30 flex items-center justify-center text-[30px]">${I.sparkles}</div>
           <h2 class="fredoka text-[24px] font-bold mt-4">Batch delivered — OSS!</h2>
-          <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">Your questions were sent to Sensei Richqrd for review before entering the syllabus, and your batch has been cleared. Arigatou gozaimasu!</p>
+          <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed">Your questions were delivered straight into Sensei Richqrd's admin console for review before entering the syllabus, and your batch has been cleared. Arigatou gozaimasu!</p>
           <div class="mt-5 grid grid-cols-2 gap-2">
             <button id="cAnother" class="h-12 rounded-full bg-black text-white font-bold fredoka text-[14px] press">Add More</button>
             <button id="cDone" class="h-12 rounded-full bg-[#FAF8F5] border font-bold fredoka text-[14px] press">Back to Dojo</button>
@@ -1459,6 +1512,20 @@ function renderApp(){
         render();
         showToast('Removed from batch');
       }));
+      document.getElementById('shareDirect')?.addEventListener('click',async()=>{
+        if(!saved.length){ showToast('Your batch is empty'); return; }
+        const pr=getProfile()||{};
+        let okCount=0, queued=0, failed=0;
+        for(const c of saved){
+          const r=await window.DojoFirebase.addSubmission({kind:'question', belt:c.belt, topic:c.topic||'Community', q:c.q, options:c.options, answer:c.answer, explanation:c.explanation, name:pr.name||'', email:(state.user&&state.user.email)||pr.email||'', at:c.at||new Date().toISOString()});
+          if(r&&r.ok) okCount++; else if(r&&r.queued) queued++; else failed++;
+        }
+        if(!failed && (okCount+queued)===saved.length){
+          localStorage.setItem('oralDojo_contributions','[]');
+          state.contribStep='shared'; render();
+          showToast(okCount?'Sent straight to Sensei — OSS!':'Saved offline — delivers when online');
+        } else showToast('Some questions could not send — try again or use WhatsApp');
+      });
       document.getElementById('shareWa').onclick=()=>{
         window.open('https://wa.me/'+SENSEI_WHATSAPP+'?text='+encodeURIComponent(buildBatchMsg()),'_blank');
         localStorage.setItem('oralDojo_contributions','[]');
@@ -1501,17 +1568,29 @@ function renderApp(){
         <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-6 sm:p-7">
           <div class="w-16 h-16 mx-auto rounded-full bg-[#FFF8D6] border border-[#FFD93D]/40 flex items-center justify-center text-[30px]" style="color:#8A6D00">${I.chat}</div>
           <h2 class="fredoka text-[24px] font-bold mt-4 text-center">Tell us about it</h2>
-          <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed text-center">What would you like to see in Oral Dojo? How was your experience? Your message goes straight to Sensei on WhatsApp.</p>
+          <p class="text-[13px] font-medium text-black/60 mt-2 leading-relaxed text-center">What would you like to see in Oral Dojo? How was your experience? Your message goes straight into Sensei's admin console.</p>
           <div class="mt-5 space-y-3">
             <input id="fbName" placeholder="Your name (optional)" class="w-full h-12 rounded-2xl border-2 border-black/10 px-3 font-semibold text-[14px] focus:border-black outline-none">
             <textarea id="fbText" rows="5" placeholder="e.g. I would love to see more kata bunkai questions... The app helped me pass my grading!" class="w-full rounded-2xl border-2 border-black/10 px-3 py-2 font-semibold text-[14px] focus:border-black outline-none"></textarea>
-            <button id="fbSend" class="w-full h-[52px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[16px] press flex items-center justify-center gap-2 shadow-[0_8px_20px_-6px_rgba(37,211,102,0.5)]">Send via WhatsApp →</button>
+            <button id="fbSend" class="w-full h-[52px] rounded-full bg-black text-white font-bold fredoka text-[16px] press flex items-center justify-center gap-2">Send straight to Sensei →</button>
+            <button id="fbWa" class="w-full h-[48px] rounded-full bg-[#25D366] hover:bg-[#1DA851] text-white font-bold fredoka text-[14px] press flex items-center justify-center gap-2">Backup: send via WhatsApp →</button>
+            <p class="text-[11px] font-medium text-black/40 text-center">Your message lands in Sensei's admin console instantly. WhatsApp stays as a backup.</p>
           </div>
         </div>
       </div>
     </div>`;
     document.getElementById('fbBack').onclick=()=>transition('path');
-    document.getElementById('fbSend').onclick=()=>{
+    document.getElementById('fbSend').onclick=async()=>{
+      const txt=document.getElementById('fbText').value.trim();
+      const name=document.getElementById('fbName').value.trim();
+      if(!txt){ showToast('Please write your feedback first'); return; }
+      const pr=getProfile()||{};
+      const r=await window.DojoFirebase.addSubmission({kind:'feedback', name:name||pr.name||'', email:(state.user&&state.user.email)||pr.email||'', text:txt, at:new Date().toISOString()});
+      if(r&&r.ok){ document.getElementById('fbText').value=''; showToast("Sent straight to Sensei's console — OSS!"); }
+      else if(r&&r.queued){ document.getElementById('fbText').value=''; showToast('Saved offline — delivers to Sensei when you are back online'); }
+      else showToast('Could not send right now — use the WhatsApp backup below');
+    };
+    document.getElementById('fbWa').onclick=()=>{
       const txt=document.getElementById('fbText').value.trim();
       const name=document.getElementById('fbName').value.trim();
       if(!txt){ showToast('Please write your feedback first'); return; }
@@ -1679,6 +1758,20 @@ function renderApp(){
         else { window.location.href='mailto:'+SENSEI_EMAIL+'?subject='+encodeURIComponent('Oral Dojo Thesis Submission ('+cur.length+')')+'&body='+encodeURIComponent(msg); showToast('Opening your email app — OSS!'); }
         tSet([]); state.thesisModal=null; render();
       };
+      const sendThesesDirect=async()=>{
+        const cur=tGet();
+        if(!cur.length){ showToast('Your batch is empty'); return; }
+        const pr=getProfile()||{};
+        let ok=0, queued=0, failed=0;
+        for(const t of cur){
+          const r=await window.DojoFirebase.addSubmission({kind:'thesis', name:t.name||pr.name||'', grade:t.grade||'', title:t.title, style:t.style||'', problem:t.problem||'', method:t.method, contribution:t.contribution, link:t.link||'', email:(state.user&&state.user.email)||pr.email||'', at:t.at||new Date().toISOString()});
+          if(r&&r.ok) ok++; else if(r&&r.queued) queued++; else failed++;
+        }
+        if(!failed && (ok+queued)===cur.length){ tSet([]); state.thesisModal=null; render(); showToast(ok?'Theses sent straight to Sensei — OSS!':'Saved offline — delivers when online'); }
+        else showToast('Some theses could not send — try again or use WhatsApp');
+      };
+      document.getElementById('tDirect')?.addEventListener('click',sendThesesDirect);
+      document.getElementById('tDirect2')?.addEventListener('click',sendThesesDirect);
       document.getElementById('tShareWa')?.addEventListener('click',()=>shareTheses('wa'));
       document.getElementById('tShareMail')?.addEventListener('click',()=>shareTheses('mail'));
       document.getElementById('tShareWa2')?.addEventListener('click',()=>shareTheses('wa'));
@@ -1692,10 +1785,44 @@ function renderApp(){
   }
 }
 
+// ─── LIVE SYNC WIRING (Firebase): live catalog, Google account, cloud progress ───
+function mergeCloudProgress(p){
+  if(!p) return;
+  try{
+    if(Array.isArray(p.unlocked)) state.unlocked=Array.from(new Set([...(state.unlocked||[]),...p.unlocked]));
+    if(Array.isArray(p.completed)) state.completed=Array.from(new Set([...(state.completed||[]),...p.completed]));
+    if(typeof p.belt==='number') state.belt=Math.max(state.belt,p.belt);
+    if(typeof p.xp==='number') state.xp=Math.max(state.xp,p.xp);
+    if(typeof p.gems==='number') state.gems=Math.max(state.gems,p.gems);
+    if(typeof p.streak==='number') state.streak=Math.max(state.streak,p.streak);
+    if((state.lastCompleted===null||state.lastCompleted===undefined)&&p.lastCompleted!==undefined&&p.lastCompleted!==null) state.lastCompleted=p.lastCompleted;
+  }catch(e){}
+}
+async function syncCloudProgress(){
+  if(!state.user||!window.DojoFirebase) return;
+  try{ const remote=await DojoFirebase.getProgress(state.user.uid); mergeCloudProgress(remote); }catch(e){}
+  saveProgress();
+  window.__progUnwatch=DojoFirebase.watchProgress(state.user.uid,p=>{
+    if(p&&p.updatedAtMs&&p.updatedAtMs<=(window.__lastProgPush||0)) return;
+    mergeCloudProgress(p); render();
+  });
+}
+// Live catalog from Firebase — refresh data and re-render (never mid-form / mid-lesson)
+DojoData.onChange(()=>{
+  refreshData();
+  if(!['register','avatar','contribute','feedback','lesson'].includes(state.view)) render();
+});
+// Google account state
+window.DojoFirebase.onAuth(u=>{
+  state.user=u||null;
+  if(u){ syncCloudProgress(); }
+  else if(window.__progUnwatch){ try{ window.__progUnwatch(); }catch(e){} window.__progUnwatch=null; }
+  if(!['lesson'].includes(state.view)) render();
+});
 loadProgress();
 render();
 playPageIn();
-console.log("ORAL DOJO loaded. All " + belts.length + " belts unlocked. Data source: " + DojoData.getSource());
+console.log("ORAL DOJO loaded — " + belts.length + " belts. Source: " + DojoData.getSource() + (DojoData.isLive()?" [FIREBASE LIVE]":" [LOCAL MODE]"));
 </script>
 <script>
 if('serviceWorker' in navigator){
