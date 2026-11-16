@@ -145,13 +145,13 @@ h1,h2,h3,.fredoka{font-family:"Fredoka",sans-serif}
 <script type="module">
 // --- DATA LAYER (dojo-data.js + catalog.json) — all content flows through DojoData ---
 await DojoData.init();
-let belts=[], questions={}, extraQs=[], research=[], leaderboard=[], dictionary=[], library=[], settings={};
+let belts=[], questions={}, extraQs=[], research=[], dictionary=[], library=[], settings={};
 let SENSEI_WHATSAPP='', SENSEI_EMAIL='';
 function refreshData(){
   const c=DojoData.getCatalog();
   belts=c.belts||[]; questions={};
   (c.questions||[]).forEach(q=>{ (questions[q.belt]=questions[q.belt]||[]).push(q); });
-  extraQs=c.extras||[]; research=c.research||[]; leaderboard=c.leaderboard||[];
+  extraQs=c.extras||[]; research=c.research||[];
   dictionary=c.dictionary||[]; library=c.library||[]; settings=c.settings||{};
   SENSEI_WHATSAPP=settings.senseiWhatsApp||'2348074001613';
   SENSEI_EMAIL=settings.senseiEmail||'oraldojo@ttosr.com';
@@ -284,12 +284,101 @@ async function flushOutbox(){
 }
 // --- Progress persistence: resume from wherever you stopped on this device ---
 function saveProgress(){
-  const prog={belt:state.belt,unlocked:state.unlocked,completed:state.completed,lastCompleted:state.lastCompleted,xp:state.xp,gems:state.gems,streak:state.streak};
+  const prog={belt:state.belt,unlocked:state.unlocked,completed:state.completed,lastCompleted:state.lastCompleted,xp:state.xp,gems:state.gems,streak:state.streak,seenQ:state.seenQ||{}};
   try{ localStorage.setItem(PROGRESS_KEY,JSON.stringify(prog)); }catch(e){}
   // Cloud sync: signed-in karateka get their progress on every device
   if(state.user&&window.DojoFirebase&&DojoFirebase.isConnected()){ window.__lastProgPush=Date.now(); DojoFirebase.saveProgress(state.user.uid,prog).catch(()=>{}); }
+  syncLeaderboardEntry();
 }
-function loadProgress(){ try{ const p=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'null'); if(p){ if(typeof p.belt==='number') state.belt=p.belt; if(Array.isArray(p.unlocked)) state.unlocked=p.unlocked; if(Array.isArray(p.completed)) state.completed=p.completed; if(p.lastCompleted!==undefined) state.lastCompleted=p.lastCompleted; if(typeof p.xp==='number') state.xp=p.xp; if(typeof p.gems==='number') state.gems=p.gems; if(typeof p.streak==='number') state.streak=p.streak; } }catch(e){} }
+function loadProgress(){ try{ const p=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'null'); if(p){ if(typeof p.belt==='number') state.belt=p.belt; if(Array.isArray(p.unlocked)) state.unlocked=p.unlocked; if(Array.isArray(p.completed)) state.completed=p.completed; if(p.lastCompleted!==undefined) state.lastCompleted=p.lastCompleted; if(typeof p.xp==='number') state.xp=p.xp; if(typeof p.gems==='number') state.gems=p.gems; if(typeof p.streak==='number') state.streak=p.streak; if(p.seenQ&&typeof p.seenQ==='object'&&!Array.isArray(p.seenQ)) state.seenQ=p.seenQ; } }catch(e){} }
+
+// --- LIVE LEADERBOARD (real karateka, no demo rows) ---
+// Every signed-in student owns ONE row at leaderboard/{uid}. Progress saves
+// keep it fresh (name, belt, XP, streak) and every browser watches the
+// collection live, so the board reorders itself the moment anyone earns XP.
+function beltLabel(i){ const b=belts[i]; return b?(b.from||'White Belt'):'White Belt'; }
+function syncLeaderboardEntry(){
+  if(!state.user||!window.DojoFirebase||!DojoFirebase.isConnected()) return;
+  const pr=getProfile();
+  const key=[state.user.uid,(pr&&pr.name)||(state.user.name||''),state.belt,state.xp,state.streak].join('|');
+  if(window.__lastLbKey===key) return; // nothing changed — skip the write
+  window.__lastLbKey=key;
+  DojoFirebase.pushLeaderboardEntry(state.user.uid,{
+    name:(pr&&pr.name)||(state.user.name||'')||'Karateka',
+    belt:beltLabel(state.belt),
+    beltIndex:state.belt,
+    xp:state.xp,
+    streak:state.streak,
+    avatar:(pr&&pr.avatar)||''
+  }).catch(()=>{});
+}
+
+// --- NEW-QUESTION NOTICES ---
+// state.seenQ remembers how many questions each belt held when the karateka
+// last trained it. When Sensei pushes new questions into a belt the user has
+// ALREADY PASSED, the app raises a toast + a "check out the new questions"
+// banner on the Belt Path. Belts not yet passed stay silent — the student
+// meets the new questions naturally when they train that belt.
+function updateNewQBelts(){
+  try{
+    if(!state.seenQ||typeof state.seenQ!=='object'||Array.isArray(state.seenQ)) state.seenQ={};
+    const ids=[];
+    belts.forEach(b=>{
+      const n=(questions[b.id]||[]).length;
+      const seen=state.seenQ[b.id];
+      if(typeof seen!=='number'){ state.seenQ[b.id]=n; return; } // first sighting = baseline, never spam
+      if(state.completed.includes(b.id)&&n>seen) ids.push(b.id);
+    });
+    state.newQBeltIds=ids;
+  }catch(e){ state.newQBeltIds=[]; }
+}
+function newQBannerHTML(){
+  const all=state.newQBeltIds||[]; const ids=all.slice(0,4);
+  if(!ids.length) return '';
+  const rows=ids.map(id=>{
+    const b=belts[id]; if(!b) return '';
+    const n=(questions[id]||[]).length;
+    const seen=state.seenQ&&typeof state.seenQ[id]==='number'?state.seenQ[id]:n;
+    const fresh=Math.max(0,n-seen)||n;
+    return `<button data-belt="${id}" class="newqGo w-full flex items-center gap-3 p-3 rounded-2xl bg-white border border-black/5 press text-left"><span class="w-9 h-9 rounded-full flex items-center justify-center text-[14px] shrink-0" style="background:${b.color};border:1px solid rgba(0,0,0,.08)">${I.sparkles}</span><span class="flex-1 min-w-0"><span class="block fredoka font-bold text-[13px] leading-tight text-black">${esc(b.from)} → ${esc(b.to)}</span><span class="block text-[11px] font-medium text-black/50 mt-0.5">You passed this level • ${fresh} new question${fresh===1?'':'s'} of ${n}</span></span><span class="text-[10px] font-black tracking-widest text-[#0F766E] whitespace-nowrap">CHECK OUT →</span></button>`;
+  }).join('');
+  return `<div class="mt-5 rounded-[22px] p-4 bg-[#E9FBF8] border-2 border-[#14B8A6]/40"><div class="flex items-center gap-2">${I.sparkles}<div class="fredoka font-bold text-[14px] text-[#0A5C4E]">New questions just dropped</div></div><div class="text-[12px] font-medium text-black/60 mt-1 mb-3">You've already passed ${ids.length===1?'this level':'these levels'} — check out the new questions:</div><div class="space-y-2">${rows}</div>${all.length>4?`<div class="text-[11px] font-bold text-black/40 mt-2">+${all.length-4} more — scroll the Belt Path</div>`:''}</div>`;
+}
+function renderLeaderboardCard(){
+  const live=state.lbLive&&Array.isArray(state.lbEntries);
+  const me=state.user; const pr=getProfile();
+  const myName=(pr&&pr.name)||'You';
+  const medal=i=>i===0?'bg-[#FFD93D] text-black':i===1?'bg-[#E5E5E5] text-black':i===2?'bg-[#F0CBA0] text-black':'bg-white border text-black/60';
+  let rows=[];
+  if(live){
+    rows=state.lbEntries.slice(0,8).map((e,i)=>({name:e.name||'Karateka',belt:e.belt||'White Belt',xp:e.xp||0,streak:e.streak||0,me:!!(me&&e.uid===me.uid),rank:i+1}));
+    if(me&&!rows.some(r=>r.me)){
+      const idx=state.lbEntries.findIndex(e=>e.uid===me.uid);
+      const mine=idx>=0?state.lbEntries[idx]:null;
+      if(mine) rows.push({name:mine.name||myName,belt:mine.belt||beltLabel(state.belt),xp:mine.xp||0,streak:mine.streak||0,me:true,rank:idx+1});
+    }
+  } else if(me||pr){
+    rows=[{name:myName,belt:beltLabel(state.belt),xp:state.xp,streak:state.streak,me:true,rank:1}];
+  }
+  const badge=live?'<span class="text-[10px] font-black tracking-widest bg-[#E8FFF3] text-[#0A7A42] border border-[#2ECC71]/30 px-2 py-1 rounded-full inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#2ECC71] animate-pulse inline-block"></span>LIVE</span>':'<span class="text-[10px] font-black tracking-widest bg-[#FAF8F5] border px-2 py-1 rounded-full text-black/40">LOCAL</span>';
+  const body=rows.length?rows.map((u,i)=>`<div class="flex items-center gap-3 p-2.5 rounded-2xl border ${u.me?"bg-black text-white border-black":"bg-[#FAF8F5] border-black/5"}"><div class="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 ${u.me?'bg-[#FFD93D] text-black':medal(i)}">${u.rank}</div><div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-none truncate ${u.me?"text-white":"text-black"}">${esc(u.me?'You':u.name)}</div><div class="text-[11px] ${u.me?"text-white/60":"text-black/50"} truncate">${esc(u.belt)}</div></div><div class="text-right shrink-0"><div class="text-[12px] font-bold ${u.me?"text-[#FFD93D]":""}">${u.xp} XP</div><div class="flex items-center gap-1 text-[11px] font-bold text-[#FF8C42]">${I.flame} ${u.streak}</div></div></div>`).join('')
+    :`<div class="text-center py-3"><div class="text-[24px] flex justify-center">${I.users}</div><div class="fredoka font-bold text-[13px] mt-1">The board is warming up</div><div class="text-[11px] font-medium text-black/50 mt-1 leading-relaxed">No demo names here — the leaderboard only shows real karateka. Sign in with Google and start training to put your name on it.</div></div>`;
+  const hint=(!me&&live&&rows.length)?'<div class="text-[10px] font-bold text-black/40 mt-3 text-center">Sign in with Google to put your name on the board</div>':'';
+  return `<div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold flex items-center gap-2">${I.star} Dojo Leaderboard</h3>${badge}</div><div class="space-y-2.5">${body}</div>${hint}</div>`;
+}
+function markBeltSeen(id){
+  if(!state.seenQ||typeof state.seenQ!=='object'||Array.isArray(state.seenQ)) state.seenQ={};
+  state.seenQ[id]=(questions[id]||[]).length;
+  state.newQBeltIds=(state.newQBeltIds||[]).filter(x=>x!==id);
+}
+function startBelt(id){
+  if(id>=11){ state.lockedBelt=true; render(); return; }
+  state.belt=id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; state.lastCompleted=id;
+  // Opening the belt counts as checking out its questions (incl. new pushes)
+  markBeltSeen(id);
+  saveProgress();
+  transition('lesson');
+}
 // Invite message used on the profile page + score card share — always carries the site URL
 const INVITE_MSG='OSS! 🥋 I am training in Oral Dojo — the Karate oral grading, by Sensei Richqrd. History, technique, philosophy & tradition, a karate knowledge test platform. Come train with me → https://oraldojo.ttosr.com';
 function copyText(t){ try{ if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(t); } else { const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } }catch(e){} }
@@ -516,10 +605,14 @@ let state={
  unlocked:[0],
  completed:[],
  lastCompleted:null,
+ seenQ:null,          // per-belt question counts when last trained — powers "new questions" notices
+ newQBeltIds:[],      // passed belts that just received new questions
+ lbEntries:[],        // live leaderboard rows from Firestore
+ lbLive:false,        // true once the live leaderboard snapshot arrives
  contribStep:'gate',
- xp:1240,
- gems:340,
- streak:7,
+ xp:0,
+ gems:0,
+ streak:0,
  hearts:3,
  qIndex:0,
  selected:null,
@@ -942,7 +1035,7 @@ function renderApp(){
       const updated={...cur, avatar:picked};
       try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
       const r=await postToSheetdb(updated);
-      if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); }catch(e){} }
+      if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); syncLeaderboardEntry(); }catch(e){} }
       if(r.ok) showToast('Welcome to the Dojo, '+(cur.name||'karateka').split(' ')[0]+' — OSS!');
       else if(r.reason==='no-endpoint') showToast('Saved on this device — Sensei will connect the register');
       else showToast('Saved on this device — will sync when online');
@@ -1038,7 +1131,7 @@ function renderApp(){
         if(!/^\S+@\S+\.\S+$/.test(email)){ showToast('Please enter a valid email'); return; }
         const updated={...p, name, email, rank, avatar:editAv, at:new Date().toISOString()};
         try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
-        if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); }catch(e){} }
+        if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); syncLeaderboardEntry(); }catch(e){} }
         showToast('Saving…');
         await postToSheetdb(updated);
         state.profileEdit=false;
@@ -1136,6 +1229,7 @@ function renderApp(){
               }).join('')}
             </div>
             <div class="belt-track-hint"><span>←</span> SCROLL TO SEE ALL BELTS — ${belts.length} LEVELS <span>→</span></div>
+            ${newQBannerHTML()}
             <div class="mt-5 bg-[#FAF8F5] rounded-[18px] border border-dashed border-black/10 p-3.5 text-center"><div class="fredoka font-bold text-[13px]">The path ends at Judan — mastery never ends ${I.belt}</div><div class="text-[11px] text-black/50 font-medium mt-1">All 13 belts are open: train, grade, and contribute to the dojo. Current belt pops to top.</div></div>
           </div>
 
@@ -1151,7 +1245,7 @@ function renderApp(){
           </div>
           <div class="bg-black text-white rounded-[24px] belt-shadow border border-white/10 p-5 relative overflow-hidden"><div class="absolute -right-10 -top-10 w-40 h-40 bg-[#FFD93D] rounded-full blur-[40px] opacity-20"></div><div class="relative"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">${I.books}</div><div><div class="fredoka font-bold text-[14px] leading-none">Godan Research Hub</div><div class="text-[11px] text-white/60 font-medium">5th Dan+ theses & stories</div></div><span class="ml-auto bg-[#FFD93D] text-black text-[10px] font-black px-2 py-1 rounded-full">NEW</span></div><div class="space-y-2">${research.slice(0,2).map(r=>`<div class="bg-white/10 rounded-2xl p-3 border border-white/10"><div class="text-[12px] font-bold leading-tight line-clamp-2">${r.title}</div><div class="text-[11px] text-white/60 mt-1">by ${r.author} • ${r.rank}</div></div>`).join('')}</div><button id="openResearch2" class="mt-4 w-full h-10 rounded-full bg-white text-black fredoka font-bold text-[13px] flex items-center justify-center gap-1.5">Open Research Hub →</button></div></div>
           <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5"><div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[16px]">${I.handshake} Dojo Community</h3><span class="text-[10px] font-black tracking-widest bg-[#FFD93D] px-2 py-1 rounded-full">OPEN</span></div><p class="text-[12px] font-medium text-black/50 mt-1">Help grow the dojo — add grading questions or tell Sensei what you think.</p><div class="grid grid-cols-2 gap-2 mt-3"><button id="sideContribute" class="h-11 rounded-2xl bg-black text-white font-bold text-[12px] press">Add Questions</button><button id="sideFeedback" class="h-11 rounded-2xl bg-[#FAF8F5] border font-bold text-[12px] press">Give Feedback</button></div></div>
-          <div class="bg-white rounded-[24px] belt-shadow border border-black/5 p-5"><div class="flex items-center justify-between mb-4"><h3 class="fredoka font-bold flex items-center gap-2">${I.star} Dojo Leaderboard</h3><span class="text-[11px] font-bold bg-[#FAF8F5] border px-2 py-1 rounded-full">Weekly</span></div><div class="space-y-2.5">${leaderboard.map((u,i)=>`<div class="flex items-center gap-3 p-2.5 rounded-2xl border ${u.name==="You"?"bg-black text-white border-black":"bg-[#FAF8F5] border-black/5"}"><div class="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold ${i===0?'bg-[#FFD93D] text-black':i===1?'bg-[#E5E5E5]':'bg-white border'}">${i+1}</div><div class="flex-1 min-w-0"><div class="text-[13px] font-bold leading-none ${u.name==="You"?"text-white":"text-black"}">${u.name}</div><div class="text-[11px] ${u.name==="You"?"text-white/60":"text-black/50"}">${u.belt}</div></div><div class="text-right"><div class="text-[12px] font-bold ${u.name==="You"?"text-[#FFD93D]":""}">${u.xp} XP</div><div class="flex items-center gap-1 text-[11px] font-bold text-[#FF8C42]">${I.flame} ${u.streak}</div></div></div>`).join('')}</div></div>
+          ${renderLeaderboardCard()}
           <div class="text-center text-[11px] font-medium text-black/30 py-2">Oral Grading • History • Techniques • Philosophy • Tradition • Research</div>
         </div>
       </div>
@@ -1175,12 +1269,9 @@ function renderApp(){
     document.getElementById('lockClose')?.addEventListener('click',()=>{state.lockedBelt=false; render();});
     document.getElementById('lockWelcome')?.addEventListener('click',()=>{state.lockedBelt=false; transition('welcome');});
     document.getElementById('lockBackdrop')?.addEventListener('click',e=>{ if(e.target.id==='lockBackdrop'){ state.lockedBelt=false; render(); } });
+    document.querySelectorAll('.newqGo').forEach(b=>b.addEventListener('click',e=>{ startBelt(parseInt(e.currentTarget.dataset.belt)); }));
     document.querySelectorAll('.beltBtn').forEach(b=>b.addEventListener('click',e=>{
-      const id=parseInt(e.currentTarget.dataset.belt);
-      if(id>=11){ state.lockedBelt=true; render(); return; }
-      state.belt=id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; state.lastCompleted=id;
-      saveProgress();
-      transition('lesson');
+      startBelt(parseInt(e.currentTarget.dataset.belt));
     }));
   } else if(state.view==='lesson' && q){
     if(q.type==='match'&&q.pairs&&q.pairs.length>1) initMatch(q);
@@ -1333,12 +1424,13 @@ function renderApp(){
         // Go straight into the next belt lesson - no need to re-select the belt
         state.lastCompleted=nextBelt.id;
         state.belt=nextBelt.id; state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3;
+        markBeltSeen(nextBelt.id); saveProgress();
         transition('lesson');
       } else {
         transition('path');
       }
     };
-    document.getElementById('practiceAgain').onclick=()=>{state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; transition('lesson');};
+    document.getElementById('practiceAgain').onclick=()=>{state.qIndex=0; state.selected=null; state.answered=false; state.correct=null; state.xpEarned=0; state.correctCount=0; state.match=null; state.hearts=3; markBeltSeen(state.belt); saveProgress(); transition('lesson');};
     document.getElementById('shareScoreBtn').onclick=()=>shareResultScore(scorePct,belt,state.correctCount||0,totalQ);
     document.getElementById('dlScoreBtn').onclick=async()=>{ const blob=await makeScoreBlob(scorePct,belt,state.correctCount||0,totalQ); if(blob){ downloadBlob(blob,'oral-dojo-'+(belt.short||('belt'+belt.id))+'-score.png'); showToast('Score card downloaded — OSS!'); } else { showToast('Could not build the score card'); } };
     document.getElementById('fbScoreBtn').onclick=()=>{ state.fbFromContribute=false; transition('feedback'); };
@@ -1796,21 +1888,45 @@ function mergeCloudProgress(p){
     if(typeof p.gems==='number') state.gems=Math.max(state.gems,p.gems);
     if(typeof p.streak==='number') state.streak=Math.max(state.streak,p.streak);
     if((state.lastCompleted===null||state.lastCompleted===undefined)&&p.lastCompleted!==undefined&&p.lastCompleted!==null) state.lastCompleted=p.lastCompleted;
+    // seenQ merges belt-by-belt (highest count wins) so a belt trained on one
+    // device never re-announces its new questions on another device
+    if(p.seenQ&&typeof p.seenQ==='object'&&!Array.isArray(p.seenQ)){
+      if(!state.seenQ||typeof state.seenQ!=='object'||Array.isArray(state.seenQ)) state.seenQ={};
+      Object.keys(p.seenQ).forEach(k=>{ const v=parseInt(p.seenQ[k],10); if(typeof v==='number'&&!isNaN(v)) state.seenQ[k]=Math.max(state.seenQ[k]||0,v); });
+    }
   }catch(e){}
 }
 async function syncCloudProgress(){
   if(!state.user||!window.DojoFirebase) return;
-  try{ const remote=await DojoFirebase.getProgress(state.user.uid); mergeCloudProgress(remote); }catch(e){}
+  try{ const remote=await DojoFirebase.getProgress(state.user.uid); mergeCloudProgress(remote); updateNewQBelts(); }catch(e){}
   saveProgress();
   window.__progUnwatch=DojoFirebase.watchProgress(state.user.uid,p=>{
     if(p&&p.updatedAtMs&&p.updatedAtMs<=(window.__lastProgPush||0)) return;
-    mergeCloudProgress(p); render();
+    mergeCloudProgress(p); updateNewQBelts(); render();
   });
 }
 // Live catalog from Firebase — refresh data and re-render (never mid-form / mid-lesson)
+let booted=false;
 DojoData.onChange(()=>{
   refreshData();
+  updateNewQBelts();
+  const fresh=state.newQBeltIds||[];
+  if(booted&&fresh.length){
+    const b=belts[fresh[0]];
+    const label=b?(b.from+' → '+b.to):'a level you passed';
+    showToast(fresh.length===1
+      ?('New questions just landed in '+label+' — check them out!')
+      :('New questions in '+label+' and '+(fresh.length-1)+' more level'+(fresh.length>2?'s':'')+' — check the Belt Path!'));
+  }
   if(!['register','avatar','contribute','feedback','lesson'].includes(state.view)) render();
+});
+// LIVE LEADERBOARD — real karateka only; the card re-renders the moment any row changes
+window.DojoFirebase.watchLeaderboard(entries=>{
+  state.lbEntries=entries||[]; state.lbLive=true;
+  if(state.view==='path') render();
+},()=>{
+  state.lbLive=false; state.lbEntries=[];
+  if(state.view==='path') render();
 });
 // Google account state
 window.DojoFirebase.onAuth(u=>{
@@ -1820,8 +1936,10 @@ window.DojoFirebase.onAuth(u=>{
   if(!['lesson'].includes(state.view)) render();
 });
 loadProgress();
+updateNewQBelts(); // baseline question counts so only FUTURE Sensei pushes notify
 render();
 playPageIn();
+booted=true;
 console.log("ORAL DOJO loaded — " + belts.length + " belts. Source: " + DojoData.getSource() + (DojoData.isLive()?" [FIREBASE LIVE]":" [LOCAL MODE]"));
 </script>
 <script>

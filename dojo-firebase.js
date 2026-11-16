@@ -34,7 +34,8 @@
     user:null, authCbs:[],
     mainData:null, mainLoaded:false, qLoaded:false, catUnsubs:[],
     inboxCache:[], inboxCbs:[], inboxUnsub:null, inboxError:null,
-    progUnsub:null, progUid:null, flushing:false
+    progUnsub:null, progUid:null, flushing:false,
+    lbUnsub:null, lbCbs:[], lbCache:[], lbError:null
   };
 
   function sanitize(obj){ try{ return JSON.parse(JSON.stringify(obj)); }catch(e){ return {}; } }
@@ -248,6 +249,44 @@
         return { ok:true, questions: questions.length, removed: stale.length };
       }catch(e){ return { ok:false, reason:String((e&&e.code)||e) }; }
     },
+
+    /* ---------- LIVE dojo leaderboard ----------
+       One row per signed-in karateka at leaderboard/{uid} — real names,
+       real XP, real streaks. Every client watches it live, so the board
+       reorders itself the moment anyone earns XP. Demo rows are gone. */
+    async pushLeaderboardEntry(uid, entry){
+      const ok = await ensure(); if(!ok) return { ok:false };
+      try{
+        await S.fsM.setDoc(S.fsM.doc(S.db,'leaderboard', uid), sanitize(Object.assign({}, entry, {
+          uid: uid,
+          updatedAtMs: Date.now()
+        })), { merge:true });
+        return { ok:true };
+      }catch(e){ return { ok:false, reason:String((e&&e.code)||e) }; }
+    },
+    watchLeaderboard(cb, onError){
+      if(typeof cb==='function' && S.lbCbs.indexOf(cb)<0) S.lbCbs.push(cb);
+      ensure().then(ok=>{
+        if(!ok){ S.lbError=S.error; if(onError) onError(S.error); return; }
+        if(S.lbUnsub) return; // already watching — callbacks already registered
+        S.lbUnsub = S.fsM.onSnapshot(
+          S.fsM.query(S.fsM.collection(S.db,'leaderboard'), S.fsM.orderBy('xp','desc'), S.fsM.limit(50)),
+          snap=>{
+            S.lbError=null;
+            S.lbCache = snap.docs.map(d=>Object.assign({ uid:d.id }, d.data()));
+            S.lbCbs.forEach(f=>{ try{ f(S.lbCache.slice()); }catch(e){ console.error(e); } });
+          },
+          err=>{
+            S.lbError=String((err&&err.code)||err);
+            console.warn('leaderboard watch:', err);
+            if(onError) onError(S.lbError);
+          }
+        );
+      });
+      return ()=>{ S.lbCbs=[]; if(S.lbUnsub){ try{ S.lbUnsub(); }catch(e){} S.lbUnsub=null; } };
+    },
+    leaderboard: ()=>S.lbCache.slice(),
+    leaderboardError: ()=>S.lbError,
 
     /* ---------- submissions inbox (feedback / theses / questions) ---------- */
     async addSubmission(obj){

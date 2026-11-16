@@ -50,12 +50,9 @@
       {id:1, title:'Oral grading as a tool for kata understanding', author:'Sensei Bola', rank:'Rokudan', tag:'Methodology', excerpt:'How speaking answers aloud exposes gaps that written tests hide — and how to structure an oral panel.', likes:12},
       {id:2, title:'Retention drills that work on the dojo floor', author:'Sensei Ada', rank:'Godan', tag:'Original Research', excerpt:'Analysis of 200 students: the 3 main reasons beginners quit and 5 drills that improve retention by 40%.', likes:24}
     ],
-    leaderboard:[
-      {name:'You', belt:'White → 9th Kyu', xp:1240, streak:7},
-      {name:'Sensei Bola', belt:'Shodan', xp:2100, streak:12},
-      {name:'Chidi O.', belt:'8th Kyu', xp:980, streak:5},
-      {name:'Amina K.', belt:'6th Kyu', xp:1610, streak:9}
-    ],
+    /* LIVE leaderboard now lives in Firestore (leaderboard collection) —
+       real karateka, real XP. The old demo rows are gone for good. */
+    leaderboard:[],
     dictionary:[
       {id:'seed-d1', term:'Rei', reading:'れい', category:'Command', definition:'Bow — respect made visible. Rei opens and closes every class and grading.'},
       {id:'seed-d2', term:'Zanshin', reading:'ざんしん', category:'Concept', definition:'Awareness that remains after the technique ends — the mind stays alert.'},
@@ -95,6 +92,9 @@
   function normCatalog(c){
     c=c||{};
     LIST_KEYS.forEach(k=>{ if(!Array.isArray(c[k])) c[k]=[]; });
+    // The leaderboard is FIREBASE-LIVE now (real accounts). Old catalogs and
+    // cached copies may still carry the demo rows — always wipe them.
+    c.leaderboard=[];
     if(!Array.isArray(c.belts)||!c.belts.length) c.belts=deepClone(SEED.belts);
     c.settings=Object.assign({}, deepClone(SEED.settings), c.settings||{});
     c.version=parseInt(c.version,10)||0;
