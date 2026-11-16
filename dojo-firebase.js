@@ -151,6 +151,15 @@
         return snap.exists() ? snap.data() : null;
       }catch(e){ return null; }
     },
+    // Read-only profile lookup (users/{uid}) — used to tell a RETURNING
+    // karateka from a brand-new email BEFORE anything creates the doc.
+    async getUserDoc(uid){
+      const ok = await ensure(); if(!ok || !uid) return null;
+      try{
+        const snap = await S.fsM.getDoc(S.fsM.doc(S.db,'users',uid));
+        return snap.exists() ? { exists:true, data:snap.data() } : { exists:false, data:null };
+      }catch(e){ return null; }
+    },
     async saveProgress(uid, prog){
       const ok = await ensure(); if(!ok) return { ok:false };
       try{

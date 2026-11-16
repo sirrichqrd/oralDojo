@@ -235,6 +235,89 @@ const DEFAULT_SHEETDB_URL='https://sheetdb.io/api/v1/k3ejac5qmwszn';
 // Avatar options shown after the register form (optional step before entering the dojo)
 const AVATARS=['🥋','🥷','🐉','🦅','🐯','⚡','🔥','💪','🥇','⭐','🧘','🗡️'];
 const getProfile=()=>{ try{ return JSON.parse(localStorage.getItem(PROFILE_KEY)||'null'); }catch(e){ return null; } };
+// --- RETURNING VS NEW KARATEKA (start) ---------------------------------------
+// A Google account is RETURNING when its uid or email has entered the Dojo
+// before — proven by this device's registry or the karateka's cloud profile
+// (users/{uid}). ONLY a brand-new email (never signed in before) is sent to
+// the New Karateka register page; every known karateka gets "Welcome back"
+// and goes straight onto the mat — on any device.
+const SEEN_KEY='oralDojo_seenUsers';
+function readSeenMap(){ try{ return JSON.parse(localStorage.getItem(SEEN_KEY)||'{}')||{}; }catch(e){ return {}; } }
+function seenHas(u){ if(!u) return false; const m=readSeenMap(); return !!(m[u.uid]||(u.email&&m[String(u.email).trim().toLowerCase()])); }
+function rememberSeen(u){ if(!u) return; try{ const m=readSeenMap(); if(u.uid) m[u.uid]=1; if(u.email) m[String(u.email).trim().toLowerCase()]=1; localStorage.setItem(SEEN_KEY,JSON.stringify(m)); }catch(e){} }
+function saveProfileObj(p){ try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(p)); }catch(e){ } }
+// Door key: registered on this device OR a recognised (returning) Google account
+function hasDojoAccess(){
+  if(getProfile()) return true;
+  if(state.user&&(seenHas(state.user)||window.__authKnownUid===state.user.uid)) return true;
+  return false;
+}
+async function fetchCloudProfile(uid){
+  if(uid&&window.DojoFirebase&&DojoFirebase.isConnected()){
+    try{ const d=await DojoFirebase.getUserDoc(uid); if(d&&d.exists) return d.data||{}; }catch(e){}
+  }
+  return null;
+}
+// Rebuild the device profile for a known karateka — local details win, cloud fills the gaps
+function materializeProfile(u,cloud){
+  const cur=getProfile()||{};
+  const name=cur.name||(cloud&&cloud.name)||u.name||'';
+  if(!name) return false;
+  saveProfileObj({
+    name:name,
+    rank:cur.rank||(cloud&&cloud.rank)||'',
+    email:cur.email||(cloud&&cloud.email)||u.email||'',
+    avatar:cur.avatar||(cloud&&cloud.avatar)||'',
+    uid:u.uid||cur.uid||null,
+    at:cur.at||new Date().toISOString()
+  });
+  return true;
+}
+// Classify a signed-in Google account (new vs returning) and route them.
+// MUST run before any cloud profile write, so a first-ever sign-in is never
+// mistaken for a returning one. window.__signInIntent is set by an explicit
+// "Sign in" tap — that intent decides where a NEW email lands (register).
+async function routeAfterAuth(u){
+  if(!u||!u.uid) return Promise.resolve('none');
+  if(window.__authRouteUid===u.uid&&window.__authRouteP) return window.__authRouteP;
+  const intent=window.__signInIntent===true;
+  window.__signInIntent=false;
+  window.__authRouteUid=u.uid;
+  window.__authRouteP=(async()=>{
+    const cloud=await fetchCloudProfile(u.uid);
+    const returning=seenHas(u)||!!cloud;
+    if(!returning){
+      // Brand-new email — the only road that leads to the New Karateka register
+      if(intent&&(state.view==='welcome'||state.view==='register')) transition('register');
+      return 'new';
+    }
+    window.__authKnownUid=u.uid;
+    rememberSeen(u);
+    materializeProfile(u,cloud);
+    // Registry-known but no cloud profile yet (e.g. registered by email first):
+    // create the cloud doc so every other device recognises them from now on
+    if(!cloud&&window.DojoFirebase&&DojoFirebase.isConnected()){ try{ DojoFirebase.ensureUserProfile(u,getProfile()||{}); }catch(e){} }
+    updateNewQBelts();
+    const p=getProfile();
+    const fn=String(((p&&p.name)||u.name||(cloud&&cloud.name)||'Karateka')).trim().split(/\s+/)[0]||'Karateka';
+    if(state.view==='register'){
+      // A known karateka never stays on the New Karateka page — carry a shared
+      // belt link straight onto the mat, otherwise onto the Belt Path
+      showToast('Welcome back, '+fn+' — OSS! Resuming your training');
+      if(state.pendingBelt!==null&&state.pendingBelt!==undefined){ const bid=state.pendingBelt; state.pendingBelt=null; startBelt(bid); }
+      else transition('path');
+    } else if(intent&&state.view==='welcome'){
+      transition('path');
+      showToast('Welcome back, '+fn+' — OSS!');
+    } else {
+      showToast('Welcome back, '+fn+' — OSS!');
+      if(state.view!=='welcome') render();
+    }
+    return 'returning';
+  })();
+  return window.__authRouteP;
+}
+// --- RETURNING VS NEW KARATEKA (end) -----------------------------------------
 const sheetdbUrl=()=>String((settings&&settings.sheetdbUrl)||DEFAULT_SHEETDB_URL||'').trim();
 async function postToSheetdb(p){
   const url=sheetdbUrl();
@@ -422,7 +505,7 @@ function enterDeepBelt(){
   const id=state.deepBelt; state.deepBelt=null;
   try{ history.replaceState(null,'',location.pathname); }catch(e){}
   applyBeltMeta(id);
-  if(!getProfile()){ state.pendingBelt=id; transition('register'); return true; }
+  if(!hasDojoAccess()){ state.pendingBelt=id; transition('register'); return true; }
   const b=belts.find(x=>x.id===id);
   if(!b){ transition('path'); showToast('That belt link is not in the catalog yet'); return true; }
   if(id>=11){ state.belt=id; transition('path'); state.lockedBelt=true; render(); showToast('That belt is part of the Full Edition'); return true; }
@@ -706,7 +789,7 @@ function transition(to){
   // Gate the belt path (and its lesson/result) behind registration.
   // Any back button that calls transition('path') without a profile
   // is redirected to the register page instead of landing on the path.
-  if((to==='path'||to==='lesson'||to==='result') && !getProfile()){
+  if((to==='path'||to==='lesson'||to==='result') && !hasDojoAccess()){
     to='register';
   }
   state.view=to;
@@ -751,6 +834,9 @@ function renderApp(){
     const dictDemo=(dictionary.length?dictionary:[{term:'Rei',reading:'れい',definition:'Bow — respect made visible.',category:'Command'},{term:'Zanshin',reading:'ざんしん',definition:'Awareness that remains after the technique ends.',category:'Concept'}]).slice(0,2);
     const libDemo=(library.length?library:[{type:'Book',category:'Philosophy',title:'Karate-Do: My Way of Life',author:'Gichin Funakoshi'},{type:'Reference',category:'Rules',title:'WKF Kata Rules',author:'World Karate Federation'}]).slice(0,2);
     const resDemo=(research.length?research:[{tag:'Methodology',title:'Oral grading as a tool for kata understanding',author:'Sensei Bola',rank:'Rokudan'},{tag:'Original Research',title:'Retention drills that work on the dojo floor',author:'Sensei Ada',rank:'Godan'}]).slice(0,2);
+    // Returning karateka get a personal "Welcome back" — new visitors see the tour intro
+    const knownHero=!!state.user&&(!!getProfile()||seenHas(state.user)||window.__authKnownUid===state.user.uid);
+    const heroName=String(((getProfile()&&getProfile().name)||(state.user&&state.user.name)||'Karateka')).trim().split(/\s+/)[0]||'Karateka';
     const beltChips=belts.map((b,i)=>{
       const dark=(b.id>=9);
       const curB=(b.id===state.belt);
@@ -796,9 +882,12 @@ function renderApp(){
             <div id="wSlides" aria-roledescription="carousel" aria-label="Everything Oral Dojo does">
               <div class="wslide" role="group" aria-label="Welcome">
                 <svg viewBox="0 0 24 24" width="36" height="36" fill="#FFD93D" aria-hidden="true"><path d="M10.2 6.5H6.4c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5zm9.8 0h-3.8c-1.5 0-2.4.9-2.4 2.4v3.2c0 1.5.9 2.4 2.4 2.4h1.4c-.2 1.8-1.4 3-3.2 3.2v1.8c2.9-.2 5.6-2.6 5.6-6.1V6.5z"/></svg>
-                <h1 class="fredoka text-[46px] sm:text-[72px] lg:text-[92px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-6">Welcome<br>to the<br>Dojo.</h1>
+                ${knownHero?`<h1 class="fredoka text-[46px] sm:text-[72px] lg:text-[92px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-6 break-words">Welcome<br>back, ${esc(heroName)}.</h1>
+                <p class="mt-4 sm:mt-6 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">Signed in with Google — your progress follows you to every device you train on. ${state.completed.length} belt${state.completed.length===1?'':'s'} passed • ${state.xp} XP • ${state.streak}-day streak. Pick up right where you left off.</p>
+                <div class="mt-5 sm:mt-7"><button data-go="path" class="inline-flex items-center gap-2 h-11 pl-5 pr-4 rounded-full bg-white text-[#0F766E] fredoka font-bold text-[13px] sm:text-[14px] shadow-[0_8px_20px_-6px_rgba(0,0,0,0.35)] hover:bg-white/90 transition-all">Continue Your Training <span aria-hidden="true">→</span></button></div>`
+                :`<h1 class="fredoka text-[46px] sm:text-[72px] lg:text-[92px] leading-[0.98] font-bold tracking-tight text-white mt-4 sm:mt-6">Welcome<br>to the<br>Dojo.</h1>
                 <p class="mt-4 sm:mt-6 text-[14px] sm:text-[16px] leading-[1.6] text-white/80 font-medium max-w-[520px]">The oral path from white belt to 10th Dan — graded the way the masters intended: out loud. Here is everything inside the Dojo.</p>
-                <div class="mt-5 sm:mt-7"><button data-next class="inline-flex items-center gap-2 h-11 pl-5 pr-4 rounded-full border border-white/30 text-white fredoka font-bold text-[13px] sm:text-[14px] hover:bg-white/10 transition-all">See what is inside <span aria-hidden="true">→</span></button></div>
+                <div class="mt-5 sm:mt-7"><button data-next class="inline-flex items-center gap-2 h-11 pl-5 pr-4 rounded-full border border-white/30 text-white fredoka font-bold text-[13px] sm:text-[14px] hover:bg-white/10 transition-all">See what is inside <span aria-hidden="true">→</span></button></div>`}
               </div>
               <div class="wslide" role="group" aria-label="Belt Path">
                 ${eyebrow(I.belt,'THE BELT PATH • ORAL GRADING')}
@@ -953,7 +1042,7 @@ function renderApp(){
     document.getElementById('wDots').addEventListener('click',e=>{ const d=e.target.closest('[data-dot]'); if(d) wGo(parseInt(d.dataset.dot,10),true); });
     stageEl.addEventListener('click',e=>{
       const go=e.target.closest('[data-go]');
-      if(go){ wStop(); if(go.dataset.go==='path'&&!getProfile()){ transition('register'); } else { transition(go.dataset.go); } return; }
+      if(go){ wStop(); if(go.dataset.go==='path'&&!hasDojoAccess()){ transition('register'); } else { transition(go.dataset.go); } return; }
       if(e.target.closest('[data-next]')) wGo(cur+1,true);
     });
     let touchX=null;
@@ -966,8 +1055,17 @@ function renderApp(){
       if(e.key==='ArrowRight') wGo(cur+1,true);
       else if(e.key==='ArrowLeft') wGo(cur-1,true);
     };
-    document.getElementById('startBtn').onclick=()=>transition(getProfile()?'path':'register');
-    document.getElementById('hdrSignIn')?.addEventListener('click',async()=>{ const r=await window.DojoFirebase.signInGoogle(); if(r&&r.ok){ transition('register'); } else if(r&&!r.ok&&r.reason!=='cancelled'){ showToast(window.DojoFirebase.isConfigured()?'Google sign-in failed — please try again':'Connect Firebase first — see FIREBASE-SETUP.md'); } });
+    document.getElementById('startBtn').onclick=()=>transition(hasDojoAccess()?'path':'register');
+    document.getElementById('hdrSignIn')?.addEventListener('click',async()=>{
+      window.__signInIntent=true;
+      const r=await window.DojoFirebase.signInGoogle();
+      if(r&&r.ok){
+        const u=window.DojoFirebase.currentUser();
+        if(u) await routeAfterAuth(u); // returning → path + "Welcome back"; brand-new email → register
+        else transition(hasDojoAccess()?'path':'register');
+      } else if(r&&!r.ok&&r.reason!=='cancelled'){ showToast(window.DojoFirebase.isConfigured()?'Google sign-in failed — please try again':'Connect Firebase first — see FIREBASE-SETUP.md'); }
+      window.__signInIntent=false;
+    });
     document.getElementById('hdrUser')?.addEventListener('click',()=>transition('profile'));
     document.getElementById('wContributeMain')?.addEventListener('click',()=>transition('contribute'));
   } else if(state.view==='register'){
@@ -1094,6 +1192,8 @@ function renderApp(){
       const cur=getProfile()||{};
       const updated={...cur, avatar:picked};
       try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(updated)); }catch(_){ }
+      // Registration complete — this uid/email is now a known karateka forever
+      rememberSeen({uid:updated.uid,email:updated.email});
       const r=await postToSheetdb(updated);
       if(state.user&&window.DojoFirebase){ try{ DojoFirebase.ensureUserProfile(state.user,updated); syncLeaderboardEntry(); }catch(e){} }
       if(r.ok) showToast('Welcome to the Dojo, '+(cur.name||'karateka').split(' ')[0]+' — OSS!');
@@ -1168,7 +1268,7 @@ function renderApp(){
         </div>
         <div class="bg-white rounded-[28px] belt-shadow border border-black/5 p-5">
           <div class="flex items-center justify-between"><h3 class="fredoka font-bold text-[14px]">Dojo data on this device</h3></div>
-          <p class="text-[12px] font-medium text-black/50 mt-1">Your profile and progress are saved on this device so you can resume where you stopped. Clearing them signs you out and you would need to register again.</p>
+          <p class="text-[12px] font-medium text-black/50 mt-1">Your profile and progress are saved on this device so you can resume where you stopped. Signed-in karateka get everything back from the cloud the next time they sign in.</p>
           <button id="profClear" class="mt-3 h-11 px-4 rounded-full bg-[#FFF1F1] border border-[#FF4B4B]/20 text-[#9A1A1A] font-bold text-[12px] press">Clear my data on this device</button>
         </div>
         <div class="text-center text-[11px] font-medium text-black/30 py-2">Oral Grading • History • Techniques • Philosophy • Tradition • Research</div>
@@ -1205,7 +1305,7 @@ function renderApp(){
     document.getElementById('profSignOut')?.addEventListener('click',async()=>{ try{ await window.DojoFirebase.signOutUser(); }catch(e){} showToast('Signed out — your progress also stays on this device'); });
     document.getElementById('profShareWa')?.addEventListener('click',()=>{ window.open('https://wa.me/?text='+encodeURIComponent(INVITE_MSG),'_blank'); showToast('Opening WhatsApp…'); });
     document.getElementById('profShareCopy')?.addEventListener('click',()=>{ copyText(INVITE_MSG); showToast('Invite text copied — paste it anywhere!'); });
-    document.getElementById('profClear')?.addEventListener('click',()=>{ try{ localStorage.removeItem(PROFILE_KEY); localStorage.removeItem(PROGRESS_KEY); }catch(_){ } state.profileEdit=false; showToast('Your data has been cleared'); setTimeout(()=>transition('welcome'),600); });
+    document.getElementById('profClear')?.addEventListener('click',()=>{ try{ localStorage.removeItem(PROFILE_KEY); localStorage.removeItem(PROGRESS_KEY); localStorage.removeItem(SEEN_KEY); }catch(_){ } state.profileEdit=false; showToast('Your data has been cleared'); setTimeout(()=>transition('welcome'),600); });
   } else if(state.view==='path'){
     app.innerHTML=`
     <div class="min-h-screen">
@@ -1998,8 +2098,13 @@ window.DojoFirebase.watchLeaderboard(entries=>{
 // Google account state
 window.DojoFirebase.onAuth(u=>{
   state.user=u||null;
-  if(u){ syncCloudProgress(); }
-  else if(window.__progUnwatch){ try{ window.__progUnwatch(); }catch(e){} window.__progUnwatch=null; }
+  if(u){
+    routeAfterAuth(u); // returning → "Welcome back" + straight onto the mat; brand-new email → register
+    syncCloudProgress();
+  } else {
+    if(window.__progUnwatch){ try{ window.__progUnwatch(); }catch(e){} window.__progUnwatch=null; }
+    window.__authRouteUid=null; window.__authRouteP=null; window.__authKnownUid=null;
+  }
   if(!['lesson'].includes(state.view)) render();
 });
 loadProgress();
