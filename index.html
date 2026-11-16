@@ -379,6 +379,56 @@ function startBelt(id){
   saveProgress();
   transition('lesson');
 }
+// --- BELT SHARE LINKS: every belt gets its own link + social preview ---
+// Belt ids 0-12 have dedicated share pages (belt/N.html with per-belt OG tags
+// + preview image); unknown/custom belt ids fall back to the ?belt=N deep link.
+function siteBase(){
+  try{ return (location.origin&&location.origin!=='null'&&location.protocol.indexOf('http')===0)?location.origin+location.pathname.replace(/[^\/]*$/,''):'https://oraldojo.ttosr.com/'; }catch(e){ return 'https://oraldojo.ttosr.com/'; }
+}
+function beltShareUrl(id){
+  return (id>=0&&id<=12)?siteBase()+'belt/'+id+'.html':siteBase()+'?belt='+id;
+}
+function beltShareText(b){
+  const short=String(b.short||('Belt '+b.id)).replace(/\d/g,'').trim()||('Belt '+b.id);
+  return 'OSS! Train the '+short+' belt oral grading ('+b.from+' → '+b.to+') in Oral Dojo — karate oral grading by Sensei Richqrd.';
+}
+function shareBelt(id){
+  const b=belts.find(x=>x.id===id); if(!b) return;
+  const url=beltShareUrl(id); const text=beltShareText(b);
+  if(navigator.share){ navigator.share({title:'Oral Dojo — '+(b.short||'belt'),text:text,url:url}).then(()=>showToast('Belt shared — OSS!')).catch(e=>{ if(e&&e.name==='AbortError') return; beltShareFallback(text,url); }); }
+  else beltShareFallback(text,url);
+}
+function beltShareFallback(text,url){
+  try{ window.open('https://wa.me/?text='+encodeURIComponent(text+' '+url),'_blank'); }catch(e){}
+  copyText(text+' '+url);
+  showToast('Opening WhatsApp — belt link copied too');
+}
+// Per-belt social meta — updates the page's OG/Twitter tags for the linked belt
+function applyBeltMeta(id){
+  try{
+    const b=belts.find(x=>x.id===id); if(!b) return;
+    const short=String(b.short||('Belt '+id)).replace(/\d/g,'').trim()||('Belt '+id);
+    const t='Oral Dojo — '+short+' Belt: '+b.from+' → '+b.to;
+    const d='Train the '+b.from+' → '+b.to+' oral grading'+(Array.isArray(b.focus)&&b.focus.length?(' — '+b.focus.join(', ')):'')+'. Free karate oral grading by Sensei Richqrd.';
+    const img=siteBase()+'assets/belts/belt-'+id+'.png';
+    document.title=t;
+    [['meta[property="og:title"]',t],['meta[property="og:description"]',d],['meta[property="og:url"]',beltShareUrl(id)],['meta[property="og:image"]',img],['meta[name="twitter:title"]',t],['meta[name="twitter:description"]',d],['meta[name="twitter:image"]',img]].forEach(m=>{ const el=document.querySelector(m[0]); if(el) el.setAttribute('content',m[1]); });
+  }catch(e){}
+}
+// Enter the deep-linked belt: registered karateka land straight in its lesson,
+// newcomers register first and are dropped on the same belt afterwards.
+function enterDeepBelt(){
+  if(state.deepBelt===null||state.deepBelt===undefined) return false;
+  const id=state.deepBelt; state.deepBelt=null;
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
+  applyBeltMeta(id);
+  if(!getProfile()){ state.pendingBelt=id; transition('register'); return true; }
+  const b=belts.find(x=>x.id===id);
+  if(!b){ transition('path'); showToast('That belt link is not in the catalog yet'); return true; }
+  if(id>=11){ state.belt=id; transition('path'); state.lockedBelt=true; render(); showToast('That belt is part of the Full Edition'); return true; }
+  startBelt(id);
+  return true;
+}
 // Invite message used on the profile page + score card share — always carries the site URL
 const INVITE_MSG='OSS! 🥋 I am training in Oral Dojo — the Karate oral grading, by Sensei Richqrd. History, technique, philosophy & tradition, a karate knowledge test platform. Come train with me → https://oraldojo.ttosr.com';
 function copyText(t){ try{ if(navigator.clipboard&&window.isSecureContext){ navigator.clipboard.writeText(t); } else { const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } }catch(e){} }
@@ -629,7 +679,17 @@ let state={
  lockedBelt:false,
  fbFromContribute:false,
  profileEdit:false,
+ deepBelt:null,      // belt id coming from a shared link (?belt=N)
+ pendingBelt:null,   // belt to open right after a fresh registration
 };
+
+// --- DEEP LINK (?belt=N / #belt=N): a shared belt link opens straight on that belt ---
+try{
+  const __q=new URLSearchParams(location.search);
+  const __raw=__q.get('belt')!==null?__q.get('belt'):((location.hash.match(/belt=(\d+)/)||[])[1]);
+  const __n=parseInt(__raw,10);
+  if(!isNaN(__n)) state.deepBelt=__n;
+}catch(_){}
 
 const app=document.getElementById('app');
 
@@ -1039,7 +1099,9 @@ function renderApp(){
       if(r.ok) showToast('Welcome to the Dojo, '+(cur.name||'karateka').split(' ')[0]+' — OSS!');
       else if(r.reason==='no-endpoint') showToast('Saved on this device — Sensei will connect the register');
       else showToast('Saved on this device — will sync when online');
-      transition('path');
+      // A shared belt link waits here until registration is done, then opens that belt
+      if(state.pendingBelt!==null&&state.pendingBelt!==undefined){ const __id=state.pendingBelt; state.pendingBelt=null; if(__id>=11){ state.belt=__id; transition('path'); state.lockedBelt=true; render(); } else startBelt(__id); }
+      else transition('path');
     };
     document.getElementById('avSkip').onclick=()=>{ picked=''; saveAndGo(); };
     document.getElementById('avGo').onclick=saveAndGo;
@@ -1225,6 +1287,7 @@ function renderApp(){
                   <div class="belt-node">
                     <span class="kanji-badge ${b.id>=9?'text-black':'text-black/80'}">${b.kanji||'初'}</span>
                   </div>
+                  <button type="button" data-bshare="${b.id}" title="Share this belt — link with its own preview" class="absolute top-3 left-3 z-10 w-7 h-7 rounded-full bg-white/90 border border-black/10 flex items-center justify-center text-black/60 hover:text-black hover:scale-110 transition shadow-sm" style="cursor:pointer">${I.link}</button>
                 </div>`;
               }).join('')}
             </div>
@@ -1272,6 +1335,10 @@ function renderApp(){
     document.querySelectorAll('.newqGo').forEach(b=>b.addEventListener('click',e=>{ startBelt(parseInt(e.currentTarget.dataset.belt)); }));
     document.querySelectorAll('.beltBtn').forEach(b=>b.addEventListener('click',e=>{
       startBelt(parseInt(e.currentTarget.dataset.belt));
+    }));
+    document.querySelectorAll('[data-bshare]').forEach(b=>b.addEventListener('click',e=>{
+      e.preventDefault(); e.stopPropagation();
+      shareBelt(parseInt(e.currentTarget.dataset.bshare,10));
     }));
   } else if(state.view==='lesson' && q){
     if(q.type==='match'&&q.pairs&&q.pairs.length>1) initMatch(q);
@@ -1937,7 +2004,7 @@ window.DojoFirebase.onAuth(u=>{
 });
 loadProgress();
 updateNewQBelts(); // baseline question counts so only FUTURE Sensei pushes notify
-render();
+if(!enterDeepBelt()) render(); // ?belt=N lands straight on that belt
 playPageIn();
 booted=true;
 console.log("ORAL DOJO loaded — " + belts.length + " belts. Source: " + DojoData.getSource() + (DojoData.isLive()?" [FIREBASE LIVE]":" [LOCAL MODE]"));
